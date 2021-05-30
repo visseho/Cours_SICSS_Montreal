@@ -1,0 +1,38 @@
+---
+title: "Introduction à R"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS-Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Antibes
+  slidy_presentation: default
+  ioslides_presentation: default
+header-includes:
+  - \usepackage{color}
+---
+
+Ce fichier indique le contenu de la formation du jour 1
+<!--
+Pour les assistants: ceci doit vous aider à savoir la logique à suivre pour arranger les fichiers
+
+-->
+
+## Présentation cours
+- Introduction : https://r4ds.had.co.nz/introduction.html
+- Environnement R
+- RStudio
+- RMarkdown : https://r4ds.had.co.nz/r-markdown.html
+- Autres informations
+  - Shinyapp
+
+## Présentation Labo
+
+
+
+## Présentation données
+
+
+## Présentation exercices

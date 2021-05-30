@@ -1,0 +1,303 @@
+---
+title: "Séance 2.1: Transformation et exploration des données"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS-Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  slidy_presentation: default
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Antibes
+  ioslides_presentation: default
+header-includes:
+  - \usepackage{color}
+---
+
+## Plan de présentation
+
+1. Manipuler et transformer les données avec base R
+2. Manipuler et transformer les données avec Tidyverse
+3. Exploration des données
+
+## Introduction
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/r4ds.jpg)
+
+
+
+
+1. Manipuler et transformer les données avec base R
+============================================
+
+
+```{r}
+
+UNpop_URL <- "https://raw.githubusercontent.com/kosukeimai/qss/master/INTRO/UNpop.csv"
+UNpop <- read.csv(UNpop_URL)
+
+```
+
+
+## Opération sur les fichiers de données
+
+```{r}
+head(UNpop)
+```
+
+## Fichier/base de données - Opération sur les fichiers de données
+
+```{r }
+
+#Kenya <- read.csv("/Users/visseho/Documents/Documents - MacBook Pro/COURSES/SOC2206/Devoir_Maison/Devoir1/Kenya.csv")
+
+#head(Kenya)
+```
+
+
+## Fichier/base de données - Opérations sur les bases de données
+
+```{r}
+
+class(UNpop)
+names(UNpop)
+nrow(UNpop)
+ncol(UNpop)
+
+
+```
+
+## Fichier/base de données - Opérations sur les bases de données
+
+```{r}
+dim(UNpop)
+length(UNpop)
+
+```
+
+
+## Fichier/base de données - Opérations sur les bases de données
+
+```{r}
+summary(UNpop)
+```
+
+## Fichier/base de données - Opérations sur les bases de données
+
+- L'opérateur **$** est un moyen d'accéder à une variable individuelle à partir d'un objet fichier de données. 
+- Il renvoie un vecteur contenant la variable spécifiée.
+
+```{r}
+
+UNpop[c(1, 2, 3), ]
+
+```
+
+
+## Fichier/base de données - Opérations sur les bases de données
+
+```{r}
+# Selectionner une variable
+UNpop[, "world.pop"]
+UNpop$world.pop
+UNpop[["world.pop"]]
+
+```
+- select(UNpop, world.pop) marche aussi mais. select vient d'un autre package
+
+
+## Fichier/base de données - Opérations sur les bases de données
+
+```{r }
+
+UNpop[1:3, "year"]
+
+```
+
+- Que fait la commande?
+
+- select(slice(UNpop, 1:3), year) marche aussi mais. select vient d'un autre package
+
+## Fichier/base de données - Opérations sur les bases de données
+
+- Sélectionner les observations impaires
+
+```{r}
+
+UNpop$world.pop[seq(from = 1, to = nrow(UNpop), by = 2)]
+
+```
+
+## Fichier/base de données - création de nouvelles variables
+
+- Quand vous créez une nouvelle variable, il est important de la créer dans la même base de données.
+- Exemple: Calculer le taux de croissance
+
+```{r}
+
+UNpop$taux <- UNpop$world.pop / UNpop$world.pop[1]
+head(UNpop)
+
+```
+- Quand vous voulez créer une nouvelle variable qui fait appel à plusieurs calculs, créer des variables intermédiaires.
+
+## Fichier/base de données - Statistique 
+
+- Quand vous désirez calculer une statistique sur une variable, il faut créer un objet différent.
+- Exemple : calculer la population mondiale totale
+
+```{r}
+
+pop_totale <- sum(UNpop$world.pop) 
+pop_totale
+
+
+```
+
+## Fichier/base de données - Statistique 
+
+- Exemple : calculer la population mondiale moyenne
+
+```{r}
+
+pop_moyenne <- pop_totale / 6
+pop_moyenne
+
+pop_moyenne1 <- mean(UNpop$world.pop)
+pop_moyenne1
+
+```
+
+
+
+
+2. Manipuler et transformer les données avec Tidyverse
+============================================
+
+## Processus d'analyse des données
+
+<!--
+```{r}
+library(knitr)
+include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/r4ds.jpg")
+
+```
+
+-->
+
+- Tidyverse comprend un ensemble de packages qui suivent la même philosophie dont le but est de vous aider à répondre à chaque étape de votre processus d'analyse des données. 
+
+## Processus d'analyse des données
+
+- Résumons ce processus:
+  1. Où sont les données? Vous devez les importer (**read**) pour les analyser. La manière dont vous allez les importer dépend du type de fichier.
+  2. Est-ce que vous avez besoin de l'ensemble des variables du fichier de données? pas nécessairement. Vous devez sélectionner (**select**) celles qui vous intéresse
+  3. Est-ce que vous travaillez sur l'ensemble de l'échantillon ou uniquement sur les femmes? Vous devez les filtrer (**filter**)
+  4. Devez-vous utiliser les groupes d'âges ou les âges réels? Vous devez créer de nouvelles variables (**mutate**)
+  5. Que faites-vous des individus qui n'ont pas répondu à certaines questions? leur attribuer une valeur (**impute**) ou les enlever (**na.rm pour remove na**)
+  6. Que savons-nous sur les variables? Vous devez produire des statistiques descriptives (**summarize**)
+
+
+## Processus d'analyse des données  
+
+- Les gras dans le diapositif précédent indique le langage que le logiciel comprend pour faire les étapes décrites plus haut
+- Il comprend que l'Anglais. Chaque fois que vous voulez faire quelque chose, chercher le mot en anglais
+- Il respecte une certaine manière de **parler**. Il va utiliser des symbole pour se simplifier la vie comme celui-ci par exemple **%>%**
+
+## Packages de Tidyverse
+
+```{r}
+#install.packages("tidyverse")
+library(tidyverse)
+
+```
+
+
+## Processus d'analyse des données
+
+- Comme dit plus haut, Tidyverse va nous servir à faire tout ce travail.
+- Comme toujours, imitez au maximum ce que je fais
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/r4ds.jpg)
+
+
+
+## Processus d'analyse des données
+
+Chaque élément est associé à un `package` donné.
+
+**1. Importer**                                       (**readr**)
+**2. Transformation des données (data wrangling)**
+    - Arranger                                        (**tidyr**) 
+    - Transformer                                     (**dplyr**)
+3. Analyse des donnés
+    - Visualisation                                   (**ggplot2**)
+    - Modélisation
+4. Communication                                      (**rmarkdown**: ceci n'est pas un package de tidyverse)
+
+PS. Intéressant sur data wrangling
+https://www.lemagit.fr/conseil/Quest-ce-que-le-Data-Wrangling
+
+## Processus d'analyse des données
+
+- Les autres packages de tidyverse
+    - **sringr** : pour travailler avec les données caractères
+    - **forcat** : pour travailler avec les facteurs : http://perso.ens-lyon.fr/lise.vaudor/manipulation-de-facteurs-avec-forcats/
+    - **purrr** : pour travailler avec les fonctions
+    - **tibble** : transformer les données en tribble.
+  
+La documentation est éparse sur chacun de ces packages.
+
+
+## Différences dans les codes
+
+                  Base r              Tidyverse
+----------------- ------------------- -----------------------
+                  . (ex. read.csv)    _ (ex. read_csv)
+pipes             ()                  %>%
+Creer variable    ()                  mutate
+Position          mean()              summarise
+                  median()
+Dispersion        var()               summarise
+                  sd()
+Analyse/groupe                        group_by
+graphique         hist                ggplot
+                  
+
+## 1. Sélection des variables
+
+Voir Séance 2.2 
+
+## 2. Sélection des observations
+
+Séance 2.2
+
+
+## 3. Créations de nouvelles variables
+
+- Variables quantitatives
+
+- Variables factorielles
+
+Séance 2.2
+
+
+3. Exploration des données
+===================================
+
+## 1. Variables factorielles
+
+- Tableau de fréquences
+
+Voir Séance 2.3
+
+## 2. Variables quantitatives
+
+- Paramètres de tendances centrales
+- Paramètres de dispersion
+
+Voir Séance 2.3
+
+## 3. Relations entre deux variables 
+
+Voir Séance 2.3
