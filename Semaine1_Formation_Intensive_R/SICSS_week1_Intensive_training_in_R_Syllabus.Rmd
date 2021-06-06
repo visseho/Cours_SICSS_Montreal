@@ -63,7 +63,7 @@ Le paysage de l'analyse quantitative en sciences sociales tel que nous le connai
 
 # 2. Objectifs
 
-A la suite de ce cours, vous serez amené capable de :
+A la suite de ce cours, vous serez capable de :
 - conduire une analyse descriptive avec R;
 - conduire la plupart part des modèles de régressions
 - être capable de présenter une visualisation adéquate des résultats
@@ -76,7 +76,7 @@ A la suite de ce cours, vous serez amené capable de :
 
 ## 3.1. Logiciels
 
-Pour pouvoir utiliser ce langage, nous allons recourir à R Studio qui est un environnement de développement intégré. Finalement, R Studio permet de sortir les documents en version Word ou pdf. Pour ce faire, vous aurez besoin aussi d'installer sur votre machine latex. Nous n'allons pas apprendre à utiliser Latex, mais une connaissance antérieure est un atout. Cependant, b=vous pouvez tout simplement utiliser une application tinytex pour convertir vos fichiers en pdf.
+Pour pouvoir utiliser ce langage, nous allons recourir à R Studio qui est un environnement de développement intégré. R Studio permet de sortir les documents en version Word ou pdf. Pour ce faire, vous aurez besoin aussi d'installer sur votre machine Latex. Nous n'allons pas apprendre à utiliser Latex, mais une connaissance antérieure est un atout. Cependant, vous pouvez tout simplement utiliser une application tinytex pour convertir vos fichiers en pdf.
 
 Voici la procédure à suivre pour l'installation de R, de RStudio, et de Latex^[Tout ceci vous sera précisé à nouveau lors du premier cours, si vous n'avez pas pu les installer].  
 
