@@ -39,12 +39,12 @@ Ce code vous permet de charger directement les données. Vous devez télécharge
 
 ## Telecharger les données
 
-Sweden <- read.csv("Sweden.csv")
-Kenya <- read.csv("Kenya.csv")
-World <- read.csv("World.csv")
+Sweden <- read.csv("../Données/Sweden.csv")
+Kenya <- read.csv("../Données/Kenya.csv")
+World <- read.csv("../Données/World.csv")
 
 
-head(Sweden)
+#head(Sweden)
 
 
 ```
