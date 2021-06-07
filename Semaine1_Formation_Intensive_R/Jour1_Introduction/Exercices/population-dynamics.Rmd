@@ -1,0 +1,166 @@
+---
+title: "Understanding World Population Dynamics"
+output:
+  pdf_document: default
+  html_document: default
+date: "5 August 2015"
+---
+
+Understanding population dynamics is important for many areas of
+social science.  We will calculate some basic demographic quantities
+of births and deaths for the world's population from two time periods:
+1950 to 1955 and 2005 to 2010.  We will analyze the following CSV data
+files - `Kenya.csv`, `Sweden.csv`, and `World.csv`.  Each file
+contains population data for Kenya, Sweden, and the world,
+respectively.  The table below presents the names and descriptions of
+the variables in each data set.
+
+ Name                 Description
+ -------------------- ----------------------------------------------------------
+ `country`            Abbreviated country name
+ `period              Period during which data are collected
+ `age`                Age group 
+ `births`             Number of births in thousands (i.e., number of children born to women of the age group) 
+ `deaths`             Number of deaths in thousands 
+ `py.men`             Person-years for men in thousands 
+ `py.women`           Person-years for women in thousands
+
+Source: United Nations, Department of Economic and Social Affairs, Population Division (2013). *World Population Prospects: The 2012 Revision, DVD Edition.*
+
+The data are collected for a period of 5 years where *person-year* is
+a measure of the time contribution of each person during the
+period. For example, a person that lives through the entire 5 year
+period contributes 5 person-years whereas someone who only lives
+through the first half of the period contributes 2.5 person-years.
+Before you begin this exercise, it would be a good idea to directly
+inspect each data set.  In R, this can be done with the `View`
+function, which takes as its argument the name of a `data.frame` to be
+examined.  Alternatively, in RStudio, double-clicking a `data.frame`
+in the `Environment` tab will enable you to view the data in a
+spreadsheet-like view.
+
+```{r}
+## load the data set
+Sweden <- read.csv("data/Sweden.csv")
+Kenya <- read.csv("data/Kenya.csv")
+World <- read.csv("data/World.csv")
+```
+
+## Question 1
+
+We begin by computing *crude birth rate* (CBR) for a given
+  period.  The CBR is defined as:
+  $$ 
+    \text{CBR} 
+     =  \frac{\text{number of births}}{\text{number of person-years lived}}
+  $$
+  
+  Compute the CBR for each period, separately for Kenya, Sweden, and
+  the world.  Start by computing the total person-years, recorded as a
+  new variable within each existing `data.frame` via the
+  `$` operator, by summing the person-years for men and women.
+  Then, store the results as a vector of length 2 (CBRs for two
+  periods) for each region with appropriate labels.  You may wish to
+  create your own function for the purpose of efficient programming.
+  Briefly describe patterns you observe in the resulting CBRs.
+  
+## Question 2
+  
+The CBR is easy to understand but contains both men and women
+   of all ages in the denominator. We next calculate the *total
+     fertility rate* (TFR). Unlike the CBR, the TFR adjusts for age
+   compositions in the female population.  To do this, we need to
+   first calculate the *age specific fertility rate* (ASFR), which
+   represents the fertility rate for women of the reproductive age
+   range $[15, 50)$.  The ASFR for age range $[x, x+\delta)$, where
+   $x$ is the starting age and $\delta$ is the width of the age range
+   (measured in years), is defined as:
+  $$
+    \text{ASFR}_{[x,\ x+\delta)} 
+    \ = \ \frac{\text{number of births to women of age $[x,\ x+\delta)$}}{\text{Number of person-years lived by women of age $[x,\ x+\delta)$}}
+  $$
+  Note that square brackets, $[$ and $]$, include the limit whereas
+  parentheses, $($ and $)$, exclude it.  For example, $[20, 25)$
+  represents the age range that is greater than or equal to 20 years
+  old and less than 25 years old.  In typical demographic data, the
+  age range $\delta$ is set to 5 years.  Compute the ASFR for Sweden
+  and Kenya as well as the entire world for each of the two periods.
+  Store the resulting ASFRs separately for each region.  What does the
+  pattern of these ASFRs say about reproduction among women in Sweden
+  and Kenya?
+  
+## Question 3
+
+Using the ASFR, we can define the TFR as the average number of
+  children women give birth to if they live through their entire
+  reproductive age.
+  $$
+  \text{TFR} 
+   =   \text{ASFR}_{[15,\ 20)} \times 5 + \text{ASFR}_{[20,\ 25)} \times 5 
+  + \dots + \text{ASFR}_{[45,\ 50)} \times 5
+  $$
+  
+  We multiply each age-specific fertility rate rate by 5 because the
+  age range is 5 years.  Compute the TFR for Sweden and Kenya as well
+  as the entire world for each of the two periods.  As in the previous
+  question, continue to assume that women's reproductive age range is
+  $[15, 50)$.  Store the resulting two TFRs for each country or the
+  world as a vector of length two. In general, how has the number of
+  women changed in the world from 1950 to 2000? What about the total
+  number of births in the world?
+
+## Question 4
+
+Next, we will examine another important demographic process:
+  death.  Compute the *crude death rate* (CDR), which is a concept
+  analogous to the CBR, for each period and separately for each
+  region.  Store the resulting CDRs for each country and the world as
+  a vector of length two. The CDR is defined as:
+  $$ 
+    \text{CDR} 
+     =  \frac{\text{number of deaths}}{\text{number of person-years lived}}
+  $$
+  Briefly describe patterns you observe in the resulting CDRs.
+
+## Question 5
+
+One puzzling finding from the previous question is that the CDR
+  for Kenya during the period of 2005-2010 is about the same level as
+  that for Sweden.  We would expect people in developed countries like
+  Sweden to have a lower death rate than those in developing countries
+  like Kenya.  While it is simple and easy to understand, the CDR does
+  not take into account the age composition of a population.  We
+  therefore compute the *age specific death rate* (ASDR).  The
+  ASDR for age range $[x, x+\delta)$ is defined as:
+  $$
+    \text{ASDR}_{[x,\ x+\delta)} 
+    \ = \ \frac{\text{number of deaths for people of age $[x,\ x+\delta)$}}{\text{number of person-years of people of age $[x,\ x+\delta)$}}
+  $$
+  Calculate the ASDR for each age group, separately for Kenya and
+  Sweden, during the period of 2005-2010.  Briefly describe the
+  pattern you observe.
+ 
+## Question 6
+
+One way to understand the difference in the CDR between Kenya
+  and Sweden is to compute the counterfactual CDR for Kenya using
+  Sweden's population distribution (or vice versa).  This can be done
+  by applying the following alternative formula for the CDR.
+  $$
+    \text{CDR}
+    \ = \ \text{ASDR}_{[0, 5)} \times P_{[0,5)} + \text{ASDR}_{[5, 10)}
+    \times P_{[5, 10)} + \cdots 
+  $$
+  where $P_{[x, x+\delta)}$ is the proportion of the population in the
+  age range $[x, x+\delta)$.  We compute this as the ratio of
+  person-years in that age range relative to the total person-years
+  across all age ranges.  To conduct this counterfactual analysis, we
+  use $\text{ASDR}_{[x,x+\delta)}$ from Kenya and $P_{[x,x+\delta)}$
+  from Sweden during the period of 2005--2010.  That is, first
+  calculate the age-specific population proportions for Sweden and
+  then use them to compute the counterfactual CDR for Kenya. How does
+  this counterfactual CDR compare with the original CDR of Kenya?
+  Briefly interpret the result.
+
+
+
