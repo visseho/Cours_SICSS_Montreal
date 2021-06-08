@@ -1,0 +1,255 @@
+---
+title: "Exercice 2.1: Accès à l'information et attitudes face à la violence conjugale"
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+
+
+Dans cet exercice, vous aller travailler à partir de la base de donnée `dhs_ipv` qui a été utilisée dans cette étude :
+
+Pierotti, Rachel. (2013). "[Increasing Rejection of Intimate Partner Violence: Evidence of Global Cultural Diffusion](http://dx.doi.org/10.1177/0003122413480363)." *American Sociological Review*, 78: 240-265. 
+
+Il s'agit d'une base de données dont l'unité d'analyse sont les pays sur lesquels on dispose d'un certain nombre d'information. Ces informations sont présentées dans le tableau ci-dessous:
+
+Name             Description
+---------------  ---------------------------------------------------------
+`beat_goesout`     Pourcentage de femmes dans chaque pays qui pensent qu'un mari est justifié de battre sa femme
+                 si elle sort sans le lui dire. 
+`beat_burnfood`    Pourcentage de femmes dans chaque pays qui pensent qu'un mari a                                le droit de battre sa femme
+                 si elle brûle sa nourriture.  
+`no_media`         Pourcentage de femmes dans chaque pays qui ont rarement accès un 
+                 journal, une radio ou une télévision.
+`sec_school`       Pourcentage de femmes dans chaque pays ayant un niveau d'éducation                             secondaire ou supérieur.
+`year`             Année de l’enquête
+`region`           Région du monde
+`country`          pays
+
+
+Name             Description
+---------------  ---------------------------------------------------------
+beat_goesout     Percentage of women in each country that think a husband is justified to beat his wife if she goes out without telling him. 
+beat_burnfood    Percentage of women in each country that think a husband is justified to beat his wife if she burns his food.  
+no_media         Percentage of women in each country that rarely encounter a newspaper, radio, or television. 
+sec_school       Percentage of women in each country with secondary or higher education.
+year             Year of the survey
+region           Region of the world
+country          Country
+
+
+
+
+Notez qu'il existe dans ce fichier de données, deux indicateurs/variables qui mesurent les *attitudes envers la violence domestique*: `beat_goesout` et `beat_burnfood`. Ce sont ces variables que nous voulons expliquer/comprendre. On les appelle des variables dépendantes ou variables à expliquer ou des `outcomes`. Il existe également deux indicateurs/variables qui mesurent l'*accès à l'information*: `sec_school` et `no_media`. Celles-ci sont appelées des variables explicatives.
+
+Comme toujours, il faut prévoir un premier *chunck* où vous installez vos packages, les chargez et chargez la base de données. C'est une procédure qu'il faut toujours suivre. Sachez aussi que vous devez ouvrir ce fichier RMarkDown et travailler directement dedans.
+
+
+```{r, results='hide'}
+#1. Effacer l'environnement
+
+rm(list = ls())     # Permet d'éffacer l'environnement
+
+#2. Installer de nouveaux packages dont vous avez besoins
+
+#3. Chargez les packaqes 
+library(tidyverse)
+
+#4. Ouvrir votre base de données
+dhs <- read.csv("dhs_ipv.csv")
+
+```
+
+Comme vous avez pu le voir en classe, quand vous chargez Tidyverse, il charge l'ensemble des packages qui sont inclus dedans. C'est la dernière fois que je dresse la table pour vous :)
+
+
+# PARTIE A: Sélection des variables et des observations
+
+## Question 1 
+
+Votre base de données comprend combien d'observation et combien de variables ? Soyez **concis** dans votre réponse.
+
+### Votre réponse 
+
+```{r}
+
+```
+
+## Question 2
+
+Dites le type de chaque variable de la base de données. Comment est ce que R comprend ce type de variable? Présentez l'information dans un tableau.
+
+
+### Votre réponse
+
+
+Variables          Type (statistique)           Type (R)
+------------------ ---------------------------- ---------------------------
+beat_goesout
+
+
+## Question 3
+
+Quelle est le type de chaque variable de la base de données? Utiliser la fonction **class** pour le savoir. Maintenant, vous allez vous poser la question de savoir sir la réponse que vous obtenez est réellement le type de chaque variable. 
+
+### Votre réponse
+
+```{r}
+
+```
+
+## Question 4
+
+Je vous demande de créer 5 nouvelles bases de données avec les conditions suivantes. Dans chaque cas, décrivez cette base de données en terme de population et de variables.
+
+1. **dhs1**: beat_goesout est plus grand ou égale à 14 (ceci signifie que la valeur de la variable beat_goesout est >= 14)
+2. **dhs2**: beat_goesout est plus grand que 13 et beat_burnfood est plus petit que 22
+3. **dhs3**: sec_school plus grand que 22 et beat_goesout plus grand que 25
+4. **dhs4**: comprend les pays d'Afrique sub-Saharienne dont beat_goesout est plus grand que 18 et sec_school est plus grand que 10
+5. **dhs5**: beat_goesout plus petit que 15 ou beat_goesout plus grand que 22
+
+
+### Votre réponse 
+
+```{r}
+
+```
+
+## Question 5
+
+Créer des bases de données remplissant les conditions suivantes:
+
+1. **dhs6**: comprend les pays dont le nom commence par c (bonus)
+2. **dhs7**: comprend les pays dont le nom finit par i
+3. **dhs8**: comprend tous les pays pour lequel `sec_school` est plus grand que la valeur moyenne de `sec_school`
+4. **dhs9**: sélectionner les pays qui ont au moins deux années d'observation.
+5. **dhs10**: comprend uniquement les données de la dernière année d'enquête de chaque pays. 
+
+
+### Votre réponse 
+
+```{r}
+
+```
+
+
+# Partie B: Création de variables
+
+
+## Question 1
+
+Quand on crée de nouvelles variables, la règle demande d'ajouter **toujours** cette nouvelle variable dans la base de donnée qu'on a utilisée pour la créer.
+Dans la base de données **dhs**, créer les variables suivantes:
+
+1. **Pays_riche** qui est `TRUE` si sec_school est plus grand que 20 et no_media plus petit que 5 et `FALSE` dans le cas contraire
+2. **beat_goesout_3** qui rempli les conditions suivantes:
+  - elle prend la valeur **1** si beat_goesout est <=10
+  - elle prend la valeur **2** si beat_goesout est >10 et <= 20
+  - elle prend la valeur **3** si beat_goesout > 20
+
+
+### Votre réponse 
+
+```{r}
+
+```
+
+## Question 2 
+
+Sur la base des valeurs de la variable `beat_burnfood`, créer une nouvelles variable **factorielle** `beat_burnfood_cat` qui regroupe les observations en quatre catégories:
+
+1. **Très moderne**, pays où les valeurs de `beat_burnfood` sont inférieures à 5%;
+2. **Moderne**, pays où les valeurs de `beat_burnfood` sont supérieures à 5% mais inférieures à 10%;
+3. **Traditionnelle**, pays où les valeurs de `beat_burnfood` sont supérieures à 10% mais inférieures à 20%;
+4. **Très traditionnelle**, pays où les valeurs de `beat_burnfood` sont supérieures à 20%.
+
+
+### Réponse 2
+
+```{r}
+
+
+```
+
+
+# Partie C: Statistique univariée
+
+
+## Question 1
+
+Calculer les paramètres de **position** de la variable `beat-goesout`
+
+```{r}
+
+```
+
+## Question 4
+
+Faite le même calcul selon les régions d'études. Commentez les résultats. 
+PS. Vous ne devez ajouter qu'une seule ligne de commande à votre code de la question 4 pour répondre à la question.
+
+```{r}
+
+```
+
+## Question 5
+
+Calculer les paramètres de **dispersion** de la variable `beat-goesout`
+
+```{r}
+
+```
+
+## Question 6
+
+Faite le même calcul selon les régions d'études. Commentez les résultats. 
+PS. Vous ne devez ajouter qu'une seule ligne de commande à votre code de la question 4 pour répondre à la question.
+
+```{r}
+
+```
+
+
+
+# Partie D: Statistiques bivariées
+
+## Question 1
+
+Y'a-t-il une association entre la variable `beat_goesout` et `sec_school`? quel type d'analyse vous permet de répondre à cette question?
+
+## Question 2
+
+Y'a-t-il une association entre la variable `beat_goesout` et `region`? quel type d'analyse vous permet de répondre à cette question?
+
+
+
+# Partie E: Création de votre propre base de données
+
+## Question 1
+
+Vous vous demandez d'où provient cette base de données. Et bien comme je vous l'ai dit, cela provient des enquêtes démographiques et de santé. Utiliser Statcompiler pour créer votre base de données sur le sujet qui vous intéresse. Le site est https://www.statcompiler.com/en/.
+
+1. Sélectionner l'ensemble des pays
+2. Choisissez les deux variables suivantes:
+  - **Physical or sexual violence committed by husband/partner**
+  - **Women with secondary or higher education**
+  - Quelle est la variable dépendante? Quelle est la variable indépendante?
+3. Exportez les données dans une base de données (voir Export en haut du site, choisissez database).
+4. Ouvrez cette base de données dans R (Quelle est le problème avec votre procédure?)
+5. Sélectionner les données du Kenya.
+
+
+### Votre réponse 
+
+```{r}
+
+```
+
+
+
+
+
+----------------------------------------------------------- **BON EXERCICE** ---------------------------------------------------------

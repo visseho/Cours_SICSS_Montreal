@@ -1,0 +1,475 @@
+---
+title: "Séance 2.3: Exploration des données"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Enquête sociale générale, 1996
+
+- Il s'agit du CROP Socio-Cultural Survey de 1996
+- Dans cette partie, nous allons apprendre à :
+    - Selectionner les **variables** 
+    - Sélectionner les observations
+    - Réorganiser les données
+    - Créer de nouvelles variables avec des fonctions de variables existantes (mutate ())
+    - Recoder des variables existantes
+    - Calculer des statistiques univariées
+
+
+## Dressons la table
+
+```{r}
+# Effacer votre environnement
+
+rm(list = ls())
+
+# Installer les package dont vous avez besoin
+
+#install.packages("tidyverse")
+#install.packages("summarytools")
+#install.packages("tinytex")
+
+# Charger les packages - Étape fondamentales
+
+library(tidyverse)
+library(summarytools)
+
+```
+
+
+## Téléchargement de la base de données
+
+```{r}
+
+crsc96 <- read_csv("../Données/cora-crsc1996-E-1996_F1.csv")
+
+```
+
+## Sélectionnons les données qui nous intéressent
+
+q1 : 
+  - I hate being bossed around: I must feel that I have total control over all the different areas of my life
+  - **Je déteste être patronisé: je dois sentir que j'ai un contrôle total sur tous les différents domaines de ma vie**
+  
+q2:
+  - An unmarried girl of 18 should not have sexual relations
+  - *Une fille non mariée de 18 ans ne devrait pas avoir de relations sexuelles*
+
+q3: 
+  - The best way to get something from someone is by putting your foot down
+  - *La meilleure façon d'obtenir quelque chose de quelqu'un est de mettre le pied à terre (dialoguer)*
+
+q4: 
+  - In a household where both partners are working, is not right for the wife to earn more than the husband
+  - *Dans un ménage où les deux partenaires travaillent, il n'est pas normal que la femme gagne plus que le mari*
+
+q44: 
+  - Overpopulation in third world countries doesn't really affect our country
+  - *La surpopulation dans les pays du tiers monde n'affecte pas vraiment notre pays*
+  
+q95: 
+  - An extramarital affair from time to time is not that serious
+  - *Une liaison extraconjugale de temps en temps n'est pas si grave*
+
+q96:
+  - I would like to have a religious service at my funeral
+  - *J'aimerais avoir un service religieux à mes funérailles*
+  
+```{r }
+
+crsc96_small <-
+  crsc96 %>% 
+  select(sexq, region, age, ageq, q1, q2, q3, q4, q44, q95, q96)
+
+crsc96_small 
+
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age4 = case_when(
+    age < 20 ~ "adolescent",
+    age >= 20 & age < 34 ~ "jeune",
+    age >= 35 & age <59 ~ "adulte",
+    age >=60 ~ "ainé"
+  ))
+
+```
+
+
+Statistiques univariées
+=================================
+
+## Statistiques univariées
+
+Les objectifs de la statistique descriptive sont de :
+- définir le ou les groupes étudiées (population ou échantillon)
+- définir le codage des observations
+- définir la présentation des données : numérique et/ou graphique
+- réduire les données à quelques indicateurs statistiques synthétiques
+
+
+
+Distribution de fréquences et de pourcentage
+================================================
+
+## Utilisation de base R
+
+
+## Utilisation de tidyverse
+
+```{r}
+
+nombre_sexe <-
+  crsc96_small %>% 
+  count(sexe = sexq)
+
+nombre_age4 <-
+  crsc96_small %>% 
+  count(age = age4)
+
+```
+
+
+## Calculer des proportions
+
+```{r}
+
+
+proportion1 <-
+  crsc96_small %>% 
+  count(sexe = sexq, age = age4) %>% 
+  mutate(proportion = n / (sum(n)))
+proportion1
+
+# proportion
+
+
+proportion2 <-
+  crsc96_small %>% 
+  group_by(sexq) %>% 
+  count(age = age4) %>% 
+  mutate(proportion = n / (sum(n)))
+proportion2
+
+```
+
+## Avec le package Summarytools
+
+```{r}
+freq(crsc96$sexq)
+freq(crsc96$q1)
+freq(crsc96$region)
+freq(crsc96$q44)
+freq(crsc96$q95)
+```
+
+
+Paramètres de tendances centrales et de dispersion
+======================================================
+
+## Avec base R
+
+La commande summary nous donne une premieère indication sur l'ensemble des variables de notre base de données.
+Il faut préter attention aux variables manquantes.
+
+```{r}
+
+summary(crsc96_small)
+
+```
+
+
+L’inconvénient, c'est que c'est mal présenté, et ce ne sont pas l'ensemble des variables de notre base de données qui nous concernent. Les informations sur les variables nominales ne sont pas fournis.
+
+## Paramètres de position (Base R)
+
+
+```{r}
+
+age_moyen <- mean(crsc96_small$age)
+age_moyen
+
+age_mediane <- median(crsc96_small$age)
+age_mediane
+
+```
+
+Cette approche n'est pas la bonne car elle nous demande beaucoup de coding (avec la création de plusieurs objets)
+
+
+## Paramètres de position - tidyverse
+
+La fonction `summarise` permet de calculer l'ensemble des indicateurs dont nous avons besoin.
+Dans toute étude, il est important de résumé l'information contenue dans les variables pour se faire une première idée.
+
+```{r}
+
+age_position <- 
+  crsc96_small %>% 
+  summarise(age_moyen = mean(age),
+            age_median = median(age),
+            age_Q1 = quantile(age, prob = 0.25),
+            age_Q3 = quantile(age, prob = 0.75),
+            age_min = min(age))
+age_position
+
+```
+
+## Statistiques univariées: Mode
+
+Il n'y a aucune fonction qui permet de calculer directement le mode. Alors, il faut la créer soi-même.
+
+```{r}
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+
+age_position <- 
+  crsc96_small %>% 
+  summarise(age_moyen = mean(age),
+            age_median = median(age),
+            age_Q1 = quantile(age, prob = 0.25),
+            age_Q1 = quantile(age, prob = 0.75),
+            age_mode = getmode(age))
+
+age_position
+
+```
+
+
+## Statistiques univariées : Histogramme
+
+```{r}
+
+ggplot(crsc96_small) +
+  geom_histogram(aes(x = age)) +
+  geom_vline(aes(xintercept = mean(age)), color = "red") +
+  geom_vline(aes(xintercept = median(age)), color = "blue") +
+  geom_vline(aes(xintercept = getmode(age)), color = "white") 
+  
+```
+
+On reviendra sur le cours prochain sur la visualisation, l'une des forces de tidyverse.
+
+## Statistique par groupe
+
+Nous pouvons aussi regarder ces données selon le sexe des individus
+
+```{r}
+
+age_position_sexe <- 
+  crsc96_small %>% 
+  group_by(sexq) %>% 
+  summarise(age_moyen = mean(age),
+            age_median = median(age),
+            age_Q1 = quantile(age, prob = 0.25),
+            age_Q3 = quantile(age, prob = 0.75),
+            age_mode = getmode(age))
+
+age_position_sexe
+
+age_position_sexe <-
+  age_position_sexe %>% 
+  mutate(écart = age_moyen - age_median)
+
+
+age_position_age4 <- 
+  crsc96_small %>% 
+  group_by(age4) %>% 
+  summarise(age_moyen = mean(age),
+            age_median = median(age),
+            age_Q1 = quantile(age, prob = 0.25),
+            age_Q1 = quantile(age, prob = 0.75),
+            age_mode = getmode(age))
+
+age_position_age4
+
+```
+
+## Statistiques univariés sur plusieurs variables, solution alternative
+
+On regarde les statistiques pas sur une seule variable mais sur plusieurs variables.
+On peut combiner plusieurs tableaux avec les fonctions `binds_row` et `binds_col`.
+
+```{r}
+
+position_q <-
+  crsc96_small %>% 
+  select(num_range("q", c(1:4, 44, 95))) %>% 
+  summarise_each(funs(mean, median))
+position_q
+
+```
+Le problème, c'est la longueur du fichier.
+
+## EXERCICE
+
+Calculer les paramètres de dispersion de la variable age et commenter.
+
+## Application  1: Données abbérantes ou extrêmes
+
+```{r}
+
+#install.packages("carData")
+library(carData)
+library(tidyverse)
+data(package = "carData")
+
+data("Davis", package = "carData")
+save(Davis, file = "Davis.Rdata")
+
+
+load(file = "Davis.Rdata")
+
+summary(Davis)
+
+
+```
+
+Ce fichier comprend les informations sur le poids et la taille de 200 individues ainsi que leur poids et taille autodéclaré. On veut voir de quelle manière les poids auto-déclarés sont fiables. 
+
+On ne l'a pas encore vu, mais on peut rapidement voir les variables deux par deux dans un graphique
+
+```{r}
+
+ggplot(Davis) +
+  geom_point(aes(x = repwt, y = weight))
+
+```
+
+
+
+## Application 2 : Données manquantes
+
+```{r}
+
+poids_moyen <- 
+  Davis %>% 
+  summarise(poids_moyen = mean(weight))
+poids_moyen
+
+poids_moyen_reporte <- 
+  Davis %>% 
+  summarise(poids_moyen_reporte = mean(repwt))
+poids_moyen_reporte
+
+            
+```
+
+Qu'est-ce qui s'est passé. En fait, le poids reporté comporte des valeurs manquantes. Il faut indiquer dans le calcul de la moyenne qu'il y a des valeurs manquantes, et qu'il faut les enlever avant de calculer la moyenne, ou toute autre statistique.
+
+```{r}
+
+poids_moyen_reporte <- 
+  Davis %>% 
+  summarise(poids_moyen_reporte = mean(repwt, na.rm = TRUE))
+poids_moyen_reporte
+
+```
+Quel est le problème qui se pose quand des informations sont manquantes. Peut-on faire confiance aux résultats?
+
+
+
+
+## Remarques
+
+1. Tous les objets que vous créez, vous pouvez les manipuler à votre guise
+
+2. Les variables que vous créez, vous pouvez les réutiliser juste après
+
+3. Interprétations des résultats
+
+
+Statistiques bivariées : Association entre variables
+==========================================================
+
+## Statistiques bivariées : Association entre variables
+
+Existe-il une relation entre l'age et l'opinion des gens?
+Existe-il une relation entre le sexe et l'opinion des gens?
+
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(sexe = factor(sexq, labels = c("Homme", "Femme")))
+
+freq(crsc96_small$sexe)
+
+```
+
+## Association 
+
+- Sexe avec la variable q2
+
+q2: "An unmarried girl of 18 should not have sexual relations"
+Une jeune fille non mariée de 18 ans ne devrait pas avoir de relations sexuelles
+- Se fait à base de tableaux croisés (contingency table)
+
+```{r}
+
+qlabel <- c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(q2_new = factor(q2, labels = qlabel),
+         q3_new = factor(q3, labels = qlabel))
+
+ctable(crsc96_small$sexe, crsc96_small$q2_new)
+
+```
+
+## Association
+
+Les colonnes et les lignes d'un tableau croisés, ne sont pas identiques.
+
+```{r}
+
+ctable(crsc96_small$q2_new, crsc96_small$sexe)
+
+```
+
+
+Lequel des deux tableaux donne une indication sur l'association entre les deux variables?
+
+## Association
+
+Aussi, est-il important de préciser si vous calculer des proportions lignes ou des proportions colonnes.
+
+```{r}
+
+ctable(crsc96_small$sexe, crsc96_small$q2_new, "r")
+
+```
+
+
+```{r}
+
+ctable(crsc96_small$sexe, crsc96_small$q2_new, "c")
+
+```
+
+## Questions
+
+Que faites vous si une des variables est quantitative, par exemple l’âge et q2_new
+
+
+
+
+
+
+
+
+
+
+
+
+
