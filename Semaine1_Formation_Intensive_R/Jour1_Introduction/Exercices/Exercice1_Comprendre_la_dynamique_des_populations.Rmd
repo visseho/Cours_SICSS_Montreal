@@ -47,6 +47,7 @@ World <- read.csv("../Données/World.csv")
 #head(Sweden)
 
 
+
 ```
 
 ### QUESTION 1

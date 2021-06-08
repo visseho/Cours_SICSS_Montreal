@@ -1,0 +1,626 @@
+---
+title: "Séance 2.2: Transformation des données"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Plan
+
+1. Créer manuellement une base de données
+2. Télécharger des données des médias sociaux
+3. Travailler avec des données 
+
+## Effaçons notre environnement
+
+Ce code permet d'effacer l'environnement.
+
+```{r}
+
+rm(list = ls())
+
+```
+
+## Entrons les données pour créer la base de données 
+
+- la section de code est obtenue par ce raccourci:
+    - command + Option + i (mac)
+- Pour exécuter une ligne de code, il faut se placer sur la ligne et faire 
+    - command + Entree (mac)
+```{r}
+
+nom_classe <- c("guillaume", "amy", "andree", "john", "natacha")
+nom_classe
+
+sexe_classe <- c("h", "f", "f", "h", "f")
+sexe_classe
+
+sexe_classe1 <- c(1, 0, 0, 1, 0)
+sexe_classe1
+
+revenu_classe <- c(24000, 15000, 22000, 17000, 21000)
+revenu_classe
+
+age_classe <- c(19, 25, 30, 27, 32)
+age_classe
+
+sexe_classe_factor <- factor(c(1, 0, 0, 1, 0), labels = c("Femme", "Homme"))
+sexe_classe_factor
+
+education_classe <- c("universite", "college", "secondaire", "universite", "college")
+education_classe
+
+```
+
+## Petite parenthèse sur les fonctions
+
+Dans la création de la variable `sexe_classe_factor`, on a utilisé une fonction qui s'appelle **factor**. Si vous tapez **?factor** dans le chunk (c'est quoi un chunk?), il vous indiquera comment utiliser cette fonction. 
+
+```{r}
+?factor
+```
+
+On voit ainsi dans RStudio, dans la fenêtre **Help**, la description de cette fonction et son usage. Certains de ces arguments (ce qui se trouve dans la parenthèse) sont optionnelles, alors que d'autres sont obligatoires. La fonction factor permet de créer une variable **qualitative** ou **categorielle** ou **factorielle**, à partir d'une autre variable. Il faut donc lui indiquer cette variable à partir de laquelle on créer la nouvelle variable factorielle. Dans notre cas (chunk ligne 47, il s'agit de la variable c(1, 0, 0, 1, 0). De manière optionnelle, il faut lui indiquer à quoi représentent les valeurs de l'ancienne variable. ce;a se fait avec **labels**. Finalement, il faut indiquer l'ordre dans lequel les valeurs dela nouvelle variables vont être affichées. Si on ne lui indique rien, il va les afficher par ordre alphabétique. Autrement, il faut lui indiquer l'ordre que vous souhaitez, avec l'option **levels**. Vous avez plusieurs autres arguments que vous pouvez aller consulter vous-mêmes. Finalement, la description se termine toujours par des exemples d'utilisation.
+
+
+## Base de données
+
+Une base de données n'est qu'une mise ensemble de plusieurs vecteurs ou variables.
+
+```{r}
+
+base_classe <- data.frame(nom = nom_classe, age = age_classe, sexe = sexe_classe, sexe01 = sexe_classe1, sexefactor = sexe_classe_factor, revenu = revenu_classe, education = education_classe)
+
+base_classe
+
+```
+
+
+Pour créer cette base de données, j'ai utilisé la fonction **data.frame**. cette fonction comme la fonction factor viennent de base R. Cela signifie qu'elles sont incorporées directement dans votre R, une fois que vous télécharger R pour la première fois. Par contre, plusieurs autres fonctions qui ne figurent pas dans la base R, vous devez télécharger leur package avant de les utiliser. C'est ce que nous avons fait avec le package **tidyverse**. Et la fonction de tidyverse pour créer une base de données est data_frame. Avez-vous remarqué là où se trouve la différence. Dans bien des cas, quand une fonction se trouve dans la base R et dans une autre package, la différence va être celle là (_ au lieu de .) ou sur la capitalisation de la première lettre (Factor au lieu de factor). Chaque fois que vous tapez une fonction, prenez la peine d'observer de quel packahe provient la fonction. 
+
+## Comme dans une matrice
+
+On peut travailler dans une base de données comme dans une matrice.
+
+```{r}
+
+base_classe[1, "nom"]
+base_classe[, "nom"]
+base_classe["nom"]
+base_classe["age2"] <- base_classe["age"]*2
+
+```
+
+## Quelle est la classe des éléments de cette base de données?
+
+```{r}
+
+class(base_classe$nom)        # factor
+class(base_classe$sexe)       # factor
+class(base_classe$sexe01)         # numeric
+class(base_classe$sexefactor)     # factor
+class(base_classe$revenu)         # numeric
+class(base_classe$age)            # numeric
+class(base_classe$education)      # numeric
+
+```
+
+## Maintenant, on va travailler avec une base de donnée plus simple.
+
+- Il s'agit du CROP Socio-Cultural Survey de 1996
+- Dans cette partie, nous allons apprendre à :
+    - Sélectionner les variables 
+    - Sélectionnez les observations
+    - Réorganiser les données
+    - Créer de nouvelles variables avec des fonctions de variables existantes (mutate ())
+    - Recoder des variables existantes
+    - Calculer des statistiques univariées
+
+## Maintenant, on va travailler avec une base de donnée plus simple.
+
+Nous allons travaillé avec les données issues des enquêtes socioculturelles. Les enquêtes socioculturelles font partie d'une grande série d'études internationales comparatives sur les valeurs fondamentales. Des enquêtes parallèles sont effectuées chaque année dans plusieurs pays européens et aux États-Unis. CROP Inc. a commencé cette série au Canada en 1983. Ces enquêtes portent sur un large éventail d’attitudes fondamentales - sociales, culturelles, économiques et politiques. Ces données sont disponibles sur le site suivant:  https://www.queensu.ca/cora/our-data/data-holdings
+
+
+## Dressons la table
+
+Avant de travailler avec ces données, il faut charger les packages que nous allons utiliser. Ici, nous ferons recours à `tidyverse` et à `summarytools`. Chargeons les deux packages. Si vous travailler sur vos machines, vous devez télécharger en premier lieu ces packaqes avec la commande :
+ `install.packages("tidyverse")` et `install.packages("summarytools"). Cependant, un package s'installe une seule fois. Mais chaque fois que vous voulez les utilisez, vous devez juste les charger.
+On peut faire l'analogie avec Facebook. Pour pouvoir utiliser `facebook` sur votre téléphone, vous devez en premier lieu télécharger cette application. Pour les prochaines utilisations, vous n'avez pas besoin de le télécharger à nouveau. Vous devez juste l'ouvrir. C'est le même principe avec les packaqes de R.
+
+Donc ici, dans la partie code, j'ai mis un hashtag au début des commentaires pour signifier que je ne veux pas les exécuter.
+
+
+
+```{r}
+# Effacer votre environnement
+
+rm(list = ls())
+
+# Installer les package dont vous avez besoin
+
+#install.packages("tidyverse")
+#install.packages("summarytools")
+#install.packages("tinytex")
+
+# Charger les packages - Étape fondamentales
+
+library(tidyverse)
+library(summarytools)
+
+```
+
+Une fois que les packages de tidyverse sont téléchargés, ils vous les montrent. Il vous indique les endroits où il y a conflit avec d'autres packages.
+
+
+## Téléchargement de la base de données
+
+Maintenant, il faut charger les données que vous voulez utiliser dans R. Ici, on fait recours à la fonction `read_csv` qui est issue du package `tidyverse`. Remarquer l'usage de `_`. La même fonction existe dans base R avec un `.` (read.csv). cette fonction lit les fichiers csv. Si vous avez d'autres types de fichiers, vous devez utiliser d'autres fonctions. On verra certains plus tard dans le cours.
+
+
+```{r}
+
+crsc96 <- read_csv("../Données/cora-crsc1996-E-1996_F1.csv")
+
+```
+
+## Regardons ce que contient cette base de données
+
+```{r}
+# trois manière de faire
+
+#View(crsc96)
+
+head(crsc96)
+#glimpse(crsc96)
+
+```
+
+Taille échantillon : 2859
+Nombre de variables : 416
+
+
+
+## Travailler avec les données.
+
+Nous utiliserons surtout ici le package **dplyr** pour manipuler les données:
+- sélectionner les variables avec `select`
+- sélectionner les individus avec `filter`
+- déterminer le type de variable avec `class`
+- recoder et créer de nouvelles variables avec `mutate`
+
+
+
+## Sélectionnons les données qui nous intéressent
+
+q1 : 
+  - I hate being bossed around: I must feel that I have total control over all the different areas of my life
+  - **Je déteste être patronisé: je dois sentir que j'ai un contrôle total sur tous les différents domaines de ma vie**
+  
+q2:
+  - An unmarried girl of 18 should not have sexual relations
+  - *Une fille non mariée de 18 ans ne devrait pas avoir de relations sexuelles*
+
+q3: 
+  - The best way to get something from someone is by putting your foot down
+  - *La meilleure façon d'obtenir quelque chose de quelqu'un est de mettre le pied à terre (dialoguer)*
+
+q4: 
+  - In a household where both partners are working, is not right for the wife to earn more than the husband
+  - *Dans un ménage où les deux partenaires travaillent, il n'est pas normal que la femme gagne plus que le mari*
+
+q44: 
+  - Overpopulation in third world countries doesn't really affect our country
+  - *La surpopulation dans les pays du tiers monde n'affecte pas vraiment notre pays*
+  
+q95: 
+  - An extramarital affair from time to time is not that serious
+  - *Une liaison extraconjugale de temps en temps n'est pas si grave*
+
+q96:
+  - I would like to have a religious service at my funeral
+  - *J'aimerais avoir un service religieux à mes funérailles*
+
+  
+```{r }
+
+crsc96_small <-
+  crsc96 %>% 
+  select(sexq, region, age, ageq, q1, q2, q3, q4, q44, q95, q96)
+
+crsc96_small 
+
+```
+
+Signification du code:
+
+- La première ligne du code indique le nom du nouveau fichier
+- La deuxième ligne indique le fichier qui va être utilisé. Cette ligne est terminée par le symbole %>% qu'on appelle **pipe**. Ce symbole n'a aucune signification statistique ou mathématique. Il indique juste une succession d'opération.
+- la dernière ligne donne les indications sur la manière dont vous voulez créer le fichier de la **première ligne**.
+
+
+## Sélectionnons les données les données qui nous intéressent
+
+
+- Select 
+
+```{r }
+
+crsc96_small <-
+  crsc96 %>% 
+  select(sexq, region, age, ageq, q1, q2, q3, q4, q44, q95)
+
+crsc96_small 
+
+```
+
+- Première ligne: Ceci signifie que je crée un nouvel objet (ici une base de données) que je nomme
+`crsc96_small`
+- Deuxième ligne: Je le crée à partir de la base de donnée que je viens de charger `crsc96`. Le signe `%>%` s'appelle `pipes` et signifie que j'applique ce qui viens après le symbole à ce qui est à sa droite.
+- Troisième ligne: les variables que je veux sélectionner.
+
+Le code est très bien éclairé avec des espaces aux bons endroits avant les symboles `<-` et `%>%`. Remarquer aussi l'indentation après `<-` sur la nouvelle ligne.
+
+Un bon codage permet de vous faire lire facilement. Adopter une bonne manière dès maintenant. 
+
+
+## Sélectionner les observations
+
+```{r}
+
+crsc96_small_homme <-
+  crsc96_small %>% 
+  filter(sexq == 1 & age >= 35)
+
+crsc96_small_homme
+
+```
+
+
+## Toutes ces étapes peuvent se réduire à:
+On n'est pas obliger de séparer ces deux étapes. On peut les combiner ensemble.
+
+
+```{r}
+
+crsc96_small_homme_general <-
+  crsc96 %>% 
+  select(sexq, region, age, ageq, q1, q2, q3, q4, q44, q95) %>% 
+  filter(sexq == 1 & age >= 35)
+
+```
+
+
+## Subset dans base R vous permet de faire les deux choses en méme temps
+Voici enfin une autre manière de faire en utilisant la fonction subset de base R.
+
+```{r}
+
+crsc_base <-
+crsc96 %>% 
+  subset(sexq == 1 & age >= 35, select = c(sexq, region, age, ageq, q1, q4, q44, q95))
+
+```
+
+
+## Information sur une variable
+
+Maintenant, nous allons travailler avec la base de données `crsc_small`. 
+Nous introduisons ici un nouvel symbole `$`. `$` fait référence à une colonne (une variable) spécifique dans une base de données. C'est la même chose que nous avons appris précédemment avec les matrices en utilisant [,]. 
+
+
+```{r}
+
+crsc96_small$sexq
+crsc96_small[, 1]
+
+```
+
+## Classe des variables
+Avant de travailler avec une variable, nous devons savoir de quel type elle est. Nous savons par exemple que nous ne pouvons pas faire des calculs avec des variables nominales. La fonction class, nous permet de déterminer le type d'une variable.
+
+```{r}
+
+class(crsc96_small$q1)
+
+class(crsc96_small$q2)
+class(crsc96_small$sexq)
+class(crsc96_small$age)
+
+```
+
+- Allons voir si cette variable est vraiment numérique. Cette information se trouve dans le codebook (dictionnaire) de cette étude. Ces variables ont donc besoin d’être recodé correctement si elles ne sont pas numériques. Le recodage d'une variable signifie qu'on change les modalités de cette variable. Mais, une bonne pratique consiste `toujours` à créer une nouvelle variable à partir de l'ancienne variable et à recoder cette dernière. de ce fait, on ne risque pas de commettre des erreurs et d'écraser par mégarde une variable de notre base de données.
+
+Avant d'aller recoder/créer des variables factorielles, voyons les chagements qu'on peut faire à partir d'une variable conitibue
+
+## Changement d'échelle d'une variable numérique
+
+Pour toute variable continue, on peut utiliser les opérations mathématiques pour créer une nouvelle variable. Comme par exemple, le double de l'âge, ou l'écat de l'age de chaque individu par rapport à la moyenne. Comment pensez-vous qu'on va créer cette variable `age_ecart`? 
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age_double =  age*2,
+         age_écart = age - mean(age))
+
+```
+
+L'une des modification les plus importantes pour une variable continue est le calcul du score z (z-score en anglais), ou score standardisé. Il désigne le nombre d'écarts-types par rapport à la moyenne d'un point de données. Par exemple, un individu qui a une valeur de z-score de 2, signifie qu'il se trouve à deux écarts-types de la moyenne. Le calcul des z-scores permet de comparer les populations entre elle, en enlevant l'unité de mesure spécifique dans laquelle les mesures ont été faites. Les tests standardisés, les poids et taille standardisés sont des z-scores. Il se calcule de la manière suivante:
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age_standardise = (age - mean(age))/sqrt(age))
+
+```
+
+
+
+## Recodage et création de variables factorielles
+
+- La création de nouvelles variables se fait avec la commande `mutate`
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(q1_new = q1)
+
+class(crsc96_small$q1_new)
+
+head(crsc96_small)
+```
+On voit que q1_new est exactement comme q1. Mais ce n'est pas ce que nous voulons. Nous voulons que ce soit une variable factorielle.
+
+## Recodage et création de variables facorielles
+
+```{r}
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(q1_new = as.factor(q1))
+
+class(crsc96_small$q1_new)
+head(crsc96_small)
+
+```
+
+Une autre façon de créer une variable factorielle est d'utiliser la fonction **factor**.
+
+Si vous tapez **?factor** dans le chunk (c'est quoi un chunk?), il vous indiquera comment utiliser cette fonction. 
+
+```{r}
+?factor
+
+```
+
+On voit ainsi dans RStudio, dans la fenêtre **Help**, la description de cette fonction et son usage. Certains de ces arguments (ce qui se trouve dans la parenthèse) sont optionnelles, alors que d'autres sont obligatoires. La fonction factor permet de créer une variable **qualitative** ou **categorielle** ou **factorielle**, à partir d'une autre variable. Il faut donc lui indiquer cette variable à partir de laquelle on créer la nouvelle variable factorielle. Dans notre cas (chunk ligne 47, il s'agit de la variable c(1, 0, 0, 1, 0). De manière optionnelle, il faut lui indiquer à quoi représentent les valeurs de l'ancienne variable. ce;a se fait avec **labels**. 
+
+## Recodage et création de variables facorielles
+
+Finalement, bien qu'il soit une variable factorielle, on ne sait pas ce que signifie ses modalités. Il nous faut chaque fois retourner dans le codebook pour ce faire.  On peut faire simplement avec la fonction factor qui prend au moins deux arguments: la variable et le labels des modalités. Observer que ce label se fait selon l'ordre des modalités.
+
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(q1_new = factor(q1, labels = c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")))
+
+class(crsc96_small$q1_new)
+
+head(crsc96_small)
+
+```
+
+
+```{r}
+
+freq(crsc96_small$q1_new)
+
+```
+
+
+Finalement, il faut indiquer l'ordre dans lequel les valeurs dela nouvelle variables vont être affichées. Si on ne lui indique rien, il va les afficher par ordre alphabétique. Autrement, il faut lui indiquer l'ordre que vous souhaitez, avec l'option **levels**. Vous avez plusieurs autres arguments que vous pouvez aller consulter vous-mêmes. Finalement, la description se termine toujours par des exemples d'utilisation.
+
+
+## Si on veut changer toutes les variables qui sont catégorielles
+
+```{r}
+
+qlabel <- c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(q2_new = factor(q2, labels = qlabel),
+         q3_new = factor(q3, labels = qlabel))
+
+freq(crsc96_small$q2)
+
+```
+
+
+## If_else pour créer des variables binaires ou dichotomiques
+
+Supposons que nous voulons scinder la variable age en deux catégories, alors on peut utiliser la commande `if_else`
+
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age2 = if_else(age >= 35, "adulte", "jeune"))
+
+class(crsc96_small$age2)
+
+# Transformer en facteur
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age2bis = as.factor(if_else(age >= 35, "adulte", "jeune")))
+
+# utiliser factor
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(ageter = if_else(age >= 35, 1, 2))
+
+class(crsc96_small$ageter)
+```
+
+Pour le transformer en une variable factorielle, il faut juste utiliser factor au début de la création de la variable:
+
+
+
+## Commande case_when pour des cas plus généraux
+
+```{r}
+
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age4 = case_when(
+    age < 20 ~ "adolescent",
+    age >= 20 & age < 34 ~ "jeune",
+    age >= 35 & age <59 ~ "adulte",
+    age >=60 ~ "ainé"
+  ))
+
+class(crsc96_small$age4)
+
+head(crsc96_small)
+```
+
+Si je veux que ce soit une variable factorielle, que dois-je faire?
+
+
+## Pour le rendre comme une variable catégorielle
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age5 = factor(case_when(
+    age < 20 ~ 1,
+    age >= 20 & age < 34 ~ 2,
+    age >= 35 & age <59 ~ 3,
+    age >=60 ~ 4), labels = c("adolescent", "jeune", "adulte", "ainé")
+  ))
+
+class(crsc96_small$age5)
+
+```
+
+## Finalement, on peut créer la variable age en le scindant en 5 catégories
+
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age6 = ntile(age, 5))
+
+class(crsc96_small$age6)
+freq(crsc96_small$age6)
+
+```
+
+
+## Je peux donc utiliser ntile en combinaison avec factor pour créer une variable factorielle
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age6 = factor(ntile(age, 5), labels = c("g1", "g2", "g3", "g4", "g5")))
+
+class(crsc96_small$age6)
+
+head(crsc96_small)
+
+```
+
+
+## Application
+
+- Créer la variable age au carré nommé `age_square`
+- Recoder la variable q2 en trois catégories (`agree`, `dk`, et `disagree`) (variable factorielle) que vous nommez q2_3
+- Créer une nouvelle variable qui permet de savoir combien de personne sont dans le groupe d'âge [25, 35], que vous nommez age_25_35
+- Créer une variable scalaire avec l'âge
+- De quel type est chaque variable?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age_square = age^2,
+         q2_3 = factor(case_when(
+           q2 == 1 | q2 == 2 ~ 1,
+           q2 == 3 ~ 2,
+           q2 == 4 | q2 == 5 ~ 3), labels = c("agree", "dk", "disagree")),
+         age_25_35 = between(age, 25, 34))
+
+class(crsc96_small$age_25_35)
+
+
+```
+
+
+## Autres fonctions pour construire des variables
+
+```{r}
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(var1 = lead(age, n = 2),                    # Remplace var la valeur de rang 2
+         var2 = lag(age, n = 1))                 
+
+```
+
+## Exercices
+
+- Explorer les autres fonctions de `Fonction "window"` de la feuille cheatsheet.
+
+
+
+
+
+
+
+
+
+
