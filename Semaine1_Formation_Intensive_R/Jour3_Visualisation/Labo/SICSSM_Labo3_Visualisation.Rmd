@@ -1,0 +1,555 @@
+---
+title: "Lab6.2: Retour sur les paramètres de dispersion"
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+## Plan
+
+- Mesure des paramètres de dispersion
+- Courbe normale
+- Mesure de l'inégalité: coefficient de Gini
+
+
+## Données
+
+On va travailler avec les données de l'enquête canadienne sur le revenu de 2015.
+https://search1.odesi.ca/#/
+
+## Mesure des paramètres de dispersion
+
+```{r}
+
+rm(list = ls())
+
+
+#library(qss)
+library(tidyverse)
+library(summarytools)
+#library(tinytex)
+
+cis_2015 <- read_csv("CIS-72M0003-E-2015_F1.csv")
+
+
+summary(cis_2015$CFATINC) 
+
+freq(cis_2015$PROV)
+freq(cis_2015$AGEGP)
+```
+
+
+## Sélection les variables importantes et création de nouvelles variables
+
+```{r}
+
+cis_short <-
+  cis_2015 %>% 
+  select(PUMFID, PERSONID, AGEGP, SEX, MARST, PROV, IMMSTP, YRIMMGP, CMPHI, HLEV2G, CFID, CFSIZE, CFMJSI, CFATINC, CFEARNG, EFID, EFSIZE, EFATINC, HHSIZE, FWEIGHT) %>% 
+  mutate(Province = case_when(
+    PROV == 10 ~ "Terre-Neuve-et-Labrador",
+    PROV == 11 ~ "Ile du prince Edouard",
+    PROV == 12 ~ "Nouvelle-Écosse",
+    PROV == 13 ~ "Nouveau-Brunswick",
+    PROV == 24 ~ "Québec",
+    PROV == 35 ~ "Ontario",
+    PROV == 46 ~ "Manitoba",
+    PROV == 47 ~ "Saskatchewan",
+    PROV == 48 ~ "Alberta",
+    PROV == 59 ~ "Colombie Britanique"
+  ),
+  region = case_when(
+    PROV <= 13 ~ "Atlantique",
+    PROV == 24 ~ "Québec",
+    PROV == 35 ~ "Ontario",
+    PROV >=46 & PROV <= 48 ~ "Ouest",
+    PROV == 59 ~ "Colombie Britanique"
+  ),
+  sexe = if_else(SEX == 1, "Male", "Female"))
+
+#sort(cis_short$CFATINC)
+```
+
+CMPHI : Flag - Person completed high school
+HLEV2G : Highest level of education of person, 2nd grouping
+EFID : Economic family identifier
+EFSIZE : Number of economic family members
+EFATINC : EF - After-tax income
+HHSIZE : Number of household members
+FWEIGHT : Final weight
+
+## Revenu familial moyen
+
+
+```{r}
+
+mean_income <-
+  cis_short %>% 
+  group_by(Province) %>% 
+  summarise(mean(CFATINC))
+
+mean_income
+
+summary(cis_short$CFATINC)
+
+
+mean_income1 <-
+  cis_short %>% 
+  filter(CFATINC >= 0) %>% 
+  group_by(Province) %>% 
+  summarise(mean(CFATINC))
+
+mean_income1
+
+income_mean <- bind_cols(mean_income, mean_income1)
+income_mean
+```
+
+Ce que cette distribution ne nous dit pas, c'est le niveau d'inégalité au sein de la population. Une manière de le voir, est de calculer la variance, c'est à dire la manière dont les revenus sont distribués par rapport à la moyenne.
+
+## Variance du revenu
+
+```{r}
+
+variation_income <-
+  cis_short %>% 
+  group_by(Province) %>% 
+  summarise(var(CFATINC, na.rm = TRUE))
+
+variation_income
+
+```
+
+On voit que de manière générale, la variance des revenus est aussi très grands à Alberta. On voit que les niveaux de la variance sont très grands et ne sont pas de la même unité que le revenu. C'est pourquoi, on va lui préférer l'écart-type.
+
+```{r}
+
+ecart_income <-
+  cis_short %>% 
+  group_by(Province) %>% 
+  summarise(sd(CFATINC, na.rm = TRUE))
+
+ecart_income
+```
+
+On ne peut pas comparer directement les revenus des gens de Québec avec Ontario, il faut pour cela standardisés les revenus avant de les comparer. Mais, avant de faire cela, visualisons la distribution du revenu. La visualisation est un bon moyen de se faire une première idée de la nature des données. 
+
+## Histogramme
+
+
+```{r}
+
+ggplot(cis_short) +
+  geom_histogram(aes(x = CFATINC)) 
+
+```
+
+Mais, on peut présenter la distribution pour chaque province. Comment pensez-vous qu'on puisse le faire?
+
+
+
+## Boxplot
+
+https://statistique-et-logiciel-r.com/comment-detecter-les-outliers-avec-r/
+
+
+<!--
+![Interprétation boxplot](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/boxplot_interpretation.png)
+-->
+
+```{r}
+knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/boxplot_interpretation.png")
+```
+
+
+
+```{r}
+
+ggplot(cis_short) +
+  geom_boxplot(aes(y = CFATINC))
+
+```
+
+Ce graphique permet de visualiser les données abbérantes ou les outliers. Un **outlier**, ou **donnée aberrante** est “une valeur ou une observation qui est « distante » des autres observations effectuées sur le même phénomène, c’est-à-dire qu’elle contraste grandement avec les valeurs « normalement » mesurées. Une donnée aberrante peut être due à la variabilité inhérente au phénomène observé ou bien elle peut aussi indiquer une erreur expérimentale. Les dernières sont parfois exclues de la série de données”. Mais avant cela, voyons comment se présentent les distributions selon les régions du Canada.
+
+```{r}
+
+ggplot(cis_short) +
+  geom_boxplot(aes(y = CFATINC)) +
+  facet_grid(~ Province)
+
+
+```
+
+```{r}
+ggplot(cis_short) +
+  geom_boxplot(aes(x = Province, y = CFATINC, color = Province))
+
+ggplot(cis_short) +
+  geom_boxplot(aes(x = Province, y = CFATINC), color = "green")
+
+```
+
+
+## Travaillons maintenant avec les données sans les outliers
+
+Les outliers correspondent à des observations dont les valeurs sont :
+
+- supérieures à la valeur du 3ème quartile plus 1.5 fois l’intervalle inter-quartile (**valeur_haute**),
+- ou inférieures à la valeur du 1er quartile moins 1.5 fois l’intervalle inter-quartile (**valeur_basse**).
+
+On va donc calculer ces valeurs:
+
+```{r}
+
+outliers <-
+  cis_short %>% 
+  summarise(Income_Q1 = quantile(CFATINC, prob = 0.25),
+            Income_Q3 = quantile(CFATINC, prob = 0.75),
+            ecart_IQ = Income_Q3 - Income_Q1,
+            valeur_haute = Income_Q3 + 1.5*ecart_IQ,
+            valeur_basse = Income_Q1 - 1.5*ecart_IQ)
+outliers
+
+
+
+```
+
+Maintenant, on crée la nouvelle base de données sans les outliers.
+
+```{r}
+
+cis_no_outliers <-
+  cis_short %>% 
+  filter(CFATINC <= outliers$valeur_haute & CFATINC >= outliers$valeur_basse)
+
+
+ggplot(cis_no_outliers) +
+  geom_boxplot(aes(y = CFATINC)) 
+
+
+```
+
+## Boxplot et histogramme par region ou province
+
+Les graphiques boxplot et histogrammes sont seulement construits pour les variables quantitatives.
+
+```{r}
+
+ggplot(cis_no_outliers) +
+  geom_boxplot(aes(y = CFATINC)) +
+  facet_grid(~Province)
+
+```
+
+```{r}
+
+ggplot(cis_no_outliers, aes(x = CFATINC, y = ..density..)) +
+  geom_histogram() +
+  geom_density(color = "red")+
+  facet_grid(~region)
+
+```
+
+Ou, une autre manière de présenter les courbes sans les histogrammes. Alors, je présente quatre différents graphiques. Pouvez-vous dire ce que chaque ajout d'options apporte ? remarquez surtout là où l'option est placcée, à l'intérieur ou à l'extérieur du aes.
+
+1.
+
+```{r}
+
+ggplot(cis_no_outliers) + 
+  geom_density(aes(x = CFATINC)) 
+
+```
+
+2. 
+
+```{r}
+ggplot(cis_no_outliers) + 
+  geom_density(aes(x = CFATINC, color = region))
+```
+3.
+
+```{r}
+
+ggplot(cis_no_outliers) + 
+  geom_density(aes(x = CFATINC, color = region, fill = region))
+
+```
+
+4. 
+
+```{r}
+
+ggplot(cis_no_outliers) + 
+  geom_density(aes(x = CFATINC, color = region, fill = region), alpha = .2)
+
+```
+
+## Distribution normale
+
+https://rstudio-pubs-static.s3.amazonaws.com/257631_649def6429d3466086fca5db7a1986f1.html
+
+```{r}
+
+set.seed(1)
+df <- data.frame(PF = 10*rnorm(1000))
+
+ggplot(df, aes(x = PF)) + 
+    geom_histogram(aes(y =..density..),
+                   breaks = seq(-50, 50, by = 10), 
+                   colour = "black", 
+                   fill = "white") +
+stat_function(fun = dnorm, args = list(mean = mean(df$PF), sd = sd(df$PF)))
+
+head(df)
+```
+
+Finalement, présentons la courbe normale sur notre graphique précédent
+
+
+```{r}
+
+
+ggplot(cis_no_outliers) +
+  geom_histogram(aes(x = CFATINC, y = ..density..)) +
+  geom_density(aes(x = CFATINC, y = ..density..), color = "blue")+
+  stat_function(fun = dnorm, args = c(mean = mean(cis_no_outliers$CFATINC), sd = sd(cis_no_outliers$CFATINC)), color = "tomato")
+
+```
+
+
+## Mesure de l'inégalité: coefficient de Gini
+
+Le coefficient de Gini sert à mesurer le niveau d’inégalité de la répartition du revenu au sein de diverses populations ou au sein de la même population au fil du temps. Il peut être calculé pour d'autres indicateurs autre que le revenu. La courbe de Lorenz (figure) présente le rapport entre la proportion cumulée de la population, ordonnée selon le niveau de revenu, et la proportion cumulée du revenu total lui revenant. Le coefficient de Gini provient du calcul de l’aire entre la courbe de Lorenz et la droite de l’égalité parfaite. 
+
+- Plus cette aire est grande, plus l’inégalité est marquée. Les valeurs du coefficient de Gini varient entre 0 et 1. Une valeur de 0 indique que le revenu est également divisé entre tous les membres de la population, ceux-ci recevant exactement la même somme de revenu. Par contre, une valeur de 1 dénote une distribution parfaitement inégale au sein de laquelle une seule unité possède l’ensemble du revenu de l’économie. 
+
+- Une diminution de la valeur du coefficient de Gini peut être interprétée comme une diminution de l’inégalité, et vice versa.
+
+```{r}
+knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/gini.png")
+```
+
+<!--
+![Courbe de Lorenz](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/gini.png)
+-->
+
+
+```{r}
+
+# install.packages("ineq")
+library(ineq)
+gini_canada <- ineq(cis_no_outliers$CFATINC, type = c("Gini"))
+gini_canada
+
+?ineq
+
+```
+Maintenant, calculons ce coeficient pour chaque province
+
+```{r}
+Quebec <-
+  cis_no_outliers %>% 
+  filter(Province == "Québec")
+
+gini_quebec <- ineq(Quebec$CFATINC, type = c("Gini"))
+gini_quebec
+
+Ontario <-
+  cis_no_outliers %>% 
+  filter(Province == "Ontario")
+
+gini_ontario <- ineq(Ontario$CFATINC, type = c("Gini"))
+gini_ontario
+
+
+Alberta <-
+  cis_no_outliers %>% 
+  filter(Province == "Alberta")
+
+gini_alberta <- ineq(Alberta$CFATINC, type = c("Gini"))
+gini_alberta
+
+
+
+gini_canada <- c(Canada=gini_canada, Quebec = gini_quebec, Ontario = gini_ontario, Alberta = gini_alberta)
+
+gini_canada
+
+```
+Pourquoi le coéficient de Gini est plus faible à Alberta qu'au Québec?
+
+Refaisons le travail cette fois-ci avec les données initiales. Vous avez dû remarqué que pour calculer le coefficient de Gini des provinces, on réplique exactement la même procédure avec des possibilités d'erreur (si on le fait avec des copier-coller). Le fait de repliquer quelques choses plusieurs fois n'est pas une bonne manière de faire de la recherce. Outre le fait de potentiellement commettre des erreurs, il est aussi long à faire (supposer qu'au lieu des provinces, vous avez plutôt les pays du monde). Ce genre de problème se résoud bien avec une **fonction** qui automatise le travail pour vous. Tidyverse dispose d'un excellent package pour travailler avec les fonctions: **purr**. Vous pouvez trouver sa fiche de trichérie (Cheatsheets) ainsi que d'autres ici: https://rstudio.com/resources/cheatsheets/. Ici, je vous fais une démonstration de l'utilisation des fonctions qui comporte 3 étapes.
+
+
+```{r}
+# Étape 1 : Grouper les données
+
+n_cis <-
+  cis_short %>% 
+  group_by(Province) %>% 
+  nest()
+
+# Étape 2 : Créer la fonction et l'appliquer aux données groupées 
+ ## Création de la fonction: ceci est une fonction qui prend pour argument une base de donnée (df)
+
+mod_fun <- function(df){
+  round(ineq(df$CFATINC, type = c("Gini")), 2)
+}
+
+ ## Appliquer la nouvelle fonction aux données groupées (map ou map_dbl)
+m_cis <-
+  n_cis %>% 
+  mutate(gini_coef = map_dbl(data, mod_fun))
+
+
+
+# Étape 3 : Sortir les résultats comme il faut
+
+gini_canada2 <- 
+  m_cis %>% 
+  transmute(gini_coef)
+
+gini_canada2
+
+```
+
+
+## Maintenant, comparons le coeficient de Gini dans le monde
+
+```{r}
+rm(list = ls())
+
+
+
+gini <- read_csv("/Users/visseho/OneDrive - UQAM/Cours/Bases_donnees/Gini_worldbank/gini_world.csv")
+
+
+class(gini$`Country Name`)
+
+canada <-
+  gini %>% 
+  filter(`Country Name` == "Canada")
+
+
+```
+
+Les données ne se présentent pas bien pour faire un graphique montrant l'évolution du coefficient de Gini. Il faut les transformer. En fait, tidiverse fonctionne avec une idée simple: 
+- Chaque ligne d'une base de donnée doit contenir une seule information
+- Chaque colonne également. Et l'intersection entre la ligne et la colonne donne une seule information. Or, dans notre base de données preecédente, le coeficient de gini est repeté sur plusieurs colonne. 
+
+La fonction pivot, permet de transformer la base de données. On dit aussi reshape. Elle va transformer la base de données de long à court.
+
+https://tidyr.tidyverse.org/articles/pivot.html
+https://wid.world/news-article/gini-coefficients-available/
+
+```{r}
+
+canada_reshape <- 
+  canada %>% 
+  pivot_longer(
+    cols = contains("YR"),
+    names_to = "Annee",
+    values_to = "gini",
+    values_drop_na = TRUE
+  ) 
+
+```
+
+### Graphiques
+
+Pour faire le graphique, on a besoin que la variable gini soit numérique. Or, elle est caractère dans la base de données. Il faut donc la transformer. Le plus simple est de créer une nouvelle variable numérique à partir de cette variable.
+
+Dans le graphique 1, je vois que la ligne n'est pas complétée. Cela est du aux valeurs manquantes. De 2010 à 2013, il y a des années qui n'ont pas de données, le graphique ne sait pas quoi faire de cela. Alors, dans le second graphique, j'ai enlevé d'abord les valeurs manquantes. Remarquez la manière la plus simple où je l'ai fait avec `na.omit` appliqué directement à la base de donnée dans ggplot. Je peux le faire aussi en deux étapes, en créant d'abord une nouvelle base de données sans les données manquantes.
+
+```{r}
+
+class(canada_reshape$gini)
+
+# Création de la nouvelle variable
+canada_reshape <-
+  canada_reshape %>% 
+  mutate(gini_num = as.numeric(gini))
+
+# Graphique 1
+
+ggplot(canada_reshape) +
+  geom_point(aes(x = Annee, y = gini_num)) +
+  geom_line(aes(x = Annee, y = gini_num), group = "`Country Name`")
+  
+# Graphique 2
+
+ggplot(na.omit(canada_reshape)) +
+  geom_point(aes(x = Annee, y = gini_num)) +
+  geom_line(aes(x = Annee, y = gini_num), group = "`Country Name`")
+
+```
+
+On voit donc bien l'inégalité s'est accrue au Canada. 
+
+
+## Comparaison du coefficient de Gini
+
+Qu'en est-il du coefficient de Gini au Kazakhsta
+
+```{r}
+
+kazakhstan <-
+  gini %>% 
+  filter(`Country Name` == "Kazakhstan") %>% 
+    pivot_longer(
+    cols = contains("YR"),
+    names_to = "Annee",
+    values_to = "gini",
+    values_drop_na = TRUE) %>% 
+  mutate(gini_num = as.numeric(gini))
+
+
+ggplot(na.omit(kazakhstan)) +
+  geom_point(aes(x = Annee, y = gini_num)) +
+  geom_line(aes(x = Annee, y = gini_num), group = "`Country Name`")
+```
+
+Niveau bien plus faible qu'au Canada. Est-ce à dire que les niveaux de revenu sont pareils dans les deux pays? 
+
+Qu'en est-il des USA?
+
+
+```{r}
+
+usa <-
+  gini %>% 
+  filter(`Country Name` == "United States") %>% 
+    pivot_longer(
+    cols = contains("YR"),
+    names_to = "Annee",
+    values_to = "gini",
+    values_drop_na = TRUE) %>% 
+  mutate(gini_num = as.numeric(gini))
+
+
+ggplot(na.omit(usa)) +
+  geom_point(aes(x = Annee, y = gini_num)) +
+  geom_line(aes(x = Annee, y = gini_num), group = "`Country Name`")
+  
+```
+
+Nous avons d'autres données sur les états unis sur une plus longue période
+
+```{r}
+library(tidyverse)
+data("USGini", package = "qss")
+
+ggplot(USGini, aes(x = year, y = gini)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Année", y = "Coefficient de Gini") +
+  ggtitle("Inégalité de revenu de 1947 à 2013")
+
+```
+
+Quelles sont alors les conséquences de l'accroissement des inégalités aux USA ou au Canada ?
