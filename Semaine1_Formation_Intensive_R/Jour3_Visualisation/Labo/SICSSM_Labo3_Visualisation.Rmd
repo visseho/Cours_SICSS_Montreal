@@ -1,5 +1,5 @@
 ---
-title: "Lab6.2: Retour sur les paramètres de dispersion"
+title: "Labo3: Retour sur les paramètres de dispersion"
 author: "Visseho Adjiwanou, PhD."
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:

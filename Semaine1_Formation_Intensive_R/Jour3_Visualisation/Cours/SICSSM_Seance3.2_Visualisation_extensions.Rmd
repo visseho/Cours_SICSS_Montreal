@@ -91,11 +91,29 @@ ggplot(dhs_ipv) +
 c <- ggplot(dhs_ipv) +
   geom_bar(aes(x = region))
 
+c
 d <- ggplot(dhs_ipv) +
   geom_bar(aes(x = region), fill = "red")
 
+d
 e <- ggplot(dhs_ipv) +
   geom_bar(aes(x = region), fill = "red", alpha = 0.5)
+
+e
+
+
+ggplot(dhs_ipv) +
+  geom_bar(aes(x = region))
+
+ggplot(dhs_ipv) +
+  geom_bar(aes(x = region,  color = region))
+
+```
+
+```{r}
+
+ggplot(dhs_ipv) +
+  geom_point(aes(x = no_media, y = beat_burnfood), color = "blue")
 
 ```
 
@@ -128,7 +146,7 @@ ggplot(dhs_ipv) +
 ```{r, out.width= '50%', message = FALSE}
 
 ggplot(dhs_ipv) +
-  geom_histogram(aes(x = beat_burnfood, fill = region)) +
+  geom_histogram(aes(x = beat_burnfood), color = "blue") +
   facet_wrap(~region)
 
 ```
@@ -161,12 +179,20 @@ ggplot(dhs_ipv) +
 # Que faire si vous voulez mettre sur ce graphique la médiane de l'ensemble de l'échantillon?
 
 ```
+```{r}
+
+ggplot(dhs_ipv, aes(x = region, y = beat_burnfood, color = region)) + 
+  geom_boxplot() +
+  geom_point()
+```
+
 
 ## Représentation de plusieurs graphiques sur une même figure
 
 - Vous pouvez observer qu'ici, on a répété l'information dans le aes dans les deux geom.
 - On peut faire plus simple
-```{r, message = FALSE}
+
+```{r, message = FALSE, echo=FALSE, warning=FALSE}
 a <- ggplot(dhs_ipv) + 
   geom_boxplot(aes(x = region, y = beat_burnfood)) +
   geom_point(aes(x = region, y = beat_burnfood))
