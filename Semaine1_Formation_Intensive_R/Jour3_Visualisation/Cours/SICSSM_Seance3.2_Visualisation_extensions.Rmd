@@ -4,11 +4,11 @@ author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  slidy_presentation: default
   beamer_presentation:
     colortheme: beaver
     fonttheme: structurebold
     theme: Antibes
+  slidy_presentation: default
   ioslides_presentation: default
 header-includes:
   - \usepackage{color}
@@ -48,6 +48,20 @@ crsc96_small <-
          q2_new = factor(q2, labels = c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")))
 
 ```
+
+
+## Introduction
+
+>- Plus dans aes : **mappage** :  c'est une mise en relation entre un **attribut graphique du geom** et une variable du tableau de données.
+  - Changer les couleurs (*color*), la taille (*size*), la position (*position*), la transparence (*alpha*), le remplissage (*fill*)
+
+>- **Facets** : le **faceting** permet d’effectuer plusieurs fois le même graphique selon les valeurs d’une ou plusieurs variables qualitatives (notre *group_by*): facet_wrap, facet_grid
+
+>- Les **scales** : ils permettent de modifier la manière dont un attribut graphique va être relié aux valeurs d’une variable, et dont la légende correspondante va être affichée. 
+
+>- Les **thèmes** : ils permettent de contrôler l’affichage de tous les éléments du graphique qui ne sont pas reliés aux données : **titres**, **grilles**, **fonds**, etc.
+https://ggplot2.tidyverse.org/reference/theme.html
+
 
 
 

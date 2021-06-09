@@ -14,8 +14,8 @@ header-includes:
   - \usepackage{color}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
 ```
 
 ## Plan
@@ -36,11 +36,11 @@ Introduction
 
 - R dispose de plusieurs systèmes pour créer des graphiques, mais ggplot2 est l’un des plus élégants et des plus polyvalents.
 
-* Avec ggplot2, vous pouvez faire plus rapidement en apprenant un système et en l’appliquant à de nombreux graphiques.
+- Avec ggplot2, vous pouvez faire plus rapidement en apprenant un système et en l’appliquant à de nombreux graphiques.
 
-* Parce qu'il fait partie de `tidyverse`:
-  * Il sera chargé automatiquement une fois que vous chargez tidyverse;
-  * Il va fonctionner sur les bases de données ou les `tribbles`
+- Parce qu'il fait partie de `tidyverse`:
+ - Il sera chargé automatiquement une fois que vous chargez tidyverse;
+ - Il va fonctionner sur les bases de données ou les `tribbles`
 
 
 ## Introduction
@@ -53,11 +53,12 @@ library(tidyverse)
 ## Introduction
 
 - Les graphiques nous permettent de répondre à plusieurs types de questions :
-    - Quelle est la distribution d'une variable?
-    - Est-ce que les filles ont plus tendances à vivre dans un type particulier de structure familiale? 
-    - Comment est-ce que la structure de la famille affecte la santé des enfants?
-    - Est-ce qu'il existe une association entre les attitudes envers la violence conjugale et le niveau de scolarisation  (données dhs_ipv)
-      - Cette relation est-elle positive? négative? ou nulle?
+
+ - Quelle est la distribution d'une variable?
+ - Est-ce que les filles ont plus tendances à vivre dans un type particulier de structure familiale? 
+ - Comment est-ce que la structure de la famille affecte la santé des enfants?
+ - Est-ce qu'il existe une association entre les attitudes envers la violence conjugale et le niveau de scolarisation  (données dhs_ipv)
+ - Cette relation est-elle positive? négative? ou nulle?
 
 
 Type de graphiques pour les distributions univariées et bivariées
@@ -69,48 +70,36 @@ Type de graphiques pour les distributions univariées et bivariées
 
 - Graphiques pour representer une seule variable:
 
-
-```{r graphique1, echo=FALSE, out.width = '80%', fig.align='center'}
-
-knitr::include_graphics("../données/graphique1.jpg")
-
-```
+![](../données/graphique1.jpg)
 
 
 ## Les types de graphiques
 
 - Graphiques pour representer l'association entre deux variables  
 
-```{r graphique2, echo=FALSE, out.width = '80%', fig.align='center'}
-knitr::include_graphics("../données/graphique2.jpg")
-```
+![](../données/graphique2.jpg)
 
 
 ggplot
 ========================================================
 
-
 ## Forme générale
 
-* La forme générale d'un code de graphique est le suivant:
+- La forme générale d'un code de graphique est le suivant:
 
-```{r ggplot, echo=FALSE,  out.width = '100%'}
-knitr::include_graphics("../données/ggplot_forme_generale.jpg")
-```
+![](../données/ggplot_forme_generale.jpg)
 
-1. **ggplot** spécifie que vous utiliser la commande ggplot. C'est à ce niveau que vous spécifier les données que vous voulez utiliser.
+
+1. **ggplot** spécifie que vous utilisez la commande ggplot. C'est à ce niveau que vous spécifiez les données que vous voulez utiliser.
 
 - Ce n'est pas toujours obligatoire si vous utilisez plus d'une base de données.
 
 
-
 ## Forme générale
 
-* La forme générale d'un code de graphique est le suivant:
+- La forme générale d'un code de graphique est le suivant:
 
-```{r ggplot1, echo=FALSE,  out.width = '100%'}
-knitr::include_graphics("../données/ggplot_forme_generale.jpg")
-```
+![](../données/ggplot_forme_generale.jpg)
 
 2. **geom_function**, contient plusieurs fonctions pour spécifier le type de graphique que vous voulez faire. Le type de graphique indique le nombre de paramètres à inclure.
   - Exemples: geom_histogram() pour les **histogrammes** 
@@ -120,13 +109,9 @@ knitr::include_graphics("../données/ggplot_forme_generale.jpg")
 
 ## Forme générale
 
-* La forme générale d'un code de graphique est le suivant:
+- La forme générale d'un code de graphique est le suivant:
 
-```{r ggplot2, echo=FALSE,  out.width = '100%'}
-
-knitr::include_graphics("../données/ggplot_forme_generale.jpg")
-
-```
+![](../données/ggplot_forme_generale.jpg)
 
 3. **aes** pour aestetics indique le nombre de paramètres à passer à la fonction **geom_function**. Il permet également de spécifier des informations sur le graphique.
 
@@ -175,10 +160,10 @@ crsc96_small <-
 
 ## Distribution univariée
 
-* Histogramme : pour variable continue
-* Diagramme de barre : pour variable catégorielle
-* Diagramme de quartile qui résume cinq indicateurs
-* Diagramme circulaire
+- Histogramme : pour variable continue
+- Diagramme de barre : pour variable catégorielle
+- Diagramme de quartile qui résume cinq indicateurs
+- Diagramme circulaire
 
 ## Exemple: histogramme
 
@@ -191,24 +176,25 @@ ggplot(crsc96_small) +
 
 ## Exemple: histogramme
 
-* L'histogramme est une méthode courante pour visualiser la distribution d'une variable numérique plutôt que d'une variable factorielle.
-* Un histogramme divise les données en champs
-* L’aire de chaque domaine représente la proportion d’observations qui y sont classées. 
-* La hauteur de chaque case représente la densité, qui est égale à la proportion d'observations dans chaque case divisée par la largeur de la case. 
-* Un histogramme se rapproche de la distribution d'une variable.
+- L'histogramme est une méthode courante pour visualiser la distribution d'une variable numérique plutôt que d'une variable factorielle.
+- Un histogramme divise les données en champs
+- L’aire de chaque domaine représente la proportion d’observations qui y sont classées. 
+- La hauteur de chaque case représente la densité, qui est égale à la proportion d'observations dans chaque case divisée par la largeur de la case. 
+- Un histogramme se rapproche de la distribution d'une variable.
 
 
 ## Exemple: histogramme
 
 - Dans le cadre de cette présentation, je mets des options dans le **chunk** (Vous ne les voyez pas dans la présentation regarder le fichier .rmd)
 
-  - **out.width** pour préciser la largeur du graphique
-  - **message = FALSE** : pour ne pas afficher des messages
-  - **warning = FALSe** : pour ne pas afficher des messages d'avertissement.
+ - **out.width** pour préciser la largeur du graphique
+ - **message = FALSE** : pour ne pas afficher des messages
+ - **warning = FALSE** : pour ne pas afficher des messages d'avertissement.
 
-- Il faut les utiliser avec précaution. Les messages et les warning nous donne des informations ar exemple sur les valeurs manquantes.  
+- Il faut les utiliser avec précaution. Les messages et les warning nous donnent des informations, par exemple sur les valeurs manquantes.  
 
 ## Exemple: histogramme
+
 - Voici ce que vous obtenez si je ne les mets pas.
 
 ```{r}
@@ -220,8 +206,8 @@ ggplot(dhs_ipv) +
 
 ## Exemple: Diagramme en bâtons ou à barres
 
-* Pour résumer la distribution d'une variable **facteur** ou d'une **variable factorielle** (ou d'une variable catégorielle ou qualitative) avec plusieurs catégories, un simple tableau avec des comptes ou des proportions est souvent suffisant. 
-* Cependant, il est également possible d'utiliser un graphique en barres pour visualiser la distribution.  
+- Pour résumer la distribution d'une variable **facteur** ou d'une **variable factorielle** (ou d'une variable catégorielle ou qualitative) avec plusieurs catégories, un simple tableau avec des comptes ou des proportions est souvent suffisant. 
+- Cependant, il est également possible d'utiliser un graphique en barres pour visualiser la distribution.  
 
 ## Exemple: Diagramme en bâtons
 
@@ -252,7 +238,7 @@ ggplot(crsc96_small) +
 
 - Que se passe-t-il si vous ne mettez pas **group = 1**
 
-- On peut représenter ce diagramme par un diagramme circulaire. comment créer un diagramme circulaire?
+- On peut représenter ce diagramme par un diagramme circulaire. Comment créer un diagramme circulaire?
 
 ## Diagramme circulaire
 
@@ -269,8 +255,9 @@ ggplot(crsc96_small) +
 
 ## Exemple: Diagramme de quartile 
  
-* La boîte à moustaches représente un autre moyen de visualiser les distributions d'une variable numérique.
-* Une boîte à moustaches visualise **la médiane**, **les quartiles** et **l'écart-interquartile** sous la forme d'un seul objet.
+- La boîte à moustache représente un autre moyen de visualiser les distributions d'une variable numérique.
+- Une boîte à moustache visualise **la médiane**, **les quartiles** et **l'écart-interquartile** sous la forme d'un seul objet.
+
 ```{r, out.width = '50%', message = FALSE, warning=FALSE, fig.align='center'}
 
 ggplot(crsc96_small) + 
@@ -280,9 +267,9 @@ ggplot(crsc96_small) +
 
 ## Exemple: Diagramme de quartile ou boîte à moustaches
 
-* C'est particulièrement utile lorsque vous **comparez la distribution de plusieurs variables** en les plaçant côte à côte. 
+- C'est particulièrement utile lorsque vous **comparez la distribution de plusieurs variables** en les plaçant côte à côte. 
 
-* `geom_boxplot` permet de représenter des boîtes à moustaches. On lui passe en **y** (axe des ordonnées) la variable dont on veut étudier la répartition (variable quantitative), et en **x** (axe des abscisses) la variable contenant les classes qu’on souhaite comparer (variable qualitative). 
+- `geom_boxplot` permet de représenter des boîtes à moustaches. On lui passe en **y** (axe des ordonnées) la variable dont on veut étudier la répartition (variable quantitative), et en **x** (axe des abscisses) la variable contenant les classes qu’on souhaite comparer (variable qualitative). 
 
 
 Exemples: Visualiser la distribution bivariée
@@ -298,8 +285,8 @@ ggplot(crsc96_small) +
 
 ```
 
-* Ce graphique nous donne pour chaque sexe, le nombre de personne qui sont dans chaque catégorie de la variable dépendante.
-* Il a cependant un problème, c'est difficile de comparer le nombres bruts. Il faut des pourcentages.
+- Ce graphique nous donne pour chaque sexe, le nombre de personne qui sont dans chaque catégorie de la variable dépendante.
+- Il a cependant un problème, c'est difficile de comparer le nombres bruts. Il faut des pourcentages.
 
 
 ## Croisement de deux variables qualitatives
@@ -310,6 +297,7 @@ ggplot(crsc96_small) +
   geom_bar(aes(x = sexe, fill = q2_new), position = "fill")  
 
 ```
+
 - On voit clairement la différence d'opinion entres les hommes et les femmes.
 
 
@@ -371,7 +359,7 @@ b <- ggplot(dhs_ipv) +
   geom_boxplot(aes(x = region, y = beat_burnfood))
 b
 ```
-* Note : x doit être une variable qualitative, et y une variable quantitative.
+- Note : x doit être une variable qualitative, et y une variable quantitative.
 
 
 ## Exemple: Diagramme de quartile 
@@ -440,16 +428,16 @@ Remarques
 
 https://slideplayer.fr/slide/10114066/
 
-## Pour aler plus loin
+## Pour aller plus loin
 
-* Plus dans aes : **mappage** : * c'est une mise en relation entre un **attribut graphique du geom** et une variable du tableau de données.
+>- Plus dans aes : **mappage** :  c'est une mise en relation entre un **attribut graphique du geom** et une variable du tableau de données.
   - Changer les couleurs (*color*), la taille (*size*), la position (*position*), la transparence (*alpha*), le remplissage (*fill*)
 
-* **Facets** : le **faceting** permet d’effectuer plusieurs fois le même graphique selon les valeurs d’une ou plusieurs variables qualitatives (notre *group_by*): facet_wrap, facet_grid
+>- **Facets** : le **faceting** permet d’effectuer plusieurs fois le même graphique selon les valeurs d’une ou plusieurs variables qualitatives (notre *group_by*): facet_wrap, facet_grid
 
-* Les **scales** : ils permettent de modifier la manière dont un attribut graphique va être relié aux valeurs d’une variable, et dont la légende correspondante va être affichée. 
+>- Les **scales** : ils permettent de modifier la manière dont un attribut graphique va être relié aux valeurs d’une variable, et dont la légende correspondante va être affichée. 
 
-* Les **thèmes** : ils permettent de contrôler l’affichage de tous les éléments du graphique qui ne sont pas reliés aux données : **titres**, **grilles**, **fonds**, etc.
+>- Les **thèmes** : ils permettent de contrôler l’affichage de tous les éléments du graphique qui ne sont pas reliés aux données : **titres**, **grilles**, **fonds**, etc.
 https://ggplot2.tidyverse.org/reference/theme.html
 
 
@@ -505,17 +493,17 @@ Ressources
 ========================================================
 
 ## Ressources
-* https://www.google.com/search?q=ggplot+theme%2C+dont+show+legend&oq=ggplot+theme%2C+dont+show+legend&aqs=chrome..69i57j0.7717j0j4&sourceid=chrome&ie=UTF-8
-* https://juba.github.io/tidyverse/08-ggplot2.html#
-  * Fortement recommandé
-* https://www.rstudio.com/resources/cheatsheets/
+- https://www.google.com/search?q=ggplot+theme%2C+dont+show+legend&oq=ggplot+theme%2C+dont+show+legend&aqs=chrome..69i57j0.7717j0j4&sourceid=chrome&ie=UTF-8
+- https://juba.github.io/tidyverse/08-ggplot2.html#
+  - Fortement recommandé
+- https://www.rstudio.com/resources/cheatsheets/
   
-* http://r4ds.had.co.nz/data-visualisation.html#aesthetic-mappings
-* http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html
-* http://www.cookbook-r.com/Graphs/
+- http://r4ds.had.co.nz/data-visualisation.html#aesthetic-mappings
+- http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html
+- http://www.cookbook-r.com/Graphs/
 
-* http://www.ggplot2-exts.org/gallery/
-  * Si vous y trouver de la passion...
+- http://www.ggplot2-exts.org/gallery/
+  - Si vous y trouver de la passion...
 
 
 
