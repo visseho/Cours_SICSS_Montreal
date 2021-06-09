@@ -1,0 +1,30 @@
+---
+title: 'Exercices jour 3 : Visualisation des données'
+author: "Visseho Adjiwanou, PhD."
+date: "09/06/2021"
+output:
+  beamer_presentation: default
+  ioslides_presentation: default
+---
+
+Vous utiliserez le fichier de données **mig** et **hdi** fourni sous format **.csv.**
+
+## Exercice 1
+
+1. Importer le fichier **mig.csv** dans RStudio.
+
+2. Créer un graphique à bandes empilées représentant la fréquence par province et territoires (**location**) selon le type de migration (**type**). Colorier les bandes selon le type de migration, labéliser convenablement les axes et donner un titre au graphique.
+
+## Exercice 2
+
+Créer des boites à moustache représentant les nombres de migration (**persons**) par province et territoires (**location**) selon le type de migration (**type**).
+
+## Exercice 3
+
+1. Importer le fichier **hdi.csv** dans RStudio.
+
+2. Représenter sur un nuage de points l'espérance de vie (**LifeExp**) en fonction du nombre d'années de scolarité attendu (**ExpYrsSchool**). Utiliser la palette de couleur brewer **Set2** pour distinguer les points selon le niveau de développement (**status**) et ajouter une ligne de tendance de couleur **or**. Labeliser enfin convenablement le graphique.
+
+## Exercice 4
+
+Avec le fichier **mig.csv**, représenter sur un même graphique l'évolution des entrées (**in-migration**) au cours de l'année 2016 (**quarter**) par province et territoires.

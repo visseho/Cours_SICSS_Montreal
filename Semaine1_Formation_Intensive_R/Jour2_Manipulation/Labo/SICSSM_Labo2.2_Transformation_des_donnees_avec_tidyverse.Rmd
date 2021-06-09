@@ -30,9 +30,10 @@ rm(list = ls())
     - command + Option + i (mac)
 - Pour exécuter une ligne de code, il faut se placer sur la ligne et faire 
     - command + Entree (mac)
+    
 ```{r}
 
-nom_classe <- c("guillaume", "amy", "andree", "john", "natacha")
+(nom_classe <- c("guillaume", "amy", "andree", "john", "natacha"))
 nom_classe
 
 sexe_classe <- c("h", "f", "f", "h", "f")
@@ -47,11 +48,11 @@ revenu_classe
 age_classe <- c(19, 25, 30, 27, 32)
 age_classe
 
-sexe_classe_factor <- factor(c(1, 0, 0, 1, 0), labels = c("Femme", "Homme"))
-sexe_classe_factor
+#sexe_classe_factor <- factor(c(1, 0, 0, 1, 0), labels = c("Femme", "Homme"))
+#sexe_classe_factor
 
-education_classe <- c("universite", "college", "secondaire", "universite", "college")
-education_classe
+#education_classe <- c("universite", "college", "secondaire", "universite", "college")
+#education_classe
 
 ```
 
@@ -72,7 +73,9 @@ Une base de données n'est qu'une mise ensemble de plusieurs vecteurs ou variabl
 
 ```{r}
 
-base_classe <- data.frame(nom = nom_classe, age = age_classe, sexe = sexe_classe, sexe01 = sexe_classe1, sexefactor = sexe_classe_factor, revenu = revenu_classe, education = education_classe)
+#base_classe <- data.frame(nom = nom_classe, age = age_classe, sexe = sexe_classe, sexe01 = sexe_classe1, sexefactor = sexe_classe_factor, revenu = revenu_classe, education = education_classe)
+
+base_classe <- data.frame(nom = nom_classe, age = age_classe, sexe = sexe_classe, sexe01 = sexe_classe1, revenu = revenu_classe)
 
 base_classe
 
@@ -91,7 +94,7 @@ base_classe[1, "nom"]
 base_classe[, "nom"]
 base_classe["nom"]
 base_classe["age2"] <- base_classe["age"]*2
-
+base_classe$age3 <- base_classe$age^2
 ```
 
 ## Quelle est la classe des éléments de cette base de données?
@@ -135,17 +138,18 @@ Donc ici, dans la partie code, j'ai mis un hashtag au début des commentaires po
 
 
 ```{r}
-# Effacer votre environnement
+#1. Effacer votre environnement
 
 rm(list = ls())
 
-# Installer les package dont vous avez besoin
+#2. Installer les package dont vous avez besoin
 
 #install.packages("tidyverse")
 #install.packages("summarytools")
 #install.packages("tinytex")
+#install.packages(haven)
 
-# Charger les packages - Étape fondamentales
+#3. Charger les packages - Étape fondamentales
 
 library(tidyverse)
 library(summarytools)
@@ -171,10 +175,11 @@ crsc96 <- read_csv("../Données/cora-crsc1996-E-1996_F1.csv")
 ```{r}
 # trois manière de faire
 
-#View(crsc96)
+View(crsc96)
 
 head(crsc96)
-#glimpse(crsc96)
+
+glimpse(crsc96)
 
 ```
 
@@ -337,14 +342,14 @@ Avant d'aller recoder/créer des variables factorielles, voyons les chagements q
 
 ## Changement d'échelle d'une variable numérique
 
-Pour toute variable continue, on peut utiliser les opérations mathématiques pour créer une nouvelle variable. Comme par exemple, le double de l'âge, ou l'écat de l'age de chaque individu par rapport à la moyenne. Comment pensez-vous qu'on va créer cette variable `age_ecart`? 
+Pour toute variable continue, on peut utiliser les opérations mathématiques pour créer une nouvelle variable. Comme par exemple, le double de l'âge, ou l'écart de l'age de chaque individu par rapport à la moyenne. Comment pensez-vous qu'on va créer cette variable `age_ecart`? 
 
 ```{r}
 
 crsc96_small <-
   crsc96_small %>% 
   mutate(age_double =  age*2,
-         age_écart = age - mean(age))
+         age_ecart = age - mean(age))
 
 ```
 
@@ -354,7 +359,7 @@ L'une des modification les plus importantes pour une variable continue est le ca
 
 crsc96_small <-
   crsc96_small %>% 
-  mutate(age_standardise = (age - mean(age))/sqrt(age))
+  mutate(age_standardise = (age - mean(age))/sd(age))
 
 ```
 
@@ -408,7 +413,7 @@ Finalement, bien qu'il soit une variable factorielle, on ne sait pas ce que sign
 
 crsc96_small <-
   crsc96_small %>% 
-  mutate(q1_new = factor(q1, labels = c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")))
+  mutate(q1_new1 = factor(q1, labels = c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")))
 
 class(crsc96_small$q1_new)
 
@@ -456,11 +461,19 @@ crsc96_small <-
 
 class(crsc96_small$age2)
 
+
+
+
+
+
+
 # Transformer en facteur
 
 crsc96_small <-
   crsc96_small %>% 
   mutate(age2bis = as.factor(if_else(age >= 35, "adulte", "jeune")))
+
+class(crsc96_small$age2bis)
 
 # utiliser factor
 
@@ -485,8 +498,17 @@ crsc96_small <-
   mutate(age4 = case_when(
     age < 20 ~ "adolescent",
     age >= 20 & age < 34 ~ "jeune",
-    age >= 35 & age <59 ~ "adulte",
-    age >=60 ~ "ainé"
+    age >= 34 & age <59 ~ "adulte",
+    age >=59 ~ "ainé"
+  ))
+
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age4 = case_when(
+    age < 20 ~ "adolescent",
+    age >= 20 & age <34 ~ "jeune",
+    
   ))
 
 class(crsc96_small$age4)
