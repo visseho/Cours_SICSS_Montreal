@@ -1,0 +1,629 @@
+---
+title: 'Labo 4.4: Régression logistique'
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Description de la base de données
+
+https://daviddalpiaz.github.io/appliedstats/logistic-regression.html
+
+bmk contient des données recueillies à Bamako, capitale du Mali, sur la mortalité infantile
+
+Name                              Description
+--------------------------------- -----------------------------------------------------
+`dead`                            Statut de survie de l'enfant (1= "decede", 0= "en vie")  
+`twin`                            Si l'enfant est un jumeau (1 = "jumeau", 0 = "unique")
+`female`                          Sexe de l'enfant (1 fille, 0 garçon)
+`agedc`                           Age au décès (en mois)
+`age15_19`                        Mère de l'enfant âgée de 15 à 19 ans, (1 si oui, 0 si non)
+`age35_49`                        Mère de l'enfant âgée de 35 à 49 ans, (1 si oui, 0 si non)
+`parity1`                         Enfant est de parité un (premier enfant)
+`parity6`                         Enfant est de parité 6 ou plus
+`bambara`                         Mère est d'ethnie Bambara (1 bambara, 0 autres)
+`primary`                         Mère de l'enfant a un niveau d'éducation primaire
+`secondary`                       Mère de l'enfant a un niveau d'éducation secondaire ou supérieur
+`id`                              Identifiant de l'enfant
+--------------------------------------------------------------------------------------
+
+## 1. Housekeeping
+
+
+
+```{r }
+
+rm(list = ls())
+
+library(devtools)
+#install_github("jrnold/qss-tidy")
+#devtools::install_github("kosukeimai/qss-package")
+#install.packages("haven")
+
+
+library(tidyverse)
+#library(ggpubr)         # help to combine figure
+#library(haven)
+#library(broom)
+library(readstata13)
+library(stargazer)
+
+library(summarytools)
+
+
+bmk <- read.dta13("/Users/visseho/OneDrive - UQAM/Cours/Bases_donnees/bmk.dta")
+
+
+```
+
+## 2. Comprendre les données
+
+- D'où proviennent les données manquantes dans agedc?
+
+```{r}
+head(bmk)
+glimpse(bmk)
+summary(bmk)
+View(bmk)
+
+with(bmk,
+     print(ctable(agedc, dead, prop = "no")))
+
+
+
+```
+Les données sont manquantes pour deux raisons:
+- le répondant ne connaît pas le statut de décès de 353 enfants
+- 9309 enfants ne disposent pas d'informations sur leur jour de décès car cette question ne s'adresse qu'aux enfants décédés. Ça a du sens. Vous devez donc toujours faire attention à la manière dont les données sont manquantes.
+
+## 3. Creation de nouvelles variables
+
+```{r}
+
+bmk <-
+  bmk %>% 
+  mutate(educ =factor(case_when(
+    primary == 1 ~ "primaire",
+    secondary == 1 ~ "secondaire",
+    primary == 0 & secondary == 0 ~ "Pas d'education")            # Pourquoi?
+  ))   
+
+# Vous devez toujours vérifié si la variable que vous avez créée est bien fait
+
+freq(bmk$educ) 
+ctable(bmk$educ, bmk$primary, useNA = "ifany", prop = "no")
+ctable(bmk$educ, bmk$secondary, useNA = "ifany", prop = "no")
+
+
+
+```
+
+## 4. Statistiques descriptives 
+
+```{r}
+
+# Use of base R
+table(bmk$dead, useNA = "ifany")
+table(bmk$educ, useNA = "ifany")
+tab_dead_educ <- table(bmk$educ, bmk$dead, useNA = "ifany")
+addmargins(tab_dead_educ)
+
+
+# Use of the package summarytools     
+freq(bmk$dead, order = "freq")         
+freq(bmk$dead, order = "freq", report.nas = FALSE)         
+
+descr(bmk$dead)                         
+
+ctable(bmk$educ, bmk$dead, report.nas = FALSE)          
+with(bmk, print(summarytools::ctable(educ, dead, report.nas = FALSE)))
+
+ctable(bmk$educ, bmk$dead, useNA = "no")          
+
+
+ggplot(bmk) +
+  geom_bar(aes(x = dead, y = ..prop.., group = 1))
+
+ggplot(bmk) +
+  geom_bar(aes(x = educ, fill = factor(dead)), position = "fill")
+
+# Il faut enlever alors les données manquantes
+
+  
+ggplot(bmk %>% filter(!is.na(educ) & !is.na(dead))) +
+  geom_bar(aes(x = educ, fill = factor(dead)), position = "fill")
+
+
+ggplot(bmk %>% filter(!is.na(educ) & !is.na(dead))) +
+  geom_bar(aes(x = educ, fill = factor(dead)), position = "dodge")
+
+
+## is.na(educ) donnera TRUE si la valeur de educ est manquante. Donc !is.na est le contraire.
+## Donc, filter(!is.na(educ) & !is.na(dead)) indique les données qui ne comportent pas de données manquantes ni pour educ, ni pour dead.
+
+
+## Relation entre twin et dead
+
+
+ggplot(bmk %>% filter(!is.na(twin) & !is.na(dead))) +
+  geom_bar(aes(x = twin, fill = factor(dead)), position = "fill")
+
+```
+
+
+## 5. Statistiques inférentielles
+
+#### 5.1 Modèle de probabilité linéaire simple
+
+```{r}
+
+bmk_old <- lm(formula = dead ~ twin, data = bmk)
+
+bmk_lpm <-
+  bmk %>% 
+  lm(formula = dead ~ twin)
+
+summary(bmk_lpm)
+
+coefficients(bmk_lpm)[2]
+
+bmk1 <-
+  bmk %>% 
+  filter(dead != "NA" , twin != "NA") %>% 
+  mutate(pred_dead = fitted.values(bmk_lpm), 
+         pred_deadc = coefficients(bmk_lpm)[1] + coefficients(bmk_lpm)[2]*twin)
+
+freq(bmk1$pred_dead, order = "freq")        
+freq(bmk1$pred_deadc, order = "freq")       
+
+
+bmk %>% 
+  ggplot(aes( x = twin, y = dead)) +
+  geom_point() +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+
+
+```
+On dira qu'être jumeau accroît la probabilité de décès de 6,7% (0.0677*100).
+
+### 5.2  Modèle de probabilité linéaire - multivarié
+
+```{r}
+
+bmk_lpm_gen <- 
+  bmk %>% 
+  lm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 + primary + secondary + bambara)
+
+summary(bmk_lpm_gen)  
+
+
+
+bmk_lpm_gen1 <- 
+  bmk %>% 
+  lm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 + educ + bambara)
+
+summary(bmk_lpm_gen1)
+
+```
+
+
+## Modèle logit
+
+Comme nous avons donné un nom à notre modèle (bmk_logit), R ne produira aucune sortie de notre régression. Pour obtenir les résultats, nous utilisons la commande summary:
+
+
+```{r}
+
+bmk_logit <-
+  bmk %>% 
+  glm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 +  primary + secondary + bambara, family = "binomial")
+
+summary(bmk_logit)
+
+
+
+```
+
+- Dans le résultat ci-dessus, la première chose que nous voyons est l'appel, c'est R qui nous rappelle le modèle que nous avons utilisé, les options que nous avons spécifiées, etc.
+
+- Nous voyons ensuite les résidus de déviance, qui sont une mesure de l'ajustement du modèle. Cette partie de la sortie montre la distribution des résidus de déviance pour les cas individuels utilisés dans le modèle. Nous expliquons ci-dessous comment utiliser les résumés de la statistique de déviance pour évaluer l'adéquation du modèle.
+
+- La partie suivante de la sortie montre les coefficients, leurs erreurs standard, la statistique z (parfois appelée statistique z de Wald) et les valeurs p associées. Seul **jumeau** est statistiquement significatif. Les coefficients de régression logistique donnent la variation de la **log odds** du résultat pour une augmentation **d'une unité de la variable prédictive**.
+
+- Les variables indicatrices ont une interprétation légèrement différente. Par exemple, le fait d'être un jumeau modifie les probabilités de décès de 0,9026.
+
+- En dessous du tableau des coefficients se trouvent des indices d'ajustement, comprenant les résidus nuls et déviance et l'AIC. Je montrerai plus tard un exemple d'utilisation de ces valeurs pour évaluer l'adéquation du modèle.
+
+
+Nous pouvons utiliser la fonction **confint** pour obtenir des intervalles de confiance pour les estimations de coefficients. Notez que pour les modèles logistiques, les intervalles de confiance sont basés sur la fonction de log-vraisemblance profilée. Nous pouvons également obtenir des CI basés uniquement sur les erreurs standard en utilisant la méthode par défaut.
+
+-----------------------
+- In the output above, the first thing we see is the call, this is R reminding us what the model we ran was, what options we specified, etc.
+
+- Next we see the deviance residuals, which are a measure of model fit. This part of output shows the distribution of the deviance residuals for individual cases used in the model. Below we discuss how to use summaries of the deviance statistic to assess model fit.
+
+- The next part of the output shows the coefficients, their standard errors, the z-statistic (sometimes called a Wald z-statistic), and the associated p-values. Only *twin* is statistically significant. The logistic regression coefficients give the change in the *log odds* of the outcome for a *one unit increase in the predictor variable*.
+    - The indicator (dummy) variables have a slightly different interpretation. For example, being a twin, changes the log odds of death by 0.9026.
+
+- Below the table of coefficients are fit indices, including the null and deviance residuals and the AIC. Later I will show an example of how you can use these values to help assess model fit.
+
+
+We can use the confint function to obtain confidence intervals for the coefficient estimates. Note that for logistic models, confidence intervals are based on the profiled log-likelihood function. We can also get CIs based on just the standard errors by using the default method.
+
+
+### Modèle logit - Intervalle de confiance et odd ratio
+
+```{r}
+
+confint(bmk_logit)
+
+exp(coefficients(bmk_logit))
+
+exp(cbind(OR = coef(bmk_logit), confint(bmk_logit)))
+
+```
+
+- Être jumeau a 2,45 fois plus de chances de mourir que de naître unique, tous les autres facteurs sont fixes.
+- Par rapport à un bébé unique, les chances de mourir (plutôt que de ne pas mourir) sont multipliées par 2,4 pour les bébés juneaux.
+
+- Notez que même si R le produit, le rapport de cotes pour l'intercept n'est généralement pas interprété.
+
+------------------------
+
+- Being a twin has 2.45 times higher chances of dying compare to being born single, all other factors maintains fixed. 
+- Compared to a single baby, for a twin baby the odds of dying (versus not dying) increase by a factor of 2.45
+- Note that while R produces it, the odds ratio for the intercept is not generally interpreted.
+
+## Modèle probit
+
+
+```{r}
+
+bmk_probit <-
+bmk %>% 
+  glm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 +  primary + secondary + bambara, family = "gaussian" )
+
+summary(bmk_probit)
+
+
+```
+
+Malheureusement, il n’existe aucun moyen d’expliquer ce résultat en termes de rapport de côtes (odds ratio). Vous interpréterez simplement le **signe** du paramètre estimé:
+- Un signe positif (+) signifie que la variable indépendante affecte positivement la variable dépendante
+- Un signe négatif (-) signifie que la variable indépendante affecte négativement la variable dépendante
+
+Et le **p value**. 
+
+- Une valeur de p inférieure à 0,05 (0,01 ou 0,001) signifie que la variable est **statistiquement** significative à 5% (1% ou 0,1% respectivement). Cependant, vous avez moins de pouvoir pour dire quelque chose à propos de la taille de l'effet. Pour cette raison, pour le modèle logit ou le modèle probit, il est préférable de **calculer la probabilité prédite** pour un groupe spécifique. Il y a différentes façons de le faire.
+
+Avant de faire cela, regardons rapidement tous nos résultats précédents:
+
+Unfortunately, there is no way to explain this result in terms of odd ratio. You will simply interpret the sign of the estimated parameter: 
+- A positive sign (+) means that the dependent variable affect positively the dependent variable
+- A negative sign (-) means that the dependent variable affect positively the dependent variable
+And the p value. A p value < than 0.05 (0.01 or 0.001) means that the variable is *statistically* significant at 5% (1% or 0.1% respectively). However, you have less power to say something about the size of the effect. For this reason, for logit model or the probit model, it is better to *compute the predicated probability* for specific group. There are different way that you can do it.
+
+Before we do that, lets quickly look at all our previous results:
+
+```{r}
+
+stargazer(bmk_lpm_gen, bmk_logit, bmk_probit, title = "Divers modèles de régression de variable dépendante dichotomique", align = TRUE, type = "text")
+
+```
+
+## Test statistiques
+
+
+```{r}
+### modèle non contraint (UM)
+
+bmk_logit_um <-
+  bmk %>% 
+  glm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 +  primary + secondary + bambara, family = "binomial" )
+
+summary(bmk_logit_um)
+
+ll_um <- logLik(bmk_logit_um)
+ll_um
+
+
+### Modèle contraint (RM) 
+
+bmk_logit_rm <-
+  bmk %>% 
+  glm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 + bambara, family = "binomial" )
+
+summary(bmk_logit_rm)
+
+ll_rm <- logLik(bmk_logit_rm)
+ll_rm
+
+## Likelihood ratio test
+
+LR <- -2*(ll_rm - ll_um)
+LR
+
+## Nombre de paramètres 2
+
+ll_rm
+ll_um
+LR
+
+```
+
+## Qualité de l'ajustement d'un modèle
+
+http://www.medicine.mcgill.ca/epidemiology/joseph/courses/epib-621/logfit.pdf
+
+
+
+## Régression avec variables dépendantes qualitatives: extension
+
+### Régression logistique multinomiales
+
+https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
+
+La base de données **Womenlf** du package **carData** de Fox, contient les données sur 263 femmes âgées de 21 à 30 ans, issues de l'enquête sociale de la populations canadienne en 1977. 
+cette base de données contient les informations suivantes:
+
+Variables            Description
+-------------------  -------------------------------------------------------------------
+partic               Participation au marché du travail (not.work, parttime, fulltime)
+hincome              Revenu du partenaire (en millier de dollars)
+children             Présence d'enfants dans le ménage (absent, present)
+region               Region (Atlantic, Quebec, Ontario, Paririe, BC)
+
+
+```{r}
+
+library(carData)
+data(package = "carData")
+data("Womenlf")
+
+summary(Womenlf)
+
+
+```
+
+Le modèle de régression logistique multinomial n'est pas un modèle traditionnel de GLM, et ne peut donc pas être estimé avec glm. Nous allons plutôt utiliser la fonction **multinom** du package **nnet**, qui fait partie de base R. Donc, nous n'avons pas besoin de le télécharcger avant de l'utiliser. Le package VGAM permet d'estimer le même modèle et bien d'autres modèles. 
+
+```{r}
+
+library(nnet)
+mod.multinom <- 
+  Womenlf %>% 
+  multinom(formula = partic ~ hincome + children + region)
+
+summary(mod.multinom)
+
+#S(mod.multinom)
+
+z_statistic <- summary(mod.multinom)$coefficients/summary(mod.multinom)$standard.errors
+z_statistic
+
+## 2 tailed z test 
+
+p <- (1 - pnorm(abs(z_statistic), 0, 1))*2
+p
+
+
+## Risque relatif 
+
+exp(coef(mod.multinom))
+
+```
+
+
+on peut changer la référence de la variable dépendante:
+
+```{r}
+
+Womenlf$partic1 <- relevel(Womenlf$partic, ref = "not.work")
+
+mod.multinom1 <- 
+  Womenlf %>% 
+  multinom(formula = partic1 ~ hincome + children + region)
+
+summary(mod.multinom1)
+
+
+```
+
+## Logit ordonné
+
+https://stats.idre.ucla.edu/r/dae/ordinal-logistic-regression/
+
+Il est estimé à partir de la fonction **polr** du package **MASS**
+
+
+```{r}
+library(MASS)
+
+mod.ordlog <- 
+  Womenlf %>% 
+  polr(formula = partic1 ~ hincome + children + region, Hess = TRUE)
+
+summary(mod.ordlog)
+
+exp(coef(mod.ordlog))
+
+```
+
+Pour les femmes qui ont des enfants à la maison, les chances de travailler (c’est-à-dire fulltime ou partime) sont 60% plus faibles que celles des femmes dont les enfants ne sont pas présents, toutes constantes restant inchangées.
+
+
+----------------------------------------
+
+## Probabilité prédite
+
+https://cran.r-project.org/web/packages/margins/vignettes/Introduction.html
+
+```{r}
+#install.packages("effects")
+library(effects)
+library(carData)
+
+
+bmklogit.mod <-
+  bmk %>% 
+  glm(formula = dead ~ twin + female + age15_19 + age35_49 + parity1 + parity6 +  primary + secondary + bambara, family = "binomial" )
+
+```
+
+
+
+
+
+
+## Predicted probability
+
+You can also use predicted probabilities to help you understand the model. Predicted probabilities can be computed for both categorical and continuous predictor variables. In order to create predicted probabilities we first need to create a new data frame with the values we want the independent variables to take on to create our predictions.
+
+We will start by calculating the predicted probability of dying at each value of parity, holding all other factors at a certain value. First we create and view the data frame.
+
+### X value at their reference 
+lets fix the value of the independent variable to their reference. (if continuous dependent variables, they will be set at their mean). Remember the reference is:
+R = {Twin = 0, female = 0, age15_19 = 0, age30_49 = 0, parity1 = 0, parity6 = 0, bambara = 0} or
+R = {Single baby, mother aged 20-29, parity1-5 and not bambara}
+
+
+```{r}
+
+# Remind the logit model
+summary(bmk_logit)
+
+coefficients(bmk_logit)[3]
+
+
+twin <- 0
+female <- 0 
+age15_19 <- 0
+age35_49 <- 0
+parity1 <- 0
+parity6 <- 0
+primary <- 0
+secondary <- 0
+bambara <- 0
+
+num <- exp(coefficients(bmk_logit)[1] + coefficients(bmk_logit)[2]*twin + coefficients(bmk_logit)[3]*female + coefficients(bmk_logit)[4]*age15_19 + coefficients(bmk_logit)[5]*age35_49 + coefficients(bmk_logit)[6]*parity1 + coefficients(bmk_logit)[7]*parity6 + coefficients(bmk_logit)[8]*primary + coefficients(bmk_logit)[9]*secondary + coefficients(bmk_logit)[10]*bambara)
+num
+
+den <- 1 + num
+den 
+
+p_single = (num / den)*1000
+p_single
+
+
+twin <- 1
+female <- 0 
+age15_19 <- 0
+age35_49 <- 0
+parity1 <- 0
+parity6 <- 0
+primary <- 0
+secondary <- 0
+bambara <- 0
+
+num <- exp(coefficients(bmk_logit)[1] + coefficients(bmk_logit)[2]*twin + coefficients(bmk_logit)[3]*female + coefficients(bmk_logit)[4]*age15_19 + coefficients(bmk_logit)[5]*age35_49 + coefficients(bmk_logit)[6]*parity1 + coefficients(bmk_logit)[7]*parity6 + coefficients(bmk_logit)[8]*primary + coefficients(bmk_logit)[9]*secondary + coefficients(bmk_logit)[10]*bambara)
+num
+
+den <- 1 + num
+den 
+
+p_twin = (num / den)*1000
+p_twin
+
+rr_twin_single <- p_twin / p_single
+rr_twin_single
+
+(p_twin/(1-p_twin) )/ (p_single / (1- p_single))
+
+
+twin <- 0
+female <- 1 
+age15_19 <- 0
+age35_49 <- 0
+parity1 <- 0
+parity6 <- 0
+primary <- 0
+secondary <- 0
+bambara <- 0
+
+
+
+
+
+# Now that you know how that works, lets do it with a more concise programming
+
+C1 <- c(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+
+
+matrix_IV <- matrix(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+                      0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 1), ncol = 10,
+                    dimnames=list(NULL, c("ref", "twin", "female",
+                                          "age15_19", "age35_49", "parity1", "parity6", "primary",
+                                          "secondary", "bambara")))
+matrix_IV
+
+coef_logit <- matrix(coefficients(bmk_logit), nrow = 10)
+#coef_logit <- coefficients(bmk_logit)
+
+matrix_num <- matrix_IV%*%coef_logit
+matrix_num
+coef_logit
+
+pp_logit <- matrix(exp(matrix_num)/(1 + exp(matrix_num))*1000, ncol = 10, 
+                   dimnames=list(NULL, c("pp_ref", "pp_twin", "pp_female",
+                                          "pp_age15", "pp_age35", "pp_par1", "pp_par6", "pp_prim",
+                                          "pp_sec", "pp_bam")))
+
+pp_logit
+p_single
+p_twin
+
+predicted_prob <- as.data.frame((pp_logit))
+predicted_prob <- 
+  predicted_prob %>% 
+  gather(key = pp_ref : pp_bam, value = "predicted probability") 
+  #mutate(relative_risk = `predicted probability`[i]/61.37103)
+
+predicted_prob
+  
+  
+relative_risk <- numeric(length = nrow(predicted_prob))  
+odd_ratio <- numeric(length = nrow(predicted_prob))  
+for (i in 1:10) {
+relative_risk[i] <- predicted_prob$`predicted probability`[i]/predicted_prob$`predicted probability`[1]
+odd_ratio[i] <- (predicted_prob$`predicted probability`[i]/(1 - predicted_prob$`predicted probability`[i]))/(predicted_prob$`predicted probability`[1]/(1 - predicted_prob$`predicted probability`[1]))
+}
+relative_risk
+odd_ratio
+
+logit_result <- cbind(predicted_prob, relative_risk, odd_ratio)
+
+logit_result
+
+```
+
+
+
+
+
+
+
+
+

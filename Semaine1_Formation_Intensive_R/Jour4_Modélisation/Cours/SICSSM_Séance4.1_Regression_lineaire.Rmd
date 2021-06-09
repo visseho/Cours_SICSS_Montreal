@@ -4,18 +4,17 @@ author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
+  slidy_presentation: default
   beamer_presentation:
     colortheme: beaver
     fonttheme: structurebold
     theme: Antibes
-  slidy_presentation: default
   ioslides_presentation: default
 ---
 
 
 ## Plan de présentation
 
-- Rappel du cours sur la causalité
 - Exemples graphiques
   - Exemple 1: accès aux médias et attitude face à la violence
   - Exemple 2: Relation entre taille et poids
@@ -23,7 +22,7 @@ output:
 - Présenter le modèle linéaire simple avec ces interprétations
 
 
-Exemple 1: Ouverture aux média et attitude face à la violence
+Exemple 1: Ouverture aux médias et attitude face à la violence
 ========================================================
 
 ## Exemple 1: 
@@ -54,7 +53,7 @@ Nom             Description
 rm(list = ls())
 
 library(tidyverse)
-dhs_ipv <- read_csv("dhs_ipv.csv")
+dhs_ipv <- read_csv("../Données/dhs_ipv.csv")
 
 ```
 
@@ -223,6 +222,7 @@ graph1
 
 ## Sur quoi nous basons-nous ou devons-nous nous baser pour choisir cette droite?
 
+
 Régression linéaire simple
 ========================================================
 
@@ -277,7 +277,7 @@ $$ E(Y|X) = \alpha + \beta X $$
 ## Spécification
 
 ```{r rline, echo=FALSE, fig.cap="", out.width = '100%'}
-knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/regression_line.png")
+knitr::include_graphics("../Données/regression_line.png")
 ```
 
 - $\beta_{0}$ = intersection à l'origine (intercept)
@@ -373,7 +373,7 @@ Estimation des paramètres
 
 
 ```{r, out.width="80%"}
-knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/hypotheses_regression.png")
+knitr::include_graphics("../Données/hypotheses_regression.png")
 ```
 
 ## Estimation des paramètres

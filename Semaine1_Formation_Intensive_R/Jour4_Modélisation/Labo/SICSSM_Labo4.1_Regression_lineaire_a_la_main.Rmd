@@ -1,0 +1,143 @@
+---
+title: 'Labo 4.1: Régression linéaire à la main'
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Travaux pratiques
+
+Les données du Tableau ci-dessous provenant de Data Bank donnent le poids corporel (lb) et la longueur corporelle (cm) des louves :
+
+| Observation | 1 | 2| 3| 4|5| 6| 7|
+|-------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|Poids (lb)   | 57 | 84| 90|	71|	77	|68|	73|
+|Longueur (cm)  |123 | 129| 143|	125|	122|	125|	122|
+
+1. Entrer les données dans R
+https://www.dummies.com/programming/r/how-to-create-a-data-frame-from-scratch-in-r/
+
+```{r}
+library(tidyverse)
+
+poids <- c(57, 84, 90, 71, 77, 68, 73)
+poids
+longueur <- c(123, 129, 143, 125, 122, 125, 122)
+longueur
+
+louve <- data_frame(poids, longueur)
+
+louve
+```
+
+2. Présenter un graphique montrant la relation entre le poids (variable dépendante) et la taille (variable indépendante)
+
+```{r}
+
+ggplot(louve) +
+  geom_point(aes(x = longueur, y = poids)) +
+  geom_smooth(aes(x = longueur, y = poids), method = "lm", se = FALSE, size = .5)
+
+```
+
+3. Quelle  est le sens de cette relation?
+
+Une relation positive. C'est à dire, qu'une plus grande taille est associée à un plus grand poids.
+
+4. En estimant que cette relation est linéaire, calculer les paramêtres $\alpha$ et $\beta$.
+
+
+```{r}
+
+louve <-
+  louve %>% 
+  mutate(dec_longueur = longueur - mean(longueur),
+         dec_longueur_sq = dec_longueur ^ 2,
+         dec_poids = poids - mean(poids),
+         prod_croise = dec_poids*dec_longueur)
+  
+louve
+
+coef_reg <- 
+  louve %>% 
+  summarise(beta = sum(prod_croise)/sum(dec_longueur_sq),
+            alpha = mean(poids) - beta*mean(longueur))
+
+coef_reg
+```
+
+
+
+5. Calculé le poids prédit
+
+```{r}
+a <- coef_reg[2]
+a
+b <- coef_reg[1]
+b
+
+louve <-
+  louve %>% 
+  mutate(poids_pred = -59.5586 + 1.053892	*longueur)
+
+louve
+```
+
+6. Calculé le résidu
+
+```{r}
+
+louve <-
+  louve %>% 
+  mutate( residu = poids - poids_pred)
+
+louve
+
+```
+
+Graphique 
+
+```{r}
+
+ggplot(louve) +
+  geom_point(aes(x = longueur, y = poids)) +
+  geom_smooth(aes(x = longueur, y = poids), method = "lm", se = FALSE, size = .5) +
+  geom_segment(aes(x = longueur, y = poids, xend = longueur, yend = poids_pred), color = "red")
+
+```
+
+
+## Régardons ce qu'on observe en utilisant directement la fonction de regression de r
+
+```{r}
+
+library(broom)
+
+reg1 <- lm(formula =  poids ~ longueur , data = louve)
+reg1
+summary(reg1)
+tidy(reg1)
+glance(reg1)
+results <- augment(reg1)
+
+louve <-
+  louve %>% 
+  mutate(longueur1 = longueur - 122)
+
+reg2 <- lm(formula =  poids ~ longueur1 , data = louve)
+reg2
+```
+
+
+
+Rappel: 
+
+- Coéficients estimés : $$\hat{\alpha} = \bar{Y} -  \hat{\beta} \bar{X}$$
+
+$$\hat{\beta} = \frac{\sum_{i=1}^n(Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n(X_i - \bar{X})^2}$$
+
+- Valeur prédite de la variable dépendante: $$\hat{Y} = \hat{\alpha} +  \hat{\beta} X$$
+- Résidue: $$\hat{\epsilon} = Y - \hat{Y}$$

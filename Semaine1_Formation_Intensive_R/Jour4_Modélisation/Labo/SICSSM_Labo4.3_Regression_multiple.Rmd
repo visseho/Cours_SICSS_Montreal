@@ -1,0 +1,281 @@
+---
+title: 'Labo 4.3: Régression linéaire multiple'
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+<!--
+
+library(car)
+library(qss)
+data("Prestige", package = "car")
+
+data("progresa", package = "qss")
+some(Prestige)
+head(Prestige)
+
+summary(Prestige)
+
+lm(prestige ~ income, data = Prestige)
+
+
+install.packages("readstata13")
+library(readstata13)
+
+poids <- read.dta13("/Users/visseho/OneDrive - UQAM/Cours/Bases_donnees/weight.dta")
+
+tanzania <- read.dta13("/Users/visseho/OneDrive - UQAM/Cours/Bases_donnees/TZIR63FL.dta")
+
+TZKR63FL
+
+-->
+
+
+
+```{r}
+
+rm(list = ls())
+
+library(tidyverse)
+library(summarytools)
+
+#install.packages("readstata13")
+library(readstata13)
+
+tanzania1 <- read.dta13("/Users/visseho/OneDrive - UQAM/Cours/Bases_donnees/TZKR63FL.dta")
+
+freq(tanzania1$v190)
+
+
+tanzania_child <-
+  tanzania1 %>% 
+  select(caseid, midx, v000, v001, v002, v003, v004, v005, v006, v007, v008, v009, v010, v011,
+         v012, v013, v016, v017, v024, v025, v106, v107, v133, v134, v137, v190, v191, v201,
+         v208, v209, v212, v213, b0:b16, m18:m19a, hwidx, hw1:hw19, v437, v438)
+
+freq(tanzania_child$m19)
+freq(tanzania_child$v438)
+freq(tanzania_child$v437)
+
+```
+
+## Visualisation
+
+```{r}
+
+poids1 <-
+  tanzania_child %>% 
+  filter(m19 <= 7500 & v438 < 5000 & v437 <=5000)
+
+
+ggplot(poids1) +
+  geom_point(aes(x = v012, y = m19))
+
+
+
+ggplot(poids1) +
+  geom_point(aes(x = v438, y = m19))
+
+
+
+
+ggplot(poids1) +
+  geom_point(aes(x = v133, y = m19))
+
+
+# Poids moyen
+
+
+ggplot(poids1) +
+  geom_point(aes(x = v201, y = m19))
+
+
+ggplot(poids1) +
+  geom_boxplot(aes(x = factor(v201), y = m19))
+
+
+ggplot(poids1) +
+  geom_point(aes(x = b11, y = m19))
+
+
+
+
+```
+
+## Scatterplot matrix
+
+https://ggobi.github.io/ggally/rd.html#ggmatrix
+
+```{r}
+
+poids_short <-
+   poids1%>% 
+  select(m19, v012, v438, v437, v133, v201, b11)
+
+#install.packages("GGally")
+library(GGally)
+
+ggpairs(poids_short)
+
+ggpairs(poids1, columns = c("m19", "v012", "v437"))
+
+ggpairs(poids1, columns = c("m19", "v012", "v438"), aes(col = v025, alpha = .2))
+ggpairs(poids1, columns = c("m19", "v012", "b4"), aes(col = b4))
+
+```
+
+
+## Estimation du modèle
+
+Régression simples
+
+https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf
+
+```{r}
+
+library(stargazer)
+
+reg1 <- lm(m19 ~ v012, data = poids1)
+reg1
+summary(reg1)
+
+reg2 <- lm(m19 ~ v438, data = poids1)
+summary(reg2)
+
+reg3 <- lm(m19 ~ v133, data = poids1)
+summary(reg3)
+
+reg4 <- lm(m19 ~ v201, data = poids1)
+summary(reg4)
+
+reg5 <- lm(m19 ~ b11, data = poids1)
+summary(reg5)
+
+stargazer(reg1, reg2, reg3, reg4, reg5, title = "Divers modèles", align = TRUE, type = "text")
+
+```
+
+## Régression multiple
+
+## Semblable dans le cours
+
+```{r}
+freq(poids1$v012)
+
+reg_mul1 <- lm(m19 ~ v190 + v012, data = poids1)
+summary(reg_mul1)
+
+```
+
+
+
+```{r}
+
+library(broom)
+reg_mul1 <- lm(m19 ~ v012 + v438 + v133 + v201 + b11, data = poids1)
+
+summary(reg_mul1)
+tidy(reg_mul1)
+```
+
+## Correction pour l'âge
+
+
+```{r}
+
+reg_mul2 <- update(reg_mul1, ~ . + poly(v012, 2, raw = TRUE))
+summary(reg_mul2)
+
+summary(update(reg_mul1, ~ . - v012 + poly(v012, 2, raw = TRUE)))
+
+#lm(m19 ~ poly(v012, 2, raw = TRUE), v438 + v133 + v201 + b11, data = poids1)
+
+
+reg_mul3 <- lm(m19 ~ poly(v012, 2, raw = TRUE)  + v438 + v133 + v201 + b11, data = poids1)
+
+summary(reg_mul3)
+
+```
+
+## Variable dichotomique 
+
+
+```{r}
+
+# Sexe
+freq(poids1$b4)
+
+reg6 <- lm(m19 ~ b4, data = poids1)
+summary(reg6)
+
+# Lieu de naissance
+reg7 <- reg1 <- lm(m19 ~ v025, data = poids1)
+summary(reg7)
+
+
+```
+
+## Variables catégorielles
+
+```{r}
+
+# Niveau d'éducation
+freq(poids1$v106)
+
+reg8 <- lm(m19 ~ v106, data = poids1)
+summary(reg8)
+
+summary(lm(m19 ~ relevel(v106, 3), data = poids1))
+
+
+ggplot(poids1) +
+  geom_boxplot(aes(x = v106, y = m19))
+```
+
+
+
+## Modèle final
+
+```{r}
+
+reg_mul_final <- lm(m19 ~ poly(v012, 2, raw = TRUE) + v106 + b4 + v438 + v201 + b11, data = poids1)
+summary(reg_mul_final)
+
+
+stargazer(reg_mul1, reg_mul2, reg_mul3, reg_mul_final, title = "Divers modèles", align = TRUE, type = "text")
+```
+
+
+
+## Interaction
+
+```{r}
+
+reg_int1 <- lm(m19 ~ b4 + v438 + v438:b4 , data = poids1)
+summary(reg_int1)
+
+```
+
+```{r}
+
+reg_int2 <- lm(m19 ~ v025 + v438 + v438:v025 , data = poids1)
+summary(reg_int2)
+
+
+reg_int3 <- lm(m19 ~ v106 + v438 + v438:v106 , data = poids1)
+summary(reg_int3)
+```
+
+
+## Shortcuts
+
+- a*b  = a + b + A:b
+- a*(b + c) = a+ B + c + a:b + a:c
+- (a + b + c)^2 = a + b + c + a:b + a:c + b:c
+- a*b*c = a+b+c +a:b + a:c + b:c + a:b:c
+

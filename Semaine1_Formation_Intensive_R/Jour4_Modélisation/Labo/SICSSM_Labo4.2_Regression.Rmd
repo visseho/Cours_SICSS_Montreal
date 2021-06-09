@@ -1,0 +1,277 @@
+---
+title: "Labo 6"
+author: "Visseho Adjiwanou, PhD."
+date: "02/11/2020"
+output: html_document
+---
+
+## Exemple 1: 
+
+Présenter à nouveau la discussion sur la relation entre violence conjugale et l'accès à l'information mesurée par les variables `sec_school` et `no_media`. ouverture aux médias éducation et radio
+
+## Exemple
+
+Name             Description
+---------------  --------------------------------------------------------------
+`beat_goesout`   Pourcentage de femmes dans chaque pays qui pensent qu'un mari
+                  a le droit de battre sa femme si elle sort sans le lui dire.
+`beat_burnfood`  Pourcentage de femmes dans chaque pays qui pensent qu'un mari 
+                  a le droit de battre sa femme si elle brûle sa nourriture.  
+`no_media`       Pourcentage de femmes dans chaque pays qui ont rarement accès
+                  un journal, une radio ou une télévision.
+`sec_school`     Pourcentage de femmes dans chaque pays ayant un niveau
+                  d'éducation secondaire ou supérieur.
+`year`           Année de l'enquête
+`region`         Région du monde
+`country`        pays
+---------------  --------------------------------------------------------------
+
+
+```{r}
+
+rm(list = ls())
+
+#install.packages("broom")
+
+library(tidyverse)
+library(summarytools)
+library(broom)
+dhs_ipv <- read_csv("../dhs_ipv.csv")
+
+summary(dhs_ipv)
+
+```
+
+# Régression linéaire simple
+
+## Effet du niveau de scolarisation sur l'attitude face à la violence
+
+```{r}
+class(dhs_ipv$beat_burnfood)
+
+lm(beat_burnfood ~ sec_school, data = dhs_ipv)
+
+```
+
+Comment interprétez-vous ces résultats?
+
+**Interprétation**
+
+Une augmentation d'une unité du pourcentage de femmes ayant le niveau secondaire ou plus entraîne une diminution de 0,38 soit de 38% du pourcentage des femmes qui estiment qu'une femme doit être battue si elle brûle la nourriture.
+
+
+De manière générale, on dit:
+
+Une augmentation d'une unité de la **variable indépendante** entraîne une  augmentation/diminution de $\beta$ de la **variable dépendante**
+
+
+## Formes du résultats
+
+```{r}
+
+reg1 <- lm(beat_burnfood ~ sec_school, data = dhs_ipv)
+reg1
+
+# ou
+
+coef(reg1)
+```
+
+## Des résultats plus détaillés
+
+```{r}
+
+summary(reg1)
+
+```
+
+
+
+## Relation entre beat_burnfood et le non-accès aux médias
+
+```{r}
+
+reg2 <- lm(beat_burnfood ~  no_media, data = dhs_ipv)
+summary(reg2)
+
+```
+
+## Relation entre beat_burnfood et la région
+
+```{r}
+
+class(dhs_ipv$region)
+freq(dhs_ipv$region)
+
+reg3 <- lm(beat_burnfood ~  region, data = dhs_ipv)
+reg3
+summary(reg3)
+
+
+```
+
+
+
+## Relation entre beat_burnfood et l'année
+
+```{r}
+
+class(dhs_ipv$year)
+dhs_ipv <-
+  dhs_ipv %>% 
+  mutate(year_binaire = factor(if_else(year <= 2010, "Avant 2010", "Apres 2010")))
+
+freq(dhs_ipv$year_binaire)
+
+reg4 <- lm(beat_burnfood ~  year_binaire, data = dhs_ipv)
+summary(reg4)
+
+```
+
+## Changement de la catégorie de référence
+
+https://stackoverflow.com/questions/3872070/how-to-force-r-to-use-a-specified-factor-level-as-reference-in-a-regression
+
+```{r}
+
+reg5 <- lm(beat_burnfood ~ relevel(year_binaire, ref = "Avant 2010"), data = dhs_ipv)
+coef(reg5)
+
+```
+
+
+```{r}
+
+dhs_ipv <-
+  dhs_ipv %>% 
+  mutate(year_binaire1 = factor(if_else(year <= 2010, "Avant 2010", "Apres 2010"), levels = c("Avant 2010", "Apres 2010")))
+
+freq(dhs_ipv$year_binaire1)
+
+reg6 <- lm(beat_burnfood ~  year_binaire1, data = dhs_ipv)
+summary(reg6)
+
+```
+
+
+# Régression multiple
+
+## Relation entre attitude face a la violence et ouverture
+
+
+```{r}
+
+reg_mul1 <- lm(beat_burnfood ~ sec_school + no_media, data = dhs_ipv)
+reg_mul1
+
+summary(reg_mul1)
+
+cor(dhs_ipv$sec_school, dhs_ipv$no_media, use = "pairwise.complete.obs")
+
+?cor
+
+
+```
+
+**Interprétation**
+
+**Toute choses étant égales par ailleurs (*ceteris paribus*)**, une augmentation d'une unité du pourcentage de femmes ayant le niveau secondaire ou plus entraîne une diminution de 0,103 soit de 10% du pourcentage des femmes qui estiment qu'une femme doit être battue si elle brûle la nourriture.
+
+Pourquoi l'effet de l'éducation avait baissé? On avait trouvé avant une diminution de 38%.
+
+Il faut regarder dans les hypothèses, celles qui peut avoir causer cela. 
+
+
+```{r}
+knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/hypotheses_regression.png")
+```
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/hypotheses_regression.png)
+
+
+## Modèle général
+
+
+```{r}
+
+reg_mul2 <- lm(beat_burnfood ~ sec_school + no_media + region + year_binaire, data = dhs_ipv)
+summary(reg_mul2)
+
+```
+
+
+
+## Combinons les résultats
+
+- Le package stargazer est un excellent package que vous devez avoir dans votre boîte à outils R. Il permet de combiner plusieurs résultats de régression.
+
+```{r}
+
+library(stargazer)
+
+```
+
+https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf
+
+
+## Combinons les résultats
+
+```{r}
+
+stargazer(reg1, reg2, reg_mul1, reg_mul2, title = "Divers modèles", align = TRUE, type = "text")
+
+```
+
+
+## Utilisation du package broom
+
+- Nécessaire pour réutiliser les données de la régression
+
+```{r}
+
+summary(reg_mul2)
+
+result <- summary(reg_mul2)
+result
+
+result[[1]][]
+
+```
+
+## Tidy
+
+- tidy
+- glance
+- augment
+
+```{r}
+
+tidy(reg_mul2)
+
+result1 <- tidy(reg_mul2)
+
+result1$estimate[3]
+
+```
+
+
+
+## Glance
+
+```{r}
+
+glance(reg_mul2)
+result2 <- glance(reg_mul2)
+
+```
+
+
+## Augment
+
+```{r}
+
+augment(reg_mul2)
+
+
+```
+
