@@ -1,0 +1,193 @@
+---
+title: "Séance 3 : Visualisation des données"
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+
+Vous utiliserez le fichier de données **mig** et **hdi** fourni sous format **.csv.**
+
+## Exercice 1
+
+1. Importer le fichier **mig.csv** dans RStudio.
+
+
+```{r}
+
+rm(list = ls())
+
+library(tidyverse)
+library(summarytools)
+
+mig <- read.csv("../Données/mig.csv")
+
+```
+
+2. Créer un graphique à bandes empilées représentant la fréquence par province et territoires (**location**) selon le type de migration (**type**). Colorier les bandes selon le type de migration, labéliser convenablement les axes et donner un titre au graphique.
+
+```{r}
+table(mig$type)
+
+freq(mig$type)
+
+table(mig$location, mig$type)
+attach(mig)
+table(location, type)
+
+ctable(location, type)
+
+```
+
+
+```{r}
+
+ggplot(mig) +
+  geom_bar(aes(x = location,
+               fill = type)) +
+  labs(x = "Provinces & Territories",
+       y = "Count",
+       title = "Number of occurences in the dataset") #+
+ # coord_flip()
+
+```
+https://ggplot2.tidyverse.org/articles/ggplot2-specs.html
+
+
+```{r}
+
+ggplot(mig) +
+  geom_bar(aes(x = location,
+               fill = type)) +
+  labs(x = "Provinces & Territories",
+       y = "Count",
+       title = "Number of occurences in the dataset") +
+  theme(legend.position = "right",
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 325),
+        axis.title.x = element_blank())
+
+```
+
+
+## Exercice 2
+
+Créer des boites à moustache représentant les nombres de migration (**persons**) par province et territoires (**location**) selon le type de migration (**type**).
+
+```{r}
+
+ggplot(mig) +
+  geom_boxplot(aes(x = location, y = persons)) +
+  facet_wrap(. ~type) + 
+  coord_flip()
+
+```
+
+https://www.rapidtables.com/web/color/RGB_Color.html
+
+```{r}
+ggplot(mig) +
+  geom_boxplot(aes(x = type, y = persons, color = type)) +
+  scale_color_manual(values = c("#00FF00", "#56B4E9")) +
+#  guides(color = FALSE) +
+  facet_wrap(. ~location) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 380),
+        axis.title.x = element_blank())
+```
+
+
+## Exercice 3
+
+1. Importer le fichier **hdi.csv** dans RStudio.
+
+```{r}
+
+hdi <- read.csv("../Données/hdi.csv")
+
+```
+
+2. Représenter sur un nuage de points l'espérance de vie (**LifeExp**) en fonction du nombre d'années de scolarité attendu (**ExpYrsSchool**). Utiliser la palette de couleur brewer **Set2** pour distinguer les points selon le niveau de développement (**status**) et ajouter une ligne de tendance de couleur **or**. Labeliser enfin convenablement le graphique.
+
+
+```{r}
+
+ggplot(hdi,
+       aes(x = ExpYrsSchool,
+           y = LifeExp)) +
+  geom_point(aes(color = Status, alpha = 0.2)) +
+  geom_smooth(color = "gold") +
+  scale_color_brewer(palette = "Set2") +
+  guides(alpha = FALSE) +
+  theme_dark() +
+  labs(x ="Expected Years of Schooling",
+       y = "Life Expectancy at Birth in Years",
+       title = "Dependency of Life Expectancy on Education")
+
+```
+
+```{r}
+
+ggplot(hdi, aes( x = Year, y = MnYrsSchool)) +
+  geom_point() +
+  geom_jitter()
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+#install.packages("wesanderson")
+
+library(wesanderson)
+
+ggplot(data = hdi,
+       mapping = aes(x = ExpYrsSchool,
+                     y = LifeExp)) +
+  geom_point(aes(color = Status)) +
+  geom_smooth(color = "gold", se = FALSE) +
+  scale_color_manual(values = wes_palette(n = 2, name = "Zissou1")) +
+  theme_minimal() +
+  labs(x ="Expected Years of Schooling",
+       y = "Life Expectancy at Birth in Years",
+       title = "Dependency of Life Expectancy on Education") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+```
+
+## Exercice 4
+
+Avec le fichier **mig.csv**, représenter sur un même graphique l'évolution des entrées (**in-migration**) au cours de l'année 2016 (**quarter**) par province et territoires.
+
+```{r}
+
+ggplot(mig %>% filter(year == 2016 & type == "in-migration")) +
+  geom_line(aes(x = quarter, y = persons, group = location, color = location)) #+
+  facet_wrap(~location)
+
+
+```
+
+```{r}
+
+ggplot(mig %>% filter(year == 2016 & type == "in-migration"),
+       aes(x = quarter, y = persons)) +
+  geom_line(aes(group = location, color = location)) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_classic() +
+  labs(x = "Quarter of the Year",
+       y = "Number of Persons",
+       title = "In-migration to Provinces & Territories in the Year 2016") +
+  guides(color = guide_legend(title = "Provinces/Territories"))
+
+
+```
+
