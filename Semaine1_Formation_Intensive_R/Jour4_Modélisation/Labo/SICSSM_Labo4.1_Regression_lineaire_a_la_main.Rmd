@@ -21,6 +21,7 @@ Les données du Tableau ci-dessous provenant de Data Bank donnent le poids corpo
 https://www.dummies.com/programming/r/how-to-create-a-data-frame-from-scratch-in-r/
 
 ```{r}
+
 library(tidyverse)
 
 poids <- c(57, 84, 90, 71, 77, 68, 73)
@@ -61,12 +62,36 @@ louve <-
   
 louve
 
+
+
 coef_reg <- 
   louve %>% 
   summarise(beta = sum(prod_croise)/sum(dec_longueur_sq),
             alpha = mean(poids) - beta*mean(longueur))
 
 coef_reg
+coef_reg[[1]]
+coef_reg[[2]]
+
+class(coef_reg[1])
+class(coef_reg[[1]])
+```
+
+```{r}
+
+ggplot(louve) +
+  geom_point(aes(x = longueur, y = poids)) +
+  geom_abline(aes(intercept = coef_reg[[2]], slope = coef_reg[[1]]), color = "red") +
+  geom_smooth(aes(x = longueur, y = poids), method = "lm", se = FALSE)
+
+```
+```{r}
+coef_reg
+
+ggplot(louve) +
+  geom_point(aes(x = longueur, y = poids)) +
+  geom_abline(data = coef_reg, aes(intercept = coef_reg$alpha, slope = coef_reg$beta), color = "red")
+
 ```
 
 
@@ -74,14 +99,14 @@ coef_reg
 5. Calculé le poids prédit
 
 ```{r}
-a <- coef_reg[2]
+a <- coef_reg[[2]]
 a
-b <- coef_reg[1]
+b <- coef_reg[[1]]
 b
 
 louve <-
   louve %>% 
-  mutate(poids_pred = -59.5586 + 1.053892	*longueur)
+  mutate(poids_pred = a + b	*longueur)
 
 louve
 ```
@@ -112,17 +137,32 @@ ggplot(louve) +
 
 ## Régardons ce qu'on observe en utilisant directement la fonction de regression de r
 
+https://www.rdocumentation.org/packages/broom/versions/0.7.6
+
 ```{r}
-
+#install.packages("broom")
 library(broom)
+?broom
+reg1 <- lm(formula =  poids ~ longueur, data = louve)
+reg1
+reg <- 
+  louve %>% 
+  lm(formula =  poids ~ longueur)
 
-reg1 <- lm(formula =  poids ~ longueur , data = louve)
+
 reg1
 summary(reg1)
-tidy(reg1)
+summary(reg1)[2]
+
+tableau_reg <- tidy(reg1)
+tableau_reg
+tableau_reg$estimate
+
 glance(reg1)
 results <- augment(reg1)
+results
 
+# Changement variable indépendante
 louve <-
   louve %>% 
   mutate(longueur1 = longueur - 122)

@@ -1,8 +1,11 @@
 ---
-title: "Labo 6"
+title: 'Labo 4.2: Régression linéaire :Violence'
 author: "Visseho Adjiwanou, PhD."
-date: "02/11/2020"
-output: html_document
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ## Exemple 1: 
@@ -36,7 +39,7 @@ rm(list = ls())
 library(tidyverse)
 library(summarytools)
 library(broom)
-dhs_ipv <- read_csv("../dhs_ipv.csv")
+dhs_ipv <- read_csv("../Données/dhs_ipv.csv")
 
 summary(dhs_ipv)
 
@@ -133,6 +136,7 @@ summary(reg4)
 https://stackoverflow.com/questions/3872070/how-to-force-r-to-use-a-specified-factor-level-as-reference-in-a-regression
 
 ```{r}
+?relevel
 
 reg5 <- lm(beat_burnfood ~ relevel(year_binaire, ref = "Avant 2010"), data = dhs_ipv)
 coef(reg5)
@@ -221,6 +225,7 @@ https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf
 stargazer(reg1, reg2, reg_mul1, reg_mul2, title = "Divers modèles", align = TRUE, type = "text")
 
 ```
+
 
 
 ## Utilisation du package broom
