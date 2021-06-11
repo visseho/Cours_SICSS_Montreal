@@ -34,7 +34,7 @@ Validité des hypothèses
 
 - Ce que ce graphique montre est une indication de:
   - Non-linéarité
-  - Non-normalité de
+  - Non-normalité et
   - Hétéroscédasticité
 
 ## Résidus versus les valeurs prédites de Y
