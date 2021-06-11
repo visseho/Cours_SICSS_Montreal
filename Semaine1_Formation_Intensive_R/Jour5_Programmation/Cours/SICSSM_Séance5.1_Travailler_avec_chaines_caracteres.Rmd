@@ -8,7 +8,7 @@ output: html_document
 
 # Introduction
 
-Les chiffres sont pour l'analyse quantitative, ce que le mot est pour l'analyse de texte. De ce fait, il est important d'apprendre à manipuler les mots/caractères avant de commencer la modélisation de données textuelles. Dans cette partie cours-labo, je vais vous apprendre les outils dont R dispose pour traiter les caractères. Comme la plupart des outils qui existent pour traiter des textes, R va faire recours aux expressions régulières pour faire correspondre les textes dans les chaînes de caractères. 
+Les chiffres sont pour l'analyse quantitative, ce que les mots sont pour l'analyse de texte. De ce fait, il est important d'apprendre à manipuler les mots/caractères avant de commencer la modélisation de données textuelles. Dans cette partie cours-labo, je vais vous apprendre les outils dont R dispose pour traiter les caractères. Comme la plupart des outils qui existent pour traiter des textes, R va faire recours aux expressions régulières pour faire correspondre les textes dans les chaînes de caractères. 
 
 
 # Références
@@ -24,7 +24,7 @@ Notez que ces données sont *assez volumineuses*. Vous voudrez les enregistrer e
 
 ```{r download_restaurant_data, eval=FALSE}
 
-
+rm(list = ls())
 
 library(tidyverse)
 library(summarytools)
@@ -87,11 +87,11 @@ Nous pouvons utiliser `substr ()` pour extraire uniquement les 5 premiers chiffr
 restaurants <- 
   restaurants %>%
   mutate(ZIP_5 = substr(Zip_Code, 1, 5),
-         ZIP_4 = substr(Zip_Code, 2, 4))
+         ZIP_3 = substr(Zip_Code, 2, 4))
 
 ?substr
 restaurants %>% distinct(ZIP_5) %>% head()
-restaurants %>% distinct(ZIP_4) %>% head()
+restaurants %>% distinct(ZIP_3) %>% head()
 
 ```
 
@@ -120,9 +120,11 @@ restaurants %>% distinct(mailing_address) %>% head()
 
 ```{r paste0}
 
+
 paste(1:5, letters[1:5]) # sep met un espace par défaut
 paste(1:5, letters[1:5], sep ="")
 paste0(1:5, letters[1:5])
+
 ```
 
 
@@ -135,6 +137,7 @@ Voici quelques exemples; assurez-vous de comprendre comment chaque ensemble d'ar
 ```{r paste_practice, eval=TRUE, results="hold"}
 paste(letters[1:5])
 paste(1:5, letters[1:5], sep = "+")
+
 paste(letters[1:5], collapse = "!")
 paste0(1:5, letters[1:5], collapse = "???")
 paste(1:5, "Z", sep = "*")
@@ -145,6 +148,7 @@ paste(1:5, "Z", sep = "*", collapse = " ~ ")
 
 # Les fonctions pour travailler avec les chaines de charactères (avec stringr)
 
+https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
 
 ## `stringr`
 
@@ -171,6 +175,8 @@ De façon pratique, **la plupart** des fonctions `stringr` commence par "`str_`"
 - `str_sub ()` est comme `substr ()` mais vous permet également de mettre des valeurs négatives pour compter à rebours depuis la fin (-1 est la fin, -3 est le troisième depuis la fin):
 
 ```{r str_sub_example}
+
+str
 
 str_sub("Washington", 3, 8)
 str_sub("Washington", -3, -1)
@@ -222,6 +228,11 @@ restaurants <-
   restaurants %>%
   mutate_at(vars(Name, Address, City), ~ str_to_upper(.))
 
+#restaurants <- 
+#  restaurants %>%
+#  mutate(Name = str_to_upper(),
+#         Address = str_to_upper(),
+#         City = str_to_upper())
 
 #restaurants <- 
 #  restaurants %>%
@@ -238,7 +249,7 @@ Les espaces blancs de début ou de fin supplémentaires sont courants dans les d
 
 ```{r show_whitespace}
 
-head(unique(restaurants$Name), 6)
+head(unique(restaurants$Name), 20)
 
 ```
 
@@ -333,16 +344,17 @@ Mais PAS pour correspondre à "206" se trouvant ailleurs:
 
 ```{r look_for_206}
 
-code_206_pattern <- "^\\(?206"
+code_206_pattern <- "^\\(?206|^\\(?306"
 
 exemple_test <- c("2061234567", "(206)1234567",
-                         "(206) 123-4567", "555-206-1234")
+                         "(306) 123-4567", "555-206-1234")
 
 exemple_test
 
 str_detect(exemple_test, "^\\(?206")
 
 str_detect(exemple_test, code_206_pattern)
+
 str_detect(exemple_test, "206")
 
 
@@ -372,6 +384,8 @@ Faites juste attention à ne pas charger un long vecteur / variable entier ou ce
 
 ```{r look_for_206_rest}
 
+code_206_pattern <- "^\\(?206"
+
 restaurants %>% 
   mutate(contient_nombre_206 = 
            str_detect(Phone, code_206_pattern)) %>% 
@@ -396,7 +410,7 @@ direction_pattern1 <- "(N|NW|NE|S|SW|SE|W|E)"
 
 
 direction_exemples <- c("2812 THORNDYKE AVE W", "512 NW 65TH ST",
-                        "407 CEDAR ST", "15 NICKERSON ST")
+                        "407 CEDAR ST", "15 NICKERSON ST ")
 
 direction_exemples
 
@@ -436,9 +450,11 @@ Peut-être que nous voulons faire une analyse des inspections au niveau de la ru
 address_number_pattern <- "^[0-9]*-?[A-Z]? (1/2 )?"
 
 address_number_test_examples <- 
-  c("2812 THORNDYKE AVE W", "1ST AVE", "10A 1ST AVE", 
+  c("2812 THORNDYKE AVE W", "1ST AVE", "10AA 1ST AVE", 
     "10-A 1ST AVE", "5201-B UNIVERSITY WAY NE",
     "7040 1/2 15TH AVE NW")
+
+address_number_test_examples
 
 str_replace(address_number_test_examples, 
             address_number_pattern, replacement = "")
@@ -540,6 +556,7 @@ restaurants %>%
 Vous pouvez diviser les chaînes en utilisant `tidyr :: separate()`. Une autre option est `str_split ()`, qui divisera les chaînes en fonction d'un modèle séparant les parties et mettra ces composants dans une liste. `str_split_fixed ()` fera cela mais avec une matrice à la place (et ne peut donc pas avoir un nombre variable de séparateurs):
 
 ```{r str_split_violation}
+?separate
 
 head(unique(restaurants$Violation_Description))
 
