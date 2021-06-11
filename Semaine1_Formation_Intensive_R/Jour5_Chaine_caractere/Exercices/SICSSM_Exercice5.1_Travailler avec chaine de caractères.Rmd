@@ -1,0 +1,33 @@
+---
+title: "Exercice 5: Travailler avec chaîne de caractères"
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+# Partie A
+
+Dans cet exercice, vous aller travailler à partir des données des Nations-Unies **fertility_UN.xlsx**.
+Cette base de données contient les informations sur le niveau de la fécondité dans l'ensemble des pays du monde depuis 1950.
+
+1. Présenter un graphique qui montre l'évolution de la fécondité de la période 1950-1955 à 2015-2020 des régions géographiques suivantes:
+- SUB-SAHARAN AFRICA
+- NORTHERN AFRICA AND WESTERN ASIA
+- CENTRAL AND SOUTHERN ASIA
+- EASTERN AND SOUTH-EASTERN ASIA
+- LATIN AMERICA AND THE CARIBBEAN
+- AUSTRALIA/NEW ZEALAND
+- OCEANIA (EXCLUDING AUSTRALIA AND NEW ZEALAND)
+- EUROPE AND NORTHERN AMERICA
+
+Vous pouvez créer un graphique dynamique
+
+**Remarques**: Vous serez amené à changer la forme de la base de données et le rendre en format long.
+
+2. Créer un diagramme de texte (geom_text), dans un diagramme de boite à moustaches qui présente pour les deux périodes 1950-1955 et 2015-2020 la fécondité de l'ensemble des pays.
+
+
+# Partie B (A venir)

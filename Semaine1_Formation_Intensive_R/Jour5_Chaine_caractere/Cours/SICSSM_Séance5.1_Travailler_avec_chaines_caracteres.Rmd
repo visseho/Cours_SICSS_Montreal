@@ -576,10 +576,12 @@ head(str_split_fixed(restaurants$Violation_Description, " - ", n = 2))
 
 `str_replace_all(string, pattern, replacement)`: Effectue plusieurs remplacements simultanément
 
-# Références
+# Références + Ressources
 
-https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf
+- https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf
 http://edrub.in/CheatSheets/cheatSheetStringr.pdf
+
+- https://regexr.com/
 
 
 **Remarques**
