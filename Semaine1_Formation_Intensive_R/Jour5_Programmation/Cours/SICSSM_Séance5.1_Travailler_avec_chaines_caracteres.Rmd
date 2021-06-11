@@ -1,0 +1,606 @@
+---
+title: 'Séance 5.1: Travailler avec les chaines de caractères'
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+# Introduction
+
+Les chiffres sont pour l'analyse quantitative, ce que le mot est pour l'analyse de texte. De ce fait, il est important d'apprendre à manipuler les mots/caractères avant de commencer la modélisation de données textuelles. Dans cette partie cours-labo, je vais vous apprendre les outils dont R dispose pour traiter les caractères. Comme la plupart des outils qui existent pour traiter des textes, R va faire recours aux expressions régulières pour faire correspondre les textes dans les chaînes de caractères. 
+
+
+# Références
+
+https://www.rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf
+
+
+# Données
+
+Nous utiliserons les données sur les inspections de sécurité alimentaire dans le comté de King à partir de [data.kingcounty.gov](https://data.kingcounty.gov/Health/Food-Establishment-Inspection-Data/f29f-zza5).
+
+Notez que ces données sont *assez volumineuses*. Vous voudrez les enregistrer et les charger à partir d'un *répertoire local*.
+
+```{r download_restaurant_data, eval=FALSE}
+
+
+
+library(tidyverse)
+library(summarytools)
+#library(xaringanthemer)
+
+restaurants <- read_csv("../Données/restaurants.csv",
+                        col_types = "ccccccccnnccicccciccciD") 
+
+
+
+#restaurants <- readRDS("../Données/restaurants.RData")
+
+glimpse(restaurants)
+#saveRDS(restaurants, "restaurants.RData")
+
+```
+
+
+# Strings
+
+Un terme de programmation général pour une unité de données de caractères est une **chaîne**, qui est définie comme *une séquence de caractères*. Dans R, les termes "chaînes" et "données de caractères" sont pour la plupart interchangeables.
+
+-
+
+Dans d'autres langages, "chaîne" fait souvent référence à une *séquence * d'informations numériques, comme chaînes binaires (par exemple "01110000 01101111 01101111 01110000"). Nous les utilisons rarement dans R.
+
+-
+
+Notez qu'il s'agit de *séquences* de nombres plutôt que de nombres uniques, et donc de *chaînes*.
+
+Une chose qui sépare une chaîne d'un nombre est que les zéros en tête sont significatifs: `01! = 1`
+
+# Les fonctions pour travailler avec les chaines de charactères (avec Basic R)
+
+## `nchar()`
+
+La fonction `nchar ()` permet d'obtenir le nombre de caractères dans une chaîne. Combien de caractères les codes postaux contiennent-ils?
+
+```{r nchar_zip}
+
+head(restaurants$Zip_Code)
+
+restaurants <- 
+  restaurants %>% 
+  mutate(ZIP_length = nchar(Zip_Code)) #%>%
+#  count(ZIP_length)
+
+freq(restaurants$ZIP_length)
+
+
+```
+
+
+## `substr()`
+
+Nous pouvons utiliser `substr ()` pour extraire uniquement les 5 premiers chiffres du code postal.
+
+```{r substr}
+
+restaurants <- 
+  restaurants %>%
+  mutate(ZIP_5 = substr(Zip_Code, 1, 5),
+         ZIP_4 = substr(Zip_Code, 2, 4))
+
+?substr
+restaurants %>% distinct(ZIP_5) %>% head()
+restaurants %>% distinct(ZIP_4) %>% head()
+
+```
+
+
+## `paste()`
+
+Nous pouvons combiner des parties de chaînes ensemble en utilisant la fonction `paste ()`, par ex. pour faire une adresse postale complète:
+
+```{r mailing_address}
+
+head(unique(restaurants$Address))
+
+
+restaurants <- 
+  restaurants %>%
+  mutate(mailing_address = 
+           paste(Address, ", ", City, ", WA ", ZIP_5, sep = ""))
+
+restaurants %>% distinct(mailing_address) %>% head()
+```
+
+
+## `paste0()`
+
+`paste0()` est un raccourci pour `paste ()` sans aucun séparateur.
+
+```{r paste0}
+
+paste(1:5, letters[1:5]) # sep met un espace par défaut
+paste(1:5, letters[1:5], sep ="")
+paste0(1:5, letters[1:5])
+```
+
+
+## `paste()` 
+
+`sep =` contrôle ce qui se passe lorsque vous écrasez en entrée les vecteurs que vous donnez à `paste()`, tandis que `collapse =` contrôle si / comment ils passent d'un vecteur à une seule chaîne.
+
+Voici quelques exemples; assurez-vous de comprendre comment chaque ensemble d'arguments produit leurs résultats:
+
+```{r paste_practice, eval=TRUE, results="hold"}
+paste(letters[1:5])
+paste(1:5, letters[1:5], sep = "+")
+paste(letters[1:5], collapse = "!")
+paste0(1:5, letters[1:5], collapse = "???")
+paste(1:5, "Z", sep = "*")
+paste(1:5, "Z", sep = "*", collapse = " ~ ")
+
+```
+
+
+# Les fonctions pour travailler avec les chaines de charactères (avec stringr)
+
+
+## `stringr`
+
+`stringr` est encore un autre package R de Tidyverse (comme` ggplot2`, `dplyr`,` tidyr`, `lubridate`,` readr`).
+
+Il fournit des fonctions qui:
+
+- Remplace certaines fonctions de chaîne de base comme `paste ()` et `nchar ()` d'une manière un peu moins délicate avec des valeurs ou des facteurs manquants
+- Supprimez les espaces ou remplissez-les
+- Effectuer des tâches liées à **la correspondance de modèles**: 
+  - Detect, 
+  - locate, 
+  - extract, 
+  - match, 
+  - replace, 
+  - split.
+- Ces fonctions utilisent **des expressions régulières** pour décrire les modèles 
+- Les versions Base R et `stringi` existent, mais sont plus difficiles à utiliser
+
+De façon pratique, **la plupart** des fonctions `stringr` commence par "`str_`" pour permettre à RStudio d'auto-completer ce que vous saisissez.
+
+## `stringr`
+
+- `str_sub ()` est comme `substr ()` mais vous permet également de mettre des valeurs négatives pour compter à rebours depuis la fin (-1 est la fin, -3 est le troisième depuis la fin):
+
+```{r str_sub_example}
+
+str_sub("Washington", 3, 8)
+str_sub("Washington", -3, -1)
+
+
+?str_sub
+
+```
+
+
+- `str_c ()` ("string combine") est exactement comme `paste()` mais où la valeur par défaut est `sep =" "` (comme `paste0()`)
+
+```{r str_c_example}
+letters
+letters[1:5]
+1:5
+
+str_c(letters[1:5], 1:5)
+
+```
+
+
+## `str_length()`
+
+- `str_length()` est équivalent à `nchar ()`:
+
+```{r nchar_v_str_length}
+
+nchar("voisines")
+str_length("voisines")
+
+```
+
+
+## Changement de caracteres
+
+`str_to_upper ()`, `str_to_lower ()`, `str_to_title ()` convertit les cas, ce qui est souvent une bonne idée à faire avant de rechercher des valeurs:
+
+```{r make_seattle_uppercase}
+
+head(restaurants$City)
+
+head(unique(restaurants$City))
+head(unique(restaurants$Name))
+head(unique(restaurants$Address))
+
+
+restaurants <- 
+  restaurants %>%
+  mutate_at(vars(Name, Address, City), ~ str_to_upper(.))
+
+
+#restaurants <- 
+#  restaurants %>%
+#  mutate(across(c(Name, Address, City)), ~ str_to_upper(.))
+
+head(unique(restaurants$City))
+
+```
+
+
+## `str_trim()` 
+
+Les espaces blancs de début ou de fin supplémentaires sont courants dans les données de texte:
+
+```{r show_whitespace}
+
+head(unique(restaurants$Name), 6)
+
+```
+
+--
+
+Toute colonne de caractères est potentiellement affectée. Nous pouvons utiliser la fonction `str_trim ()` dans `stringr` pour les nettoyer en une seule fois:
+
+```{r clean_whitespace}
+# Utilisez mutate_if pour couper toutes les colonnes de caractères
+
+restaurants <- 
+  restaurants %>% 
+  mutate_if(is.character, str_trim) 
+
+head(unique(restaurants$Name), 4)
+
+
+```
+
+Remarque: `mutate_if(x, y)` applique la fonction `y` à chaque colonne pour laquelle `x` est `TRUE`.]
+
+
+
+# Expressions régulières 
+
+# Que sont les expressions régulières?
+
+**Les expressions régulières** ou **regex** sont la façon dont nous décrivons les modèles que nous recherchons dans le texte d'une manière qu'un ordinateur peut comprendre. Nous écrivons une **expression**, l'appliquons à une entrée de chaîne, puis on peut faire des choses avec **correspond ** que nous trouvons.
+
+
+- **Les caractères littéraux** sont des extraits définis à rechercher comme `SEA` ou `206`
+
+- **Métacaractères** soyons flexibles dans la description des modèles:
+  - barre oblique inversée `\`, caret `^`, signe dollar `$`, point `.`, pipe `|`, point d'interrogation `? `, astérisque `*', plus signe `+`, parenthèses `(` et `)`, crochets `[` et `]`, accolades `{` et `}`
+  - Pour traiter un métacaractère comme un caractère littéral, vous devez **l'échapper** avec deux barres obliques inverses `\\`, par ex. pour faire correspondre `(206)` avec les parenthèses, vous utiliseriez `\\(206\\)` dans votre expression régulière
+
+## `str_detect()`
+
+Pour savoir parmi les restaurants, ceux qui sont des cafés, je dirai qu'un café est tout ce qui a "COFFEE", "ESPRESSO" ou "ROASTER" dans le nom. Le `regex` pour cela est `COFFEE | ESPRESSO | ROASTER` car `|` est un métacaractère qui signifie "OU". Utilisez la fonction `str_detect ()`, qui retourne `TRUE` si elle trouve ce que vous cherchez et ` FALSE` si ce n'est pas le cas (similaire à `grepl ()` dans base R):
+
+
+```{r coffee_check}
+
+head(unique(restaurants$Name))
+
+coffee <- 
+  restaurants %>% 
+  filter(str_detect(Name, "COFFEE|ESPRESSO|ROASTER|CAFE"))
+
+coffee %>% distinct(Name) %>% head()
+
+# Avec grepl, remarquer l'inversion des arguments
+
+coffee1 <- 
+  restaurants %>% 
+  filter(grepl("COFFEE|ESPRESSO|ROASTER", Name))
+
+coffee1 %>% distinct(Name) %>% head()
+
+
+
+```
+
+<!--
+## Histogramme
+
+
+renons chaque identifiant d'entreprise unique, conservons le score d'inspection le plus récent et examinons un histogramme des scores:
+
+```{r coffee_histogram, fig.height = 3, dev = "svg" }
+
+coffee %>% 
+  select(Business_ID, Name, Inspection_Score, Date) %>%
+  group_by(Business_ID) %>% 
+  filter(Date == max(Date)) %>% 
+  distinct(.keep_all=TRUE) %>% 
+  ggplot(aes(Inspection_Score)) + 
+  geom_histogram(bins=8) + xlab("Score d'inspection le plus récent") + ylab("") +
+    ggtitle("Histogramme des résultats d'inspection pour les cafés de Seattle")
+```
+-->
+
+
+## `str_detect()`: Patterns
+
+Cherchons des numéros de téléphone dont les trois premiers chiffres sont "206" en utilisant `str_detect ()`.
+
+Nous voudrons que cela fonctionne, qu'ils aient des parenthèses au début ou non.
+Mais PAS pour correspondre à "206" se trouvant ailleurs:
+
+
+
+```{r look_for_206}
+
+code_206_pattern <- "^\\(?206"
+
+exemple_test <- c("2061234567", "(206)1234567",
+                         "(206) 123-4567", "555-206-1234")
+
+exemple_test
+
+str_detect(exemple_test, "^\\(?206")
+
+str_detect(exemple_test, code_206_pattern)
+str_detect(exemple_test, "206")
+
+
+```
+
+- `^` est un métacaractère signifiant "ne regarder que le *début* de la chaîne"
+- `\\(?` signifie rechercher une parenthèse gauche (`\\ (`), mais elle est facultative (`?`)
+- `206` est la chaîne littérale à rechercher après la parenthèse facultative
+
+
+## `str_view()`
+
+`stringr` a également une fonction appelée `str_view ()` qui vous permet de voir dans le volet de visualisation *exactement* quel texte est sélectionné avec une expression régulière.
+
+```{r str_view, eval=FALSE}
+
+str_view(exemple_test, code_206_pattern)
+
+```
+
+Cela générera une petite page Web dans le volet de visualisation (mais pas dans les documents Markdown).
+
+Faites juste attention à ne pas charger un long vecteur / variable entier ou cela pourrait planter RStudio alors qu'il essaie de rendre une page qui est massive!
+
+
+# Combien de lignes ont des nombres 206?
+
+```{r look_for_206_rest}
+
+restaurants %>% 
+  mutate(contient_nombre_206 = 
+           str_detect(Phone, code_206_pattern)) %>% 
+  group_by(contient_nombre_206) %>% 
+  tally()
+
+?tally
+```
+
+
+# Extraire les Patterns avec `str_extract()`
+
+Extrayons la [partie directionnelle des adresses de  Seattle](https://en.wikipedia.org/wiki/Street_layout_of_Seattle#Directionals): N, NW, SE, none, etc.
+
+
+```{r test_direction}
+
+head(unique(restaurants$Address))
+
+direction_pattern <- " (N|NW|NE|S|SW|SE|W|E)( |$)"
+direction_pattern1 <- "(N|NW|NE|S|SW|SE|W|E)"
+
+
+direction_exemples <- c("2812 THORNDYKE AVE W", "512 NW 65TH ST",
+                        "407 CEDAR ST", "15 NICKERSON ST")
+
+direction_exemples
+
+str_extract(direction_exemples, "N")
+
+str_extract(direction_exemples, direction_pattern1)
+
+
+str_extract(direction_exemples, direction_pattern)
+
+```
+
+- Le premier espace correspondra à un caractère d'espace, puis
+* `(N|NW|NE|S|SW|SE|W|E)` correspond à l'une des directions du groupe
+* `( |$)` est un groupe qui dit qu'il y a un espace après, ou c'est la fin de la chaîne d'adresse (`$` signifie la fin de la chaîne)
+
+
+## Où sont les adresses?
+
+```{r extract_directions}
+
+restaurants %>% 
+  distinct(Address) %>% 
+  mutate(city_region = 
+          str_trim(str_extract(Address, direction_pattern))) %>% 
+  count(city_region) %>% arrange(desc(n))
+
+```
+
+
+## `str_replace()`: Remplacer
+
+Peut-être que nous voulons faire une analyse des inspections au niveau de la rue (par exemple comparer The Ave à Pike Street). Comment supprimer les numéros de bâtiment?
+
+```{r test_address_numbers}
+
+address_number_pattern <- "^[0-9]*-?[A-Z]? (1/2 )?"
+
+address_number_test_examples <- 
+  c("2812 THORNDYKE AVE W", "1ST AVE", "10A 1ST AVE", 
+    "10-A 1ST AVE", "5201-B UNIVERSITY WAY NE",
+    "7040 1/2 15TH AVE NW")
+
+str_replace(address_number_test_examples, 
+            address_number_pattern, replacement = "")
+
+```
+
+
+## Comment fonctionne l'expression regex du numéro de bâtiment?
+
+Décomposons `"^[0-9]*-?[A-Z]? (1/2 )?"`:
+
+- `^[0-9]` signifie rechercher un chiffre entre 0 et 9 (`[0-9]`) au début (`^`)
+
+- `*` signifie potentiellement correspondre à plus de chiffres après cela
+
+- `-?` signifie éventuellement (`?`) correspondre à un tiret (`-`)
+
+- `[A-Z]?` signifie éventuellement correspondre (`? ') à une lettre (`[A-Z]`)
+
+- Ensuite, nous faisons correspondre un espace (` `)
+
+- `(1/2 )?` correspond éventuellement à un 1/2 suivi d'un espace car il s'agit apparemment d'une chose avec certains numéros d'adresse
+
+
+# Suppression des numéros de rue
+
+```{r replace_numbers}
+
+restaurants <- 
+  restaurants %>% 
+  mutate(street_only = str_replace(Address, address_number_pattern,
+                                   replacement = ""))
+
+restaurants %>% distinct(street_only) %>% head(11)
+```
+
+
+# Et les unités / suites aussi?
+
+Se débarrasser des références d'unité / suite est délicat, mais une tentative décente serait de supprimer tout ce qui inclut et après "#", "STE", "SUITE", "SHOP", "UNIT":
+
+```{r test_unit_numbers}
+
+address_unit_pattern <- " (#|STE|SUITE|SHOP|UNIT).*$"
+
+address_unit_test_examples <-
+  c("1ST AVE", "RAINIER AVE S #A", "FAUNTLEROY WAY SW STE 108", 
+    "4TH AVE #100C", "NW 54TH ST")
+
+str_replace(address_unit_test_examples, address_unit_pattern,
+            replacement = "")
+```
+
+
+# Comment fonctionne regex?
+
+Décomposons `" (|#|STE|SUITE|SHOP|UNIT).*$"`:
+
+- D'abord, nous faisons correspondre un espace
+
+- `(#|STE|SUITE|SHOP|UNIT)` correspond à l'un de ces mots
+
+- `.*$` correspond à *tout* caractère (`.`) après ces mots, zéro ou plusieurs fois (`*`), jusqu'à la fin de la chaîne (`$`)
+
+
+# Suppression d'unités / suites
+
+```{r replace_units}
+
+restaurants <- 
+  restaurants %>% 
+  mutate(street_only = str_trim(str_replace(street_only, 
+                       address_unit_pattern, replacement = "")))
+
+restaurants %>% distinct(street_only) %>% head(11)
+```
+
+
+# Où le danger se cache-t-il?
+
+Obtenons une ligne par restaurant et par date avec le score, et voyons dans quelles rues, les scores sont  au-dessus de 45 :
+
+```{r failed_inspections}
+
+head(unique(restaurants$Inspection_Score), 15)
+
+restaurants %>% 
+  distinct(Business_ID, Date, Inspection_Score, street_only) %>% 
+  filter(Inspection_Score > 45) %>% 
+  count(street_only) %>%
+  arrange(desc(n)) %>% 
+  head(n=5)
+
+```
+
+
+## Fractionner les chaines de caractères (Strings)
+
+Vous pouvez diviser les chaînes en utilisant `tidyr :: separate()`. Une autre option est `str_split ()`, qui divisera les chaînes en fonction d'un modèle séparant les parties et mettra ces composants dans une liste. `str_split_fixed ()` fera cela mais avec une matrice à la place (et ne peut donc pas avoir un nombre variable de séparateurs):
+
+```{r str_split_violation}
+
+head(unique(restaurants$Violation_Description))
+
+head(str_split_fixed(restaurants$Violation_Description, " - ", n = 2))
+
+```
+
+
+
+## Autres fonctions `stringr` utiles
+
+`str_pad(string, width, side, pad)`: Ajoute du "rembourrage" à n'importe quelle chaîne pour lui donner une largeur minimale donnée.
+
+`str_subset(string, pattern)`: Renvoie tous les éléments qui contiennent des correspondances du modèle (pattern).
+
+`str_which(string, pattern)`: Renvoie les indices numériques des éléments qui correspondent au modèle (pattern).
+
+`str_replace_all(string, pattern, replacement)`: Effectue plusieurs remplacements simultanément
+
+# Références
+
+https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf
+http://edrub.in/CheatSheets/cheatSheetStringr.pdf
+
+
+**Remarques**
+
+Cette présentation est basée sur la présentation de Charles Lanfear (UW).
+
+
+-------------
+
+
+
+## 2. Utilisation de base r
+
+
+```{r}
+
+wikipedia_scrape <- c("Class of 2018: Senior Stories of Discovery, Learning and Serving\n\n\t\t\t\t\t\t\t", "[This]","Professor","is","not","so","great")
+
+wikipedia_scrape
+
+grepl("Class", wikipedia_scrape)    # Search for a word
+grepl("class", wikipedia_scrape)  # grepl is case sensitive
+
+gsub("\t", "", wikipedia_scrape)  # delete \t
+gsub("\t|\n", "", wikipedia_scrape)     # delete \t or \n, no space needed
+gsub("\[|]", "", wikipedia_scrape)    #Doesnt work because \ has a meaning
+gsub("\\[|\\]", "", wikipedia_scrape)
+
+
+grep("^[P]", wikipedia_scrape)    #Find a special character
+
+wikipedia_scrape[grep("^[P]", wikipedia_scrape)]
+
+
+
+
+wikipedia_scrape
+
+
+
+```
