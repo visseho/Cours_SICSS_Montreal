@@ -1,0 +1,468 @@
+---
+title: 'Séance 1.3: Données digitales'
+subtitle: "Collecte par interfaces de programmation d'applications (API)"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+# Introduction
+
+Les interfaces de programmation d'applications, ou API, sont devenues l'un des moyens les plus importants d'accéder aux données et de les transférer en ligne. De plus en plus, les API peuvent même analyser vos données. Comparées aux données de scraping, qui sont souvent illégales, logiquement difficiles (ou les deux), les API sont un outil utile pour créer des requêtes personnalisées de données de manière bien structurée et considérablement plus facile à utiliser que les données HTML ou XML décrites précédemment. 
+
+# Qu'est-ce qu'une interface de programmation d'application (applicative)?
+
+Les API sont des outils permettant de créer des applications ou d'autres formes de logiciels permettant aux utilisateurs d'accéder à certaines parties de bases de données volumineuses. Les développeurs de logiciels peuvent combiner ces outils de différentes manières, ou avec des outils d'autres API, afin de générer des outils encore plus utiles. La plupart d'entre nous utilisons ces applications chaque jour. Par exemple, si vous installez l’application Spotify sur votre page Facebook pour partager de la musique avec vos amis, cette application extrait des données de l’API de Spotify, puis les publie sur votre page Facebook en communiquant avec l’API de Facebook. Il existe d'innombrables exemples de ce type sur Internet à l'heure actuelle. **En résumé, Une API permet à deux applications de communiquer entre elles**.
+
+
+
+Le nombre d'API disponibles au public a considérablement augmenté au cours de la dernière décennie, comme le montre la figure ci-dessous. Au moment de la rédaction de cet article, le site [Programmable Web](https://www.programmableweb.com/apis/directory) répertorie plus de 19 638 API de sites aussi divers que Google, Amazon, YouTube, le New York Times, del.icio.us, LinkedIn et bien d’autres. Bien que la fonction principale de la plupart des API consiste à fournir aux développeurs de logiciels un accès aux données, de nombreuses API analysent également les données. Cela peut inclure des API de reconnaissance faciale, des API de synthèse vocale, des API produisant des visualisations de données, etc.
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api1.png)
+
+# Comment fonctionne une API?
+Pour illustrer le fonctionnement d’une API, il sera utile de commencer par une très simple. Supposons que nous voulions utiliser l'API Google Maps pour géo-coder une entité nommée ou baliser le nom d'un lieu avec les coordonnées de latitude et de longitude. Pour ce faire, écrivez une adresse URL qui: a) nomme l’API; et b) inclut le texte de la requête que nous voulons faire. Si nous recherchions «Google Maps API Geocode», nous allions éventuellement nous diriger vers la documentation de cette API et apprendre que l'URL de base de l'API Google Maps est [https://maps.googleapis.com](https://cloud.google.com/maps-platform/). Nous souhaitons utiliser la fonction de géocodage de cette API. Nous avons donc besoin d'une URL pointant vers cette partie plus spécifique de l'API: https://maps.googleapis.com/maps/api/geocode/json?address=. Nous pouvons ensuite ajouter une entité nommée à la fin de l'URL telle que “Duke” en utilisant un texte ressemblant à ceci: suit: https://maps.googleapis.com/maps/api/geocode/json?address=Duke. Ce lien (avec du texte supplémentaire que je décrirai ci-dessous) produit cette sortie dans un navigateur Web:
+
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api10.png)
+
+Ce que nous voyons s'appelle des données **JSON**. Bien que cela puisse paraître un peu brouillon au premier abord - beaucoup de crochets, de deux points, de virgules et de motifs de mise en attente -, il est en fait très structuré et capable de stocker des types de données complexes. Ici, nous pouvons voir que notre demande de géocodage «Duke» a non seulement identifié la ville dans laquelle il se trouve (Durham), mais également le comté, le pays et, vers la fin de la page, les données de latitude et de longitude à la recherche de. Nous allons apprendre à extraire cette information plus tard. L'objectif de la discussion en cours est de vous donner une idée de ce qu'est une API et de son fonctionnement.
+
+Si nous voulions rechercher un autre lieu géographique, nous pourrions prendre le lien ci-dessus et remplacer «Duke» par le nom d'un autre lieu. Essayez-le pour vous donner une idée très rudimentaire du fonctionnement d'une API.
+
+# Informations d'identification de l'API
+
+Bien que n'importe qui puisse faire une demande à l'API Google Maps, il est beaucoup plus difficile d'obtenir des données de l'API de Facebook (que Facebook appelle l'API «Graph»). En effet, Facebook ne veut pas qu'un développeur de logiciels collecte des données sur des personnes avec lesquelles il n'a pas de connexion sur Facebook. Pour éviter cela, l’API Graph de Facebook et de nombreuses autres API exigent que vous obteniez des «informations d’identité» ou des codes / mots de passe permettant de vous identifier et de déterminer les types de données auxquels vous êtes autorisé à accéder. Pour illustrer cela, jetons un coup d’œil à un outil créé par Facebook pour aider les gens à se renseigner sur les API. Il s’appelle [Graph API explorer](https://developers.facebook.com/tools/explorer?classic=0).
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api3.png)
+
+Si vous avez un compte Facebook et que vous êtes connecté, Facebook générera automatiquement les informations d'identification sous la forme d'un «Access Token». Dans la capture d'écran ci-dessus, il apparaît dans une barre située dans la partie inférieure inférieure de l'écran. écran. Ce code vous donnera l’autorisation temporaire de faire des demandes à partir de l’API Graph de Facebook, mais UNIQUEMENT pour les données auxquelles vous êtes autorisé à accéder depuis votre propre page Facebook. Si vous cliquez sur le bouton bleu «Soumettre» en haut à droite de l'écran, vous verrez une sortie contenant votre nom et l'identifiant que Facebook vous a attribué. Avec un peu plus d’efforts, nous pourrions utiliser cet outil pour passer des appels d’API afin d’accéder à notre liste d’amis, à nos amis, etc., mais pour l’instant, j’essaie simplement de préciser que chaque personne reçoit son propre code qui le permet. accéder à certaines des données de l’API de Facebook, mais certainement pas à toutes. Si je devais écrire «cocacola» au lieu de «moi» pour accéder aux données publiées par cette entreprise, j'obtiendrais un message d'erreur indiquant que mes informations d'identification actuelles ne me permettent pas d'accéder à ces données.
+
+Les informations d'identification peuvent non seulement déterminer votre accès aux personnes avec lesquelles vous êtes connecté sur un réseau social, mais également les autres privilèges que vous pouvez avoir vis-à-vis d'une API. Par exemple, de nombreuses API facturent des frais pour accéder à leurs données ou leurs services. Par conséquent, vous ne recevrez vos informations d'identification qu'après la création d'un compte. Comme nous le verrons ci-dessous, certains sites exigent également que vous disposiez de plusieurs types d'informations d'identification pouvant être décrites à l'aide de mots-clés variés tels que «tokens», «keys» ou «secrets».
+
+## Maintenant vous essayez !!!
+
+1. Crossref
+- Avec le API de Crossref: https://www.crossref.org/education/retrieve-metadata/rest-api/a-non-technical-introduction-to-our-api/
+- https://github.com/ropensci/rcrossref
+- https://ciakovx.github.io/rcrossref.html
+- https://www.crossref.org/education/retrieve-metadata/rest-api/a-non-technical-introduction-to-our-api/
+
+
+2. Données de dhs
+
+- https://api.dhsprogram.com/#/index.html
+- https://cran.r-project.org/web/packages/rdhs/vignettes/introduction.htmlz
+
+
+L’explorateur d’API Graph vous permet de rechercher différents champs. Prenez un moment et essayez de voir si vous pouvez appeler d'autres types d'informations vous concernant. Pour ce faire, vous devrez demander différents niveaux d’autorisation à l’aide du menu déroulant situé à droite de la page de l’explorateur. Vous pouvez renseigner la syntaxe de différents champs à l'aide de la case "Rechercher un champ" située dans le coin supérieur droit de la page. Ne vous inquiétez pas si vous ne pouvez pas obtenir le langage de requête correct pour le moment. Spécifier la syntaxe d’un appel API nécessite de maîtriser la documentation de chaque API, ce qui peut prendre un temps très long. Cet outil essaie de vous aider, mais il ne fonctionne pas parfaitement et la construction du bon appel peut nécessiter beaucoup de temps pour lire la documentation de l'API. Plus important encore, comme vous le verrez bientôt, un certain nombre de packages R contiennent des fonctions permettant de faire des appels d'API, ce qui vous fera économiser le temps et l'énergie nécessaires pour apprendre la syntaxe propre à chaque API.
+
+# Limitation de taux
+Avant de passer d'autres appels aux API, nous devons nous familiariser avec un concept important appelé «Limitation du débit». Les informations d'identification de la section précédente non seulement définissent le type d'informations auquel nous sommes autorisés à accéder, mais également la fréquence à laquelle nous sommes autorisés. faire des demandes pour de telles données. Celles-ci sont appelées «limites de débit». Si nous faisons trop de demandes de données dans un délai trop court, une API nous bloque temporairement des données collectées pendant une période pouvant aller de 15 minutes à 24 heures ou plus. , en fonction de l’API. La limitation de débit est nécessaire pour que les API ne soient pas submergées par un trop grand nombre de demandes simultanées, ce qui ralentirait l’accès de tous aux données. La limitation des débits permet également aux grandes entreprises telles que Google, Facebook ou Twitter d’empêcher les développeurs de collecter de grandes quantités de données susceptibles de compromettre la confidentialité de leurs utilisateurs ou de menacer leur modèle commercial (car les données ont une si grande valeur dans l’économie actuelle).
+
+Le moment exact de la limitation de débit n'est pas toujours public, car connaître ces incréments de temps pourrait permettre aux développeurs de «jouer» au système et de faire des demandes rapides dès que la limitation de débit est terminée. Cependant, certaines API vous permettent de passer un appel ou une requête à l'API afin de connaître le nombre de demandes supplémentaires que vous pouvez effectuer au cours d'une période donnée avant que votre taux ne soit limité.
+
+# Un exemple avec l’API de Twitter
+Pour illustrer le processus d'obtention des informations d'identification et mieux comprendre la limitation du débit, je vais maintenant présenter un exemple concret montrant comment obtenir différents types de données à partir de l'API Twitter. La première étape de ce processus consiste à obtenir des informations d'identification de Twitter qui vous permettront d'effectuer des appels d'API.
+
+Twitter, comme de nombreux autres sites Web, vous oblige à créer un compte afin de recevoir des informations d'identification. Pour ce faire, nous devons visiter https://apps.twitter.com. Dans ce cas, vous devrez créer un compte de développeur en cliquant sur "Apply for a developer account". Il vous sera peut-être demandé de confirmer votre adresse e-mail ou d'ajouter un numéro de téléphone mobile, car une authentification à deux facteurs aide Twitter à empêcher les utilisateurs d'obtenir un grand nombre de messages des identifiants différents utilisant plusieurs comptes pouvant être utilisés pour collecter de grandes quantités de données sans limitation de débit ou à d'autres fins néfastes telles que la création d'armées de robots générant du spam ou tentant d'influencer les élections.
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api4.png)
+
+Ensuite, il vous sera demandé si vous souhaitez demander un compte développeur pour une organisation ou pour un usage personnel. Vous voudrez probablement choisir un usage personnel (le compte de l'entreprise peut permettre à une personne de demander des informations d'identification pouvant être partagées par un grand groupe de personnes, ce qui peut être utile si vous travaillez dans un laboratoire ou une autre entreprise).
+
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api5.png)
+
+
+Ensuite, une série de questions vous sera posée sur la manière dont vous souhaitez utiliser l’API de Twitter. Malheureusement, Twitter ne publie pas de directives précises sur les personnes autorisées à utiliser l'API et pourquoi - pour autant que je sache. Cela dit, vous pouvez en apprendre beaucoup en lisant les conditions de service de Twitter. Les drapeaux rouges évidents incluraient les personnes qui espèrent créer des outils qui harcèlent d’une manière ou d’une autre les utilisateurs de Twitter, accumulent les données de Twitter (en particulier à des fins commerciales), entre autres objectifs négatifs. Vous verrez ces termes après avoir décrit les raisons pour lesquelles vous souhaitez demander des informations d'identification.
+
+Une fois que vous avez accepté les conditions, votre demande de développeur d'application sera examinée par Twitter. Au moment d'écrire ces lignes, ce processus prend beaucoup de temps - et pour cause, puisque Twitter emploie très probablement un grand nombre de personnes pour contrôler toutes les personnes qui demandent des informations d'identification en ce moment. Au moment d’écrire ces lignes, j’ai vu des gens obtenir des informations d’identité en un jour ou deux et d’autres attendre plus d’une semaine. Malheureusement, je connais même plusieurs cas dans lesquels des personnes ont présenté plusieurs demandes sans aucun des drapeaux rouges mentionnés ci-dessus (et utilisant un libellé différent) qui ont finalement été rejetées. J'espère que le vôtre sera approuvé (sinon, vous pourriez essayer de mentionner votre problème dans un tweet à l'adresse @TwitterAPI sur Twitter - cela semble avoir fonctionné pour plusieurs personnes que je connais).
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api6.png)
+
+Une fois votre compte développeur approuvé, vous pouvez vous reconnecter et cliquer sur le bouton «Créer une application» en haut à droite de l'écran. Notre objectif n'est pas de créer une application à part entière à ce stade, mais simplement d'obtenir les informations d'identification nécessaires pour commencer à effectuer de simples appels à l'API Twitter. Vous pouvez nommer votre application comme bon vous semble, la décrire comme bon vous semble et indiquer le nom de n'importe quel site Web. Une chose importante à faire est de placer le texte suivant dans la zone de texte «URL de rappel»: http://127.0.0.1:1410 Ce numéro décrit l'emplacement où l'API retournera vos données - dans ce cas, c'est votre navigateur Web (mais il peut s'agir d'un autre site sur lequel vous souhaitez stocker les résultats des données.).
+
+Si vous avez suivi les étapes ci-dessus, le nom de votre application devrait maintenant apparaître. Cliquez dessus, puis sur l'onglet «Clés et jetons d'accès» pour obtenir vos identifiants. Malheureusement, Twitter oblige les développeurs à obtenir deux types d’informations d’identité différentes qui sont répertoriées sur cette page. Celles-ci sont estompées dans la capture d'écran ci-dessous parce que je ne veux pas que les personnes qui lisent cette page Web aient accès à mes références, qu'elles pourraient ensuite utiliser de différentes manières:
+
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api7.png)
+
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api8.png)
+
+L'étape suivante consiste à définir vos informations d'identification en tant que variables de chaîne dans R, que nous utiliserons ensuite pour nous authentifier auprès de l'API Twitter. Veillez à sélectionner la chaîne entière (en triple-cliquant) et à ne pas omettre accidentellement le premier ou le dernier chiffre (ni d'ajouter des espaces):
+
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api9.png)
+
+Ensuite, nous allons installer un paquet R de Github appelé rtweet qui nous aide à faire des appels à l’API de Twitter. Plus spécifiquement, il fournit une longue liste de fonctions permettant à la fois: a) de construire des requêtes d’URL d’API pour différents types d’informations; et b) analyse les données résultantes dans des formats nets. Pour vous authentifier, vous devrez peut-être également installer le paquet httpuv (si tel est le cas, vous recevrez un message d'erreur à propos de ce paquet). Si vous n'avez jamais installé de paquet depuis Github, vous aurez besoin du paquet devtools pour le faire.
+
+
+```{r}
+#library(devtools)
+#install_github("mkearney/rtweet")
+
+# rtweet est sur CRAN, vous n'avez plus besoin de l'installer à partir du Github
+
+#install.packages("rtweet")
+```
+ 
+
+Nous sommes maintenant prêts à nous authentifier vis-à-vis de l’API de Twitter. Pour ce faire, nous allons utiliser la fonction create_token de rtweet, qui passe un appel d’API qui transmet les informations d’identification définies précédemment, puis ouvre un navigateur Web avec un dialogue d’authentification que vous devez autoriser en cliquant sur le bouton bleu «autoriser». Vous devriez alors recevoir le message suivant Authentification terminée. Veuillez fermer cette page et retourner à R.
+
+```{r}
+#install.packages("rtweet")
+library(tidyverse)
+library(rtweet)
+library(httpuv)
+library(maps)
+
+app_name <- ""
+consumer_key <- ""
+consumer_secret <- ""
+
+#access_token <-
+#access_token_secret <-
+  
+google_key <- ""
+
+create_token(app = app_name, consumer_key = consumer_key, consumer_secret = consumer_secret, set_renv = TRUE)  
+
+```
+
+# Collecter des tweets sur un thème donné
+
+Ce code crée une base de données appelée canada_tweets que nous pourrons ensuite parcourir. Jetons un coup d’œil aux dix premiers tweets que rtweet stocke sous forme de variable appelée **text**.
+
+```{r}
+
+canada_tweet <- search_tweets("#Canada", n = 3000, include_rts = FALSE)
+
+
+head(canada_tweet$text)
+
+```
+
+Notez que cet appel d'API a également généré de nombreuses autres variables intéressantes, notamment le nom et le pseudonyme de l'utilisateur, l'heure de sa publication, ainsi que de nombreux autres paramètres, notamment des liens vers du contenu multimédia et des profils d'utilisateur. Un petit nombre d'utilisateurs permet également la géolocalisation de leurs tweets - et si cette information est disponible, elle apparaîtra dans cet ensemble de données. Voici la liste complète des variables que nous avons collectées via notre appel API ci-dessus:
+
+```{r}
+names(canada_tweet)
+```
+
+En bref, la fonction rtweet s'interface parfaitement avec ggplot et d'autres bibliothèques de visualisation pour produire de jolis graphes des résultats ci-dessus. Par exemple, faisons un graphique de la fréquence des tweets sur la Corée ces derniers jours:
+
+```{r}
+
+library(tidyverse)
+ts_plot(canada_tweet, "3 hours") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Frequence des Tweets sur le Canada",
+    subtitle = "Nombre de tweet agrégés en utilisant des intervalles de trois heures",
+    caption = "Source: Données collectées à partir de l'API REST de Twitter via rtweet")
+
+
+
+```
+
+La fonction search_tweets comporte également un certain nombre d'options ou d'arguments utiles. Par exemple, nous pouvons limiter l'emplacement géographique des tweets aux États-Unis et aux tweets de langue anglaise à l'aide du code ci-dessous. Le code limite également les résultats aux non-retweets et se concentre sur les tweets les plus récents, plutôt que sur un mélange de tweets populaires et récents, qui constitue le paramètre par défaut.
+
+```{r}
+
+cd_tweets <- search_tweets("canada",
+                           "lang:en", geocode = lookup_coords("USA"),
+                           n = 1000, type="recent", include_rts=FALSE)
+head(cd_tweets$text)
+head(unique(cd_tweets$location), 12)
+head(unique(cd_tweets$geo_coords), 12)
+
+
+?search_tweets
+```
+
+
+rtweet permet également de géocoder les tweets pour les utilisateurs qui permettent à Twitter de suivre leur position:
+
+```{r}
+geocode <- lat_lng(cd_tweets)
+
+library(maps)
+par(mar = c(0, 0, 0, 0))
+maps::map("state", lwd = .25)
+with(geocode, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
+
+usa_map <- map_data("word", region = "USA")
+
+
+ggplot() +
+  geom_point(geocode, aes(x = lng, y = lat, group = group))
+
+```
+
+Nous ne voyons pas les 100 tweets dans ce diagramme pour une raison importante: nous ne regardons que les personnes qui permettent à Twitter de suivre leur position (et cela fait environ 1 personne sur 100 au moment de la rédaction de cet article).
+
+L’API de Twitter est également très utile pour collecter des données sur un utilisateur donné. Jetons un coup d’œil à la page Twitter de Bernie Sanders: http://www.twitter.com/SenSanders. On peut y voir la description et le profil du sénateur Sanders, le texte intégral de ses tweets et - si nous cliquons plusieurs liens - les noms des personnes qu’il suit, celles qui le suivent et les tweets qu’il a «aimés».
+
+Tout d’abord, voyons ses 5 derniers tweets:
+
+
+```{r}
+sanders_tweets <- get_timelines(c("sensanders"), n = 5)
+head(sanders_tweets$text)
+?get_timelines
+
+trudeau_tweets <- get_timeline("JustinTrudeau", n = 10)
+head(trudeau_tweets$text)
+```
+
+
+Notez que vous êtes limité à demander les 3 200 derniers tweets. Il peut donc être impossible d'obtenir une base de données complète de tweets pour une personne qui tweete très souvent, ou vous devrez peut-être acheter les données de Twitter lui-même:
+
+Maintenant, obtenons des informations plus générales sur Sanders en utilisant la fonction lookup_users:
+
+```{r}
+
+sanders_twitter_profile <- lookup_users("sensanders")
+
+```
+
+Cela crée une base de données avec une variété de variables supplémentaires. Par exemple:
+
+```{r}
+sanders_twitter_profile$description
+sanders_twitter_profile$location
+sanders_twitter_profile$followers_count
+sanders_twitter_profile$friends_count
+
+```
+
+
+Nous pouvons également utiliser la fonction get_favorites () pour identifier les Tweets que Sanders a récemment «aimés».
+
+```{r}
+sanders_favorites <- get_favorites("sensanders", n=5)
+sanders_favorites$text
+```
+
+Nous pouvons également obtenir une liste des personnes suivies par Sanders:
+
+```{r}
+
+sanders_follows <- get_followers("sensanders")
+head(sanders_follows)
+
+```
+
+Cela produit les ID utilisateur de ces abonnés et nous pourrions obtenir plus d'informations à leur sujet si nous souhaitons utiliser la fonction lookup_users. Si nous voulions créer un ensemble de données d'analyse de réseau social plus vaste centré sur Sanders, nous pourrions regrouper les abonnés de ses abonnés dans une boucle.
+
+La mise en boucle est un moyen efficace de collecter une grande quantité de données, mais elle déclenchera également une limitation du débit. Toutefois, comme je l’ai mentionné ci-dessus, Twitter permet aux utilisateurs de vérifier leurs limites tarifaires. La fonction rate_limit () du paquetage rtweets fait ceci comme suit:
+
+```{r}
+
+rate_limits <- rate_limit()
+
+head(rate_limits[,1:4])
+
+```
+
+
+Dans le code ci-dessus, j'ai créé un cadre de données qui décrit le nombre total d'appels que je peux effectuer dans un délai donné (appelé réinitialisation). Dans ce cas, c'est 15 minutes. Afin d’empêcher la limitation du débit dans une grande boucle, il est courant d’utiliser la fonction Sys.sleep de R, qui ordonne à R de dormir pendant un certain nombre de secondes avant de passer à la prochaine itération d’une boucle.
+
+rtweet a un certain nombre d’autres fonctions utiles que je mentionnerai au cas où elles pourraient être utiles aux lecteurs. get_trends () identifiera les sujets tendances sur Twitter dans un domaine particulier:
+
+```{r}
+
+get_trends("Montreal")
+
+```
+
+rtweet peut même contrôler votre compte Twitter. Par exemple, vous pouvez poster des messages sur votre fil Twitter à partir de R comme suit:
+
+
+```{r}
+post_tweet("I love APIs")
+```
+
+Maintenant vous essayez !!!
+
+Pour renforcer les compétences que vous avez acquises dans cette section, essayez les solutions suivantes: 1) collectez les 100 derniers tweets de CNN; 2) déterminer combien de personnes suivent CNN sur Twitter; et, 3) déterminez si CNN est en train de tweeter sur des sujets en vogue dans votre région.
+
+Enveloppement d'appels d'API dans une boucle
+
+Très souvent, on peut souhaiter envelopper les appels d'API tels que ceux que nous avons faits jusqu'à présent dans une boucle pour collecter des données sur une longue liste d'utilisateurs. Pour illustrer cela, ouvrons une liste des adresses Twitter d’élus aux États-Unis que j’ai postées sur mon site Github:
+
+
+```{r}
+
+#load list of twitter handles for elected officials
+elected_officials <- read.csv("https://cbail.github.io/Senators_Twitter_Data.csv", stringsAsFactors = FALSE)
+
+head(elected_officials)
+
+```
+
+Comme vous pouvez le constater, la deuxième colonne de ce fichier .csv contient les «noms d’écran» de Twitter, ou identifiants nécessaires pour effectuer des demandes d’API concernant chaque élu. Prenons les 100 derniers tweets de chaque responsable et combinons-les en un seul et même grand ensemble de données contenant les tweets récents d’élus élus aux États-Unis.
+
+```{r}
+
+#créer un conteneur vide pour stocker les tweets de chaque élu
+elected_official_tweets <- as.data.frame(NULL)
+
+for(i in 1:nrow(elected_officials)){
+
+  #Télécharger les tweets
+  tweets <- get_timeline(elected_officials$twitter_id[i], n=100)
+  
+  # Mettre le tweet dans le conteneur
+  elected_official_tweets <- rbind(elected_official_tweets, tweets)
+  
+  #faire une pause de cinq secondes pour éviter de dépasser le taux (rate limiting)
+  Sys.sleep(1)
+  
+  #imprimer le nombre/itération pour le débogage/suivi de la progression
+  print(i)
+}
+
+
+
+```
+
+Faire la même chose avec les données du Canada:
+https://www.noscommunes.ca/Members/fr/recherche
+
+Ce code prendrait un certain temps à fonctionner, bien sûr, puisque nous avons collecté 100 tweets de 100 personnes différentes. Vous pouvez également obtenir un taux limité, en fonction de votre activité précédente et de vos limites de taux actuelles. Si tel est le cas, modifiez la durée de la pause dans la commande Sys.sleep ci-dessus. Vous remarquerez peut-être aussi des messages d’erreur dans votre message - ceux-ci peuvent se produire du fait que les sénateurs modifient leur pseudo Twitter ou parce qu’ils ont un compte mais pas de tweets, ou d’autres erreurs du même genre.
+
+Au cas où vous ne voudriez pas extraire les données vous-même, j'ai sauvegardé une copie des données que j'ai générées en septembre 2018 et que vous pouvez charger comme suit:
+
+```{r}
+
+load(url("https://cbail.github.io/Elected_Official_Tweets.Rdata"))
+
+elected_officials <- read.csv("https://cbail.github.io/Senators_Twitter_Data.csv", stringsAsFactors = FALSE)
+
+head(elected_officials)
+```
+
+
+Maintenant que nous avons collecté les données, créons un modèle simple qui prédit le nombre de tweets retweet. Pour ce faire, nous devons fusionner l'ensemble de données que nous avons lu dans Github ci-dessus avec le nouvel ensemble de données que nous venons de produire (afin d'examiner les attributs de chaque sénateur susceptibles d'accroître la portée de leurs tweets).
+
+
+```{r}
+
+#renommer la variable twitter_id dans le jeu de données d'origine afin de le fusionner avec le jeu de données tweet
+
+View(elected_official_tweets) 
+View(elected_officials)
+
+
+head(unique(elected_official_tweets$screen_name))
+
+
+elected_officials <-
+  elected_officials %>% 
+  mutate(screen_name = twitter_id)
+
+#colnames(elected_officials)[colnames(elected_officials)=="twitter_id"]<-"screen_name"
+
+#for_analysis <- left_join(elected_official_tweets, elected_officials, by = "screen_name")
+
+
+
+tweet_analyse <- left_join(elected_official_tweets, elected_officials, by = "screen_name")
+
+# Graphique
+
+ggplot(tweet_analyse) +
+  geom_histogram(aes(x = retweet_count))
+
+
+```
+
+Ensuite, étant donné que nos données sont très asymétriques, nous pourrions utiliser quelque chose comme un modèle de régression binomiale négatif pour examiner l’association entre les divers prédicteurs dans nos données et le résultat. Pour ce faire, nous allons utiliser la fonction glm.nb du package MASS:
+
+```{r}
+#install.packages("MASS")
+library(MASS)
+
+head(tweet_analyse$retweet_count)
+
+retweet_pred <- glm.nb(retweet_count ~ party + followers_count + statuses_count + gender, data=tweet_analyse)
+
+summary(retweet_pred)
+```
+
+Sans surprise, les sénateurs qui ont plus d'abonnés ont tendance à produire des tweets qui ont plus de retweets. De plus, les républicains semblent avoir moins de retweets que les démocrates. Cela pourrait résulter du fait que les utilisateurs de Twitter qui suivent la politique - ou du moins les sénateurs - sont plus susceptibles d’être des démocrates, ou parce que les démocrates produisent des tweets plus attrayants, ou un certain nombre d’autres facteurs de confusion (nous ne devrions donc probablement pas lire trop dans cette découverte sans une analyse plus minutieuse).
+
+# Travailler avec des horodatages
+Une compétence supplémentaire vous sera utile pour travailler avec les données Twitter. Très souvent, nous souhaitons suivre les tendances dans le temps ou sous-regrouper nos données en fonction de différentes périodes. Si nous parcourons la variable qui décrit l'heure à laquelle chaque tweet a été créé, nous constatons toutefois que ce n'est pas dans un format que nous pouvons facilement utiliser dans r:
+
+
+```{r}
+
+head(tweet_analyse$created_at)
+
+```
+
+Pour gérer ces types de variables chaîne qui décrivent des dates, il est souvent très utile de les convertir en une variable de classe «date». Il existe plusieurs façons de le faire dans R, mais voici comment le faire en utilisant as. Fonction de date en base R.
+
+```{r}
+
+tweet_analyse$date <- as.Date(tweet_analyse$created_at, format="%Y-%m-%d")
+head(tweet_analyse$date)
+
+```
+
+Nous pouvons maintenant subdiviser les données en utilisant des techniques conventionnelles. Par exemple, si nous voulions ne regarder que les tweets du mois d'août, nous pourrions faire ceci:
+
+```{r}
+
+august_tweets <- 
+  tweet_analyse %>% 
+  filter(date > "2018-07-31" &  date<"2018-09-01")
+
+```
+
+
+# Défis de l'utilisation des API
+Il est à présent espéré que les API sont une ressource inestimable pour la collecte de données à partir d’Internet. Dans le même temps, il peut également être clair que le processus d'obtention d'informations d'identification, d'éviter les limitations de taux et de comprendre le jargon unique employé par les concepteurs de chaque API peut signifier de nombreuses heures à passer au crible la documentation d'une API, en particulier là où Les packages R ne fonctionnent pas correctement pour l’interfaçage avec l’API en question. Si vous devez développer votre propre code personnalisé pour fonctionner avec une API - ou si vous avez besoin d'informations qui ne peuvent pas être obtenues à l'aide de fonctions dans un package R, il peut être utile de parcourir le code source des fonctions R décrites ci-dessus. afin de voir où ils passent le langage de requête API nécessaire pour produire les résultats avec lesquels nous avons travaillé ci-dessus.
+
+Une liste des API d'intérêt
+Il existe de nombreuses bases de données décrivant les API populaires sur le Web, y compris le site Web programmable susmentionné, mais également une variété de listes générées par des utilisateurs ou par des utilisateurs:
+
+https://www.programmableweb.com/
+
+https://github.com/toddmotto/public-apis
+
+https://apilist.fun/
+
+Le site R OpenSci contient également une liste de packages R fonctionnant avec des API:
+
+https://ropensci.org/packages/
+
+
+
+# Ressources
+
+http://blog.mediatribe.net/en/node/101/index.html
+https://cran.r-project.org/web/packages/rtweet/vignettes/auth.html
+https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
+
+https://www.datanovia.com/en/blog/how-to-create-a-map-using-ggplot2/
+
+
+- API disponible
+  - Pour LinledIn: http://thinktostart.com/analyze-linkedin-with-r/
+  - Pour Instagram
+  
+
+```{r}
+ggplot(na.omit(B_TRAINING_YEAR)) + 
+  geom_point(aes(x = DISCIPLINE_COMBINED, y = PROFHAB_SCORE, color = factor(SV_YEAR))) + 
+  coord_flip() +
+  labs(x = "Domaine d'études", y = "Habiletés professionnelles (SCORE)", color = "Année d'enquête", title = "Graphique 1")
+```
+
