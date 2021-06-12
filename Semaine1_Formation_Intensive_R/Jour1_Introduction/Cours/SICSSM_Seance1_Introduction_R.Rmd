@@ -16,7 +16,7 @@ header-includes:
 
 ## Remerciements
 
-Robert Djogbénou, Georges Ngalé et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
 
 ## Cette ère est finie ...
 
@@ -62,7 +62,7 @@ Présentation générale de R
 
 ## Pourquoi R?
 
-- R s'exécute sur toutes les plates-formes informatiques couramment utilisées - y compris les systèmes Windows, Unix / Linux et Macintoshes - et s'installe normalement sur chaque plate-forme.
+- R s'exécute sur toutes les plates-formes informatiques couramment utilisées - y compris les systèmes Windows, Unix / Linux et Macintosh - et s'installe normalement sur chaque plate-forme.
   - (S-PLUS, en revanche, n'a pas de version Macintosh.)
 
 - Contrairement aux progiciels statistiques tels que SPSS, qui fournissent des interfaces utilisateur graphiques point-à-clic à la plupart de leurs capacités statistiques, R est orienté commande.
@@ -97,8 +97,7 @@ Installation de R et de RStudio
 
 ## Installation de R
 
-- Pour installer R, aller à https://cran.r-project.org/ (The Comprehensive R
-Archive Network or CRAN)
+- Pour installer R, aller à https://cran.r-project.org/ (The Comprehensive R Archive Network or CRAN)
 - Choisissez votre système d'opération
 - Suivez la procédure
 - Principal coût de R d’un point de vue pratique est qu’il doit être appris en tant que *langage de programmation* 
@@ -120,7 +119,7 @@ RStudio offre aux utilisateurs :
 1. Un $\color{red}{\text{éditeur de texte}}$ pour écrire des programmes, 
   
   - Console  --> Calcul interactif, vérification rapide de commandes
-  - Script --> Écrire de programme à éxécuter
+  - Script --> Écriture de programme à éxécuter
   - RMarkDown --> Écriture de programme + Texte, moyen de replicabilité
   
 2. Un $\color{red}{\text{visualiseur de graphiques}}$ qui affiche les graphiques que nous créons, 
@@ -151,10 +150,10 @@ Opérations arithmétiques
 ========================================================
 
 
-## Opérations arithmétiques avec le console
+## Opérations arithmétiques avec la console
 
 - Lancer R Studio *File > New File > R Script*
-- Dans le console, saisissez:
+- Dans la console, saisissez:
 
 ```{r}
 
@@ -238,7 +237,7 @@ resultat
 ```
 
 - Notez que si nous affectons une valeur différente au même nom d'objet, la valeur de l'objet sera modifiée. 
-- Par conséquent, nous devons veiller à ne pas écraser les informations précédemment attribuées que nous prévoyons d'utiliser ultérieurement.
+- Par conséquent, nous devons veiller à ne pas écraser les informations précédemment attribuées que nous prévoyons utiliser ultérieurement.
 
 
 ## Objets
@@ -445,7 +444,7 @@ rate
 ```{r}
 round(rate, 2)
 ```
-- Qu'est-ce que la commande round permet de faire?
+- Qu'est-ce que la commande **round** permet de faire?
 
 Matrice
 ========================================================
@@ -471,7 +470,7 @@ Mat_an_pop <- cbind(annee, population, pib)
 Mat_an_pop
 ```
 
-## Calcul sur une matrices
+## Calcul sur une matrice
 
 ```{r}
 # Element d'une matrice
@@ -515,7 +514,7 @@ pib_tete
 
 ```
 
-Alors, on a crée un autre vecteur qui donne le pib/tête de chaque décennie.
+Alors, on a créé un autre vecteur qui donne le pib/tête de chaque décennie.
 Il va falloir maintenant inclure cela dans la base de données existantes. 
 
 ```{r}
@@ -593,7 +592,7 @@ Fichier/base de données
 - Il existe différentes manières de modifier le répertoire de travail. 
   - Dans RStudio, le répertoire de travail par défaut est affiché dans la fenêtre en bas à droite sous l'onglet `Files`. 
   - Souvent, cependant, le répertoire par défaut n'est pas le répertoire que nous voulons utiliser. 
-  - Pour modifier le répertoire de travail, nous pouvons utiliser le menu déroulant RStudio **`Session > Set Working Directory > Choose Directory` ...** et choisissez le dossier à partir duquel vous souhaitez travailler.
+  - Pour modifier le répertoire de travail, nous pouvons utiliser le menu déroulant RStudio **`Session > Set Working Directory > Choose Directory` ...** et choisir le dossier à partir duquel nous souhaitons travailler.
   
 
 ## Fichier/base de données - Opération sur les fichiers de données
@@ -632,7 +631,7 @@ head(UNpop)
 2. **En les entrant manuellement**
 
 - Nous avons vu comment créer des vecteurs
-- ces vecteurs peuvent être combinés dans une base de données à partir de la fonction **data_frame**
+- Ces vecteurs peuvent être combinés dans une base de données à partir de la fonction **data_frame**
 
 ```{r}
 
@@ -649,7 +648,7 @@ base <- data.frame(age, nom)
 
 2. **En les entrant manuellement**
 
-- La fonction **rep** est souvent utilise pour repéter les saisies:
+- La fonction **rep** est souvent utilisée pour repéter les saisies:
 
 ```{r}
 
@@ -896,7 +895,7 @@ https://bit.ly/2NSpxLl
 ## Remarque importante
 
 - Chaque fonction prend des arguments, mais a presque toujours aussi des options.
-- les options permettent d'aller au-délà de ce qui est fait par défaut.
+- Les options permettent d'aller au-délà de ce qui est fait par défaut.
 - **help(nom_fonction)** ou **?nom_fonction** vous permet de connaître ces options et leurs utilisations
 
 ```{r}
