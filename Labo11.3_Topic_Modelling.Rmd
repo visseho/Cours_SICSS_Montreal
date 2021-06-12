@@ -1,0 +1,150 @@
+---
+title: 'Labo 11.3: Analyse quantitative du texte'
+subtitle: 'Topic modelling'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r}
+#install.packages("tidytext")
+#install.packages("textdata")
+
+library(tidyverse)
+library(tidytext)
+library(textdata)
+library(tm)
+library(maps)
+library(SnowballC)
+library(wordcloud)
+library(topicmodels)
+
+```
+
+
+```{r}
+
+load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
+
+#trumptweets <- readRDS("trumptweets.Rdata")
+
+tidy_trump_tweets <- 
+  trumptweets %>% 
+  select(created_at, text) %>% 
+  unnest_tokens("word", text)     # Tokenise the data
+
+tidy_trump_tweets <- 
+  tidy_trump_tweets %>% 
+  anti_join(stop_words)
+
+tidy_trump_tweets <-
+  tidy_trump_tweets[-grep("https|t.co|amp|rt", tidy_trump_tweets$word), ] 
+  
+tidy_trump_tweets <- tidy_trump_tweets[-grep("\\b\\d+\\b", tidy_trump_tweets$word),]
+
+tidy_trump_tweets$word <- gsub("\\s+","",tidy_trump_tweets$word)    
+
+tidy_trump_tweets %>%          
+  count(word) %>% 
+  arrange(desc(n))
+
+```
+
+
+```{r}
+
+trump_tweets_dtm <- 
+  tidy_trump_tweets %>% 
+  count(created_at, word) %>% 
+  cast_dtm(created_at, word, n)
+
+inspect(trump_tweets_dtm[1:5,1:8])
+
+```
+
+```{r}
+
+trump_tweet_lda <- LDA(trump_tweets_dtm, k = 3, control = list(seed = 3425))
+trump_tweet_lda
+
+```
+
+```{r}
+
+tt_topics <- tidy(trump_tweet_lda, matrix = "beta")
+tt_topics
+
+tt_top_term <-
+  tt_topics %>% 
+  group_by(topic) %>% 
+  top_n(10, beta) %>% 
+  ungroup() %>% 
+  arrange(topic, desc(beta)) 
+
+tt_top_term
+
+```
+
+```{r}
+
+
+tt_top_term %>%  
+  mutate(term = reorder_within(term, beta, topic)) %>% 
+  ggplot(aes(x = term, y = beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ topic, scales = "free") 
+
+
+
+```
+
+```{r}
+library(topicmodels)
+
+data("AssociatedPress")
+AssociatedPress
+
+inspect(AssociatedPress[6:20, 10:25])
+
+# Modele
+
+ap_lda <- LDA(AssociatedPress, k = 5, control = list(seed = 12345))
+ap_lda
+
+# Trouver les topics
+ap_topics <- tidy(ap_lda, matrix = "beta")
+ap_topics
+
+ap_top_topic <-
+  ap_topics %>% 
+  group_by(topic) %>% 
+  top_n(10) %>% 
+  arrange(topic, -beta)
+
+ap_top_topic
+
+# Graphique
+
+ap_top_topic %>%  
+  mutate(term = reorder_within(term, beta, topic)) %>% 
+  ggplot(aes(x = term, y = beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ topic, scales = "free")
+
+```
+
+# Données de texte
+
+- http://www.poltext.org/fr/discours-du-tr%C3%B4ne-canadiens
+- https://www.kaggle.com/rtatman/state-of-the-union-corpus-1989-2017
+
+
+
+# Références
+
+https://www.tidytextmining.com/
+https://www.tidytextmining.com/sentiment.html
+https://www.datacamp.com/community/tutorials/sentiment-analysis-R
+https://www.datacamp.com/community/tutorials/R-nlp-machine-learning
