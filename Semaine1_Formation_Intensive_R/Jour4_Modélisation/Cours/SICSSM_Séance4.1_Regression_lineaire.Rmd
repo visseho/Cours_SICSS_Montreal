@@ -339,7 +339,7 @@ Régression linéaire multiple
 ## Spécification
 
 $$ Y_i = \alpha + \beta_1 X_{1i} +  \beta_2 X_{2i} + ...+\beta_k X_{ki} +\epsilon_i$$
-Où $\epsilon_i$ suit une loi normale de moyenne 0 et de variance $\sigma^2$. On a k indépendantes variables pour n observations {(Y_i, X_11, X_12, ..., X_1k), ..., (Y_n, X_n1, X_n2, ..., X_nk)}.
+Où $\epsilon_i$ suit une loi normale de moyenne 0 et de variance $\sigma^2$. On a k indépendantes variables pour n observations ${(Y_i, X_{11}, X_{12}, ..., X_{1k}), ..., (Y_n, X_{n1}, X_{n2}, ..., X_{nk})}$.
 
 Exemple:
   - Y peut être le poids à la naissance
