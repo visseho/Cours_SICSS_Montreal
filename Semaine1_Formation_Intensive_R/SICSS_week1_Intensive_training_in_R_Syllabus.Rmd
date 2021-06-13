@@ -1,6 +1,7 @@
 ---
 title: "SICSS-Montréal : Formation intensive en R"
 author: "Visseho Adjiwanou, PhD."
+institute: "SICSS-Montréal"
 date: '`r format(Sys.time(), "%d %B %Y")`'
 output:
   pdf_document: default
@@ -21,22 +22,6 @@ header-includes:
 ---
 
 
-<!-- Margin de word: 1.87 ou 2.54  -->
-<!-- Other syllabus
-http://people.cs.vt.edu/tmitra/cs6724/
-http://courses.cse.tamu.edu/caverlee/csce489/schedule.html
-http://people.cs.vt.edu/tmitra/cs6724/resources/
-https://sites.google.com/site/cs492fall2014/materials
-https://ajungherr.github.io/dtd-konstanz-summer2018/assets/Syllabus.pdf
-http://compsocialscience.org/syllabus/
-https://clanfear.github.io/CSSS508/
-
-Data and articles to provide for the analysis
-
-- Prof sherbroke
-http://dimension.usherbrooke.ca/dimension/v2ssrcadre.html
-.-->
-
 \newpage
 
 
@@ -54,7 +39,7 @@ http://dimension.usherbrooke.ca/dimension/v2ssrcadre.html
 
 - Jour 4: Analyse/modélisation
 
-- Jour 5: Programmation / Travailler avec les données de texte
+- Jour 5: Travailler avec les données de texte
 
 
 # 1. Description
