@@ -4,8 +4,8 @@ author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ## Plan
@@ -175,7 +175,7 @@ crsc96 <- read_csv("../Données/cora-crsc1996-E-1996_F1.csv")
 ```{r}
 # trois manière de faire
 
-View(crsc96)
+#View(crsc96)
 
 head(crsc96)
 

@@ -4,11 +4,11 @@ author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
+  slidy_presentation: default
   beamer_presentation:
     colortheme: beaver
     fonttheme: structurebold
     theme: Antibes
-  slidy_presentation: default
   ioslides_presentation: default
 header-includes:
   - \usepackage{color}

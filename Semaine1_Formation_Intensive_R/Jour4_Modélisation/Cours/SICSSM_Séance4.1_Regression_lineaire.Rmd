@@ -319,6 +319,7 @@ epsilon} = Y - \hat{Y}$ : Résidus (residuals)
 - Minimiser la somme des carrées des résidus (SSR) : $$ SSR = \sum_{i=1}^n\hat{\epsilon}^2  = \sum_{i=1}^n(Y_i - \hat{\alpha} +  \hat{\beta X_i})^2 $$
 - Solution
 - Coefficients estimés : $$\hat{\alpha} = \bar{Y} -  \hat{\beta} \bar{X}$$
+
 $$\hat{\beta} = \frac{\sum_{i=1}^n(Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n(X_i - \bar{X})^2}$$
 
 - la droite des moindres carrées passe toujours par les points ($\bar{X}, \bar{Y}$)
