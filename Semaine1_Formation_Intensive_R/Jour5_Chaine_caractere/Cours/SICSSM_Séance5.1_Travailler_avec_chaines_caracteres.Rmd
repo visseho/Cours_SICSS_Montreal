@@ -1,9 +1,11 @@
 ---
 title: 'Séance 5.1: Travailler avec les chaines de caractères'
 author: "Visseho Adjiwanou, PhD."
-institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+institute: SICSS - Montréal
 ---
 
 # Introduction
@@ -30,7 +32,7 @@ library(tidyverse)
 library(summarytools)
 #library(xaringanthemer)
 
-restaurants <- read_csv("../Données/restaurants.csv",
+restaurants <- read_csv("../Donnees/restaurants.csv",
                         col_types = "ccccccccnnccicccciccciD") 
 
 
