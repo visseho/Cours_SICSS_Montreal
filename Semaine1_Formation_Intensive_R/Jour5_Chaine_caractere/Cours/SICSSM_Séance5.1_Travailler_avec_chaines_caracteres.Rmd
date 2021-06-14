@@ -9,6 +9,12 @@ output:
 institute: SICSS - Montréal
 ---
 
+
+## Remerciements
+
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+
+
 # Introduction
 
 Les chiffres sont pour l'analyse quantitative, ce que les mots sont pour l'analyse de texte. De ce fait, il est important d'apprendre à manipuler les mots/caractères avant de commencer la modélisation de données textuelles. Dans cette partie cours-labo, je vais vous apprendre les outils dont R dispose pour traiter les caractères. Comme la plupart des outils qui existent pour traiter des textes, R va faire recours aux expressions régulières pour faire correspondre les textes dans les chaînes de caractères. 
@@ -160,7 +166,7 @@ https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
 Il fournit des fonctions qui:
 
 - Remplace certaines fonctions de chaîne de base comme `paste ()` et `nchar ()` d'une manière un peu moins délicate avec des valeurs ou des facteurs manquants
-- Supprimez les espaces ou remplissez-les
+- Supprimer les espaces ou remplissez-les
 - Effectuer des tâches liées à **la correspondance de modèles**: 
   - Detect, 
   - locate, 
@@ -319,8 +325,7 @@ coffee1 %>% distinct(Name) %>% head()
 <!--
 ## Histogramme
 
-
-renons chaque identifiant d'entreprise unique, conservons le score d'inspection le plus récent et examinons un histogramme des scores:
+Prenons chaque identifiant d'entreprise unique, conservons le score d'inspection le plus récent et examinons un histogramme des scores:
 
 ```{r coffee_histogram, fig.height = 3, dev = "svg" }
 

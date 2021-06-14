@@ -1,0 +1,352 @@
+---
+title: 'Labo 10.2: Collete de données digitales par API'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api9.png)
+
+
+```{r}
+#library(devtools)
+#install_github("mkearney/rtweet")
+
+# rtweet est sur CRAN, vous n'avez plus besoin de l'installer à partir du Github
+
+#install.packages("rtweet")
+```
+ 
+
+```{r}
+#install.packages("rtweet")
+library(rtweet)
+library(httpuv)
+library(maps)
+
+app_name <- ""
+consumer_key <- ""
+consumer_secret <- ""
+
+#access_token <-
+#access_token_secret <-
+  
+create_token(app = app_name, consumer_key = consumer_key, consumer_secret = consumer_secret, set_renv = TRUE)  
+
+#create_token(app = app_name, consumer_key = consumer_key, consumer_secret = consumer_secret, access_token = access_token, access_token_secret = access_token_secret, set_renv = TRUE)  
+
+
+```
+
+# Collecter des tweets sur un thème donné
+
+Ce code crée une base de données appelée canada_tweets que nous pourrons ensuite parcourir. Jetons un coup d’œil aux dix premiers tweets que rtweet stocke sous forme de variable appelée **text**.
+
+```{r}
+
+canada_tweet <- search_tweets("#Canada", n = 3000, include_rts = FALSE)
+
+
+head(canada_tweet$text)
+
+
+```
+
+Notez que cet appel d'API a également généré de nombreuses autres variables intéressantes, notamment le nom et le pseudonyme de l'utilisateur, l'heure de sa publication, ainsi que de nombreux autres paramètres, notamment des liens vers du contenu multimédia et des profils d'utilisateur. Un petit nombre d'utilisateurs permet également la géolocalisation de leurs tweets - et si cette information est disponible, elle apparaîtra dans cet ensemble de données. Voici la liste complète des variables que nous avons collectées via notre appel API ci-dessus:
+
+```{r}
+names(canada_tweet)
+```
+
+En bref, la fonction rtweet s'interface parfaitement avec ggplot et d'autres bibliothèques de visualisation pour produire de jolis graphes des résultats ci-dessus. Par exemple, faisons un graphique de la fréquence des tweets sur la Corée ces derniers jours:
+
+```{r}
+library(tidyverse)
+ts_plot(canada_tweet, "3 hours") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Frequence des Tweets sur le Canada",
+    subtitle = "Nombre de tweet agrégés en utilisant des intervalles de trois heures",
+    caption = "Source: Données collectées à partir de l'API REST de Twitter via rtweet")
+
+
+
+```
+
+La fonction search_tweets comporte également un certain nombre d'options ou d'arguments utiles. Par exemple, nous pouvons limiter l'emplacement géographique des tweets aux États-Unis et aux tweets de langue anglaise à l'aide du code ci-dessous. Le code limite également les résultats aux non-retweets et se concentre sur les tweets les plus récents, plutôt que sur un mélange de tweets populaires et récents, qui constitue le paramètre par défaut.
+
+```{r}
+
+cd_tweets <- search_tweets("canada",
+                           "lang:en", geocode = lookup_coords("usa"),
+                           n = 1000, type="recent", include_rts=FALSE)
+head(cd_tweets$text)
+
+```
+
+
+rtweet permet également de géocoder les tweets pour les utilisateurs qui permettent à Twitter de suivre leur position:
+
+```{r}
+geocode <- lat_lng(cd_tweets)
+
+library(maps)
+par(mar = c(0, 0, 0, 0))
+maps::map("state", lwd = .25)
+with(geocode, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
+
+usa_map <- map_data("word", region = "USA")
+ggplot() +
+  geom_point(geocode, aes(x = lng, y = lat, group = group))
+
+```
+
+Nous ne voyons pas les 100 tweets dans ce diagramme pour une raison importante: nous ne regardons que les personnes qui permettent à Twitter de suivre leur position (et cela fait environ 1 personne sur 100 au moment de la rédaction de cet article).
+
+L’API de Twitter est également très utile pour collecter des données sur un utilisateur donné. Jetons un coup d’œil à la page Twitter de Bernie Sanders: http://www.twitter.com/SenSanders. On peut y voir la description et le profil du sénateur Sanders, le texte intégral de ses tweets et - si nous cliquons plusieurs liens - les noms des personnes qu’il suit, celles qui le suivent et les tweets qu’il a «aimés».
+
+Tout d’abord, voyons ses 5 derniers tweets:
+
+
+```{r}
+sanders_tweets <- get_timelines(c("sensanders"), n = 5)
+head(sanders_tweets$text)
+
+trudeau_tweets <- get_timeline("JustinTrudeau", n = 5)
+head(trudeau_tweets$text)
+```
+
+
+Notez que vous êtes limité à demander les 3 200 derniers tweets. Il peut donc être impossible d'obtenir une base de données complète de tweets pour une personne qui tweete très souvent, ou vous devrez peut-être acheter les données de Twitter lui-même:
+
+Maintenant, obtenons des informations plus générales sur Sanders en utilisant la fonction lookup_users:
+
+```{r}
+
+sanders_twitter_profile <- lookup_users("sensanders")
+
+```
+
+Cela crée une base de données avec une variété de variables supplémentaires. Par exemple:
+
+```{r}
+sanders_twitter_profile$description
+sanders_twitter_profile$location
+sanders_twitter_profile$followers_count
+```
+
+
+Nous pouvons également utiliser la fonction get_favorites () pour identifier les Tweets que Sanders a récemment «aimés».
+
+```{r}
+sanders_favorites<-get_favorites("sensanders", n=5)
+sanders_favorites$text
+```
+
+Nous pouvons également obtenir une liste des personnes suivies par Sanders:
+
+```{r}
+sanders_follows <- get_followers("sensanders")
+head(sanders_follows)
+```
+
+Cela produit les ID utilisateur de ces abonnés et nous pourrions obtenir plus d'informations à leur sujet si nous souhaitons utiliser la fonction lookup_users. Si nous voulions créer un ensemble de données d'analyse de réseau social plus vaste centré sur Sanders, nous pourrions regrouper les abonnés de ses abonnés dans une boucle.
+
+La mise en boucle est un moyen efficace de collecter une grande quantité de données, mais elle déclenchera également une limitation du débit. Toutefois, comme je l’ai mentionné ci-dessus, Twitter permet aux utilisateurs de vérifier leurs limites tarifaires. La fonction rate_limit () du paquetage rtweets fait ceci comme suit:
+
+```{r}
+
+rate_limits <- rate_limit()
+
+head(rate_limits[,1:4])
+```
+
+
+Dans le code ci-dessus, j'ai créé un cadre de données qui décrit le nombre total d'appels que je peux effectuer dans un délai donné (appelé réinitialisation). Dans ce cas, c'est 15 minutes. Afin d’empêcher la limitation du débit dans une grande boucle, il est courant d’utiliser la fonction Sys.sleep de R, qui ordonne à R de dormir pendant un certain nombre de secondes avant de passer à la prochaine itération d’une boucle.
+
+rtweet a un certain nombre d’autres fonctions utiles que je mentionnerai au cas où elles pourraient être utiles aux lecteurs. get_trends () identifiera les sujets tendances sur Twitter dans un domaine particulier:
+
+```{r}
+get_trends("Montreal")
+```
+
+rtweet peut même contrôler votre compte Twitter. Par exemple, vous pouvez poster des messages sur votre fil Twitter à partir de R comme suit:
+
+
+```{r}
+post_tweet("I love APIs")
+```
+
+Maintenant vous essayez !!!
+
+Pour renforcer les compétences que vous avez acquises dans cette section, essayez les solutions suivantes: 1) collectez les 100 derniers tweets de CNN; 2) déterminer combien de personnes suivent CNN sur Twitter; et, 3) déterminez si CNN est en train de tweeter sur des sujets en vogue dans votre région.
+
+# Utilisation de booucle avec API
+
+Très souvent, on peut souhaiter envelopper les appels d'API tels que ceux que nous avons faits jusqu'à présent dans une boucle pour collecter des données sur une longue liste d'utilisateurs. Pour illustrer cela, nous allons utiliser les données des adresses Twitter d’élus aux États-Unis, collectées par Chris Bail et disponible sur son site Github:
+
+
+```{r}
+
+elected_officials <- read.csv("https://cbail.github.io/Senators_Twitter_Data.csv", stringsAsFactors = FALSE)
+
+head(elected_officials)
+
+```
+
+Comme vous pouvez le constater, ce fichier contient les «screen_name» de Twitter, ou identifiants nécessaires pour effectuer des demandes d’API concernant chaque élu. Prenons les 100 derniers tweets de chaque responsable et combinons-les en un seul et même grand ensemble de données contenant les tweets récents d’élus élus aux États-Unis.
+
+```{r}
+
+#créer un conteneur vide pour stocker les tweets de chaque élu
+elected_official_tweets <- as.data.frame(NULL)
+
+for(i in 1:nrow(elected_officials)){
+
+  #Télécharger les tweets
+tweets <- get_timeline(elected_officials$twitter_id[i], n=100)
+  
+#  tweets <-
+#    elected_officials %>% 
+#    get_timeline(twitter_id[i], n = 100)
+  
+  # Mettre le tweet dans le conteneur
+elected_official_tweets <- rbind(elected_official_tweets, tweets)
+
+#elected_official_tweets <- binds_row(elected_official_tweets, tweets)
+
+
+    
+  #faire une pause de cinq secondes pour éviter de dépasser le taux (rate limiting)
+  Sys.sleep(1)
+  
+  #imprimer le nombre/itération pour le débogage/suivi de la progression
+  print(i)
+}
+
+```
+
+
+Ce code prendrait un certain temps à fonctionner, bien sûr, puisque nous avons collecté 100 tweets de 500 personnes différentes. Vous pouvez également obtenir un taux limité, en fonction de votre activité précédente et de vos limites de taux actuelles. Si tel est le cas, modifiez la durée de la pause dans la commande Sys.sleep ci-dessus. Vous remarquerez peut-être aussi des messages d’erreur dans votre message - ceux-ci peuvent se produire du fait que les sénateurs modifient leur pseudo Twitter ou parce qu’ils ont un compte mais pas de tweets, ou d’autres erreurs du même genre.
+
+Au cas où vous ne voudriez pas extraire les données vous-même, j'ai sauvegardé une copie des données que j'ai générées en septembre 2018 et que vous pouvez charger comme suit:
+
+```{r}
+
+load(url("https://cbail.github.io/Elected_Official_Tweets.Rdata"))
+
+```
+
+
+Maintenant que nous avons collecté les données, créons un modèle simple qui prédit le nombre de tweets retweet. Pour ce faire, nous devons fusionner l'ensemble de données que nous avons lu dans Github ci-dessus avec le nouvel ensemble de données que nous venons de produire (afin d'examiner les attributs de chaque sénateur susceptibles d'accroître la portée de leurs tweets).
+
+
+```{r}
+
+#renommer la variable twitter_id dans le jeu de données d'origine afin de le fusionner avec le jeu de données tweet
+
+View(elected_official_tweets) 
+View(elected_officials)
+
+elected_officials <-
+  elected_officials %>% 
+  mutate(screen_name = twitter_id)
+
+#colnames(elected_officials)[colnames(elected_officials)=="twitter_id"]<-"screen_name"
+
+#for_analysis <- left_join(elected_official_tweets, elected_officials, by = "screen_name")
+
+
+
+tweet_analyse <- left_join(elected_official_tweets, elected_officials, by = "screen_name")
+
+# Graphique
+
+ggplot(tweet_analyse) +
+  geom_histogram(aes(x = retweet_count))
+
+
+```
+
+Ensuite, étant donné que nos données sont très asymétriques, nous pourrions utiliser quelque chose comme un modèle de régression binomiale négatif pour examiner l’association entre les divers prédicteurs dans nos données et le résultat. Pour ce faire, nous allons utiliser la fonction glm.nb du package MASS:
+
+```{r}
+#install.packages("MASS")
+library(MASS)
+
+retweet_pred <- glm.nb(retweet_count ~ party + followers_count + statuses_count + gender, data=tweet_analyse)
+
+summary(retweet_pred)
+```
+
+Sans surprise, les sénateurs qui ont plus d'abonnés ont tendance à produire des tweets qui ont plus de retweets. De plus, les républicains semblent avoir moins de retweets que les démocrates. Cela pourrait résulter du fait que les utilisateurs de Twitter qui suivent la politique - ou du moins les sénateurs - sont plus susceptibles d’être des démocrates, ou parce que les démocrates produisent des tweets plus attrayants, ou un certain nombre d’autres facteurs de confusion (nous ne devrions donc probablement pas lire trop dans cette découverte sans une analyse plus minutieuse).
+
+# Travailler avec des horodatages
+Une compétence supplémentaire vous sera utile pour travailler avec les données Twitter. Très souvent, nous souhaitons suivre les tendances dans le temps ou sous-regrouper nos données en fonction de différentes périodes. Si nous parcourons la variable qui décrit l'heure à laquelle chaque tweet a été créé, nous constatons toutefois que ce n'est pas dans un format que nous pouvons facilement utiliser dans r:
+
+
+```{r}
+
+head(tweet_analyse$created_at)
+
+```
+
+Pour gérer ces types de variables chaîne qui décrivent des dates, il est souvent très utile de les convertir en une variable de classe «date». Il existe plusieurs façons de le faire dans R, mais voici comment le faire en utilisant as. Fonction de date en base R.
+
+```{r}
+
+tweet_analyse$date <- as.Date(tweet_analyse$created_at, format="%Y-%m-%d")
+head(tweet_analyse$date)
+
+```
+
+Nous pouvons maintenant subdiviser les données en utilisant des techniques conventionnelles. Par exemple, si nous voulions ne regarder que les tweets du mois d'août, nous pourrions faire ceci:
+
+```{r}
+
+august_tweets <- 
+  tweet_analyse %>% 
+  filter(date > "2018-07-31" &  date<"2018-09-01")
+
+```
+
+
+# Défis de l'utilisation des API
+Il est à présent espéré que les API sont une ressource inestimable pour la collecte de données à partir d’Internet. Dans le même temps, il peut également être clair que le processus d'obtention d'informations d'identification, d'éviter les limitations de taux et de comprendre le jargon unique employé par les concepteurs de chaque API peut signifier de nombreuses heures à passer au crible la documentation d'une API, en particulier là où Les packages R ne fonctionnent pas correctement pour l’interfaçage avec l’API en question. Si vous devez développer votre propre code personnalisé pour fonctionner avec une API - ou si vous avez besoin d'informations qui ne peuvent pas être obtenues à l'aide de fonctions dans un package R, il peut être utile de parcourir le code source des fonctions R décrites ci-dessus. afin de voir où ils passent le langage de requête API nécessaire pour produire les résultats avec lesquels nous avons travaillé ci-dessus.
+
+Une liste des API d'intérêt
+Il existe de nombreuses bases de données décrivant les API populaires sur le Web, y compris le site Web programmable susmentionné, mais également une variété de listes générées par des utilisateurs ou par des utilisateurs:
+
+https://www.programmableweb.com/
+
+https://github.com/toddmotto/public-apis
+
+https://apilist.fun/
+
+Le site R OpenSci contient également une liste de packages R fonctionnant avec des API:
+
+https://ropensci.org/packages/
+
+
+
+# Ressources
+
+http://blog.mediatribe.net/en/node/101/index.html
+https://cran.r-project.org/web/packages/rtweet/vignettes/auth.html
+https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
+
+https://www.datanovia.com/en/blog/how-to-create-a-map-using-ggplot2/
+
+
+- API disponible
+  - Pour LinledIn: http://thinktostart.com/analyze-linkedin-with-r/
+  - Pour Instagram
+  
+
+
+
+
+Pour Olivier
+- https://github.com/ropensci/essurvey
