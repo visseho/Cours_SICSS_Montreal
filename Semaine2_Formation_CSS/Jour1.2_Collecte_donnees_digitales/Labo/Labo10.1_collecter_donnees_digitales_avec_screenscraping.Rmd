@@ -1,0 +1,390 @@
+---
+title: 'Labo 10.1: Collete de données digitales par screen-scraping'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+Remarque: Cours basé sur les notes de cours de Chris Bail (Duke University)
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api11.png)
+ 
+# Présentation
+- Avec xpath
+- Avec SelectorGadget
+- Avec Selenium
+
+
+## 1. Grattage avec xpath
+
+### Exemple: gratter un tableau sur un site
+
+- Dressons la table
+
+Comme toujours, vous devez effacer votre environnement et installer/charger les packages dont vous avez besoin.
+
+
+```{r}
+
+rm(list = ls())
+
+
+#install.packages("rvest")
+#install.packages("selectr")
+
+
+```
+
+Le package que nous allons utiliser pour gratter les sites web est rvest de Wickham. 
+Dans ce labo, nous allons scrapper le site web de wikipedia:
+(https://en.wikipedia.org/wiki/World_Health_Organization_ranking_of_health_systems_in_2000). 
+
+Cette page est «simple», car elle ne comporte pas beaucoup de fonctionnalités interactives nécessitant des types de programmation Web sophistiqués, tels que javascript, avec lesquelles, comme nous le verrons dans un exemple ultérieur, il peut être particulièrement difficile de travailler.
+
+Voici à quoi ressemble la page Web liée ci-dessus lorsque nous la visitons via un navigateur tel que Explorer ou chrome:
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10who.png)
+
+
+Mais ce n'est pas ce que la page Web ressemble réellement à notre navigateur. Pour afficher le «code source» de la page Web, nous pouvons utiliser le menu déroulant de Chrome appelé «développeur», puis cliquer sur «Afficher la source». Nous voyons ensuite la page dans sa forme la plus élémentaire, appelée fichier HTML, qui est une longue fichier contenant à la fois le texte de la page Web et une longue liste d'instructions sur la manière dont le texte, les images et les autres composants de la page Web doivent être restitués par le navigateur:
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10code.png)
+
+
+Pour télécharger le code source dans R, nous pouvons utiliser la fonction read_html du package rvest que nous venons d'installer ci-dessus (Remarque: vous devrez peut-être aussi charger / installer le package selectr):
+
+```{r}
+
+library(tidyverse)
+library(rvest)
+
+wikipedia_page <- read_html("https://en.wikipedia.org/wiki/World_Health_Organization_ranking_of_health_systems_in_2000")
+
+wikipedia_page
+
+```
+
+## Analyse HTML (Parsing HTML)
+
+La partie la plus difficile du nettoyage d’écran consiste peut-être à extraire l’information que vous souhaitez extraire du fichier html. Cela pose un défi car ces informations sont presque toujours cachées au plus profond du code source, ce qui peut être très difficile à parcourir. Heureusement, comme le montre la figure ci-dessous, le code source d'une page Web, tel que HTML ou XML, possède une structure «arborescente» qui vous permet d'affiner progressivement la partie de la page Web où réside l'information que vous souhaitez.
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10html.png)
+
+
+Pour savoir où se trouvent les données souhaitées dans cette structure arborescente, nous pouvons utiliser un outil pratique dans Chrome, appelé "Outils du développeur" (developper tools:
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10developper.png)
+
+Cet outil vous fournit une interface interactive où vous pouvez afficher la page Web à côté du code source. Lorsque vous cliquez avec le bouton droit de la souris sur la partie de la page Web qui vous intéresse et que vous choisissez «inspecter», l'outil de développement met en surbrillance la partie du code source où se trouvent les informations souhaitées. Dans la figure ci-dessous, j'ai mis en évidence le tableau décrivant les indicateurs de santé pour les différents pays décrits sur la page Wikipedia liée ci-dessus.
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10dev2.png)
+
+Lorsque j'ai inspecté la partie de la page Web que j'essayais de gratter en cliquant avec le bouton droit de la souris, la partie du code HTML ci-dessous est surlignée:
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10dev3.png)
+
+Parfois, trouver la partie exacte du code dans laquelle se trouvent les données que vous souhaitez conserver nécessite des essais et des erreurs. Dans ce cas, j'ai découvert que je devais sélectionner une ligne précédente dans le code pour identifier la table entière que je voulais gratter au lieu d'une seule ligne.
+
+L'étape suivante consiste à identifier une chaîne de chiffres et de lettres appelée «Xpath» pour cette partie du code source. Le Xpath décrit la partie précise du code HTML où vivent les données que je veux. J'identifie le chemin X en cliquant avec le bouton droit de la souris sur la section en surbrillance du volet des outils de développement qui affiche le code html:
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10dev4.png)
+
+Maintenant que j'ai le xpath, je peux utiliser ces informations pour affiner ma recherche dans le fichier HTML pour le tableau que je veux extraire à l'aide de la fonction html_nodes qui transmet le xpath en tant qu'argument, comme illustré dans le code ci-dessous:
+
+```{r}
+
+Section_wikipedia <- html_node(wikipedia_page, xpath = '//*[@id="mw-content-text"]/div[1]/table')
+Section_wikipedia
+
+```
+
+
+
+Comme le montre la sortie ci-dessus, je me rapproche maintenant, mais je ne suis pas encore tout à fait où je veux être. La partie supérieure de la sortie m'indique que les données sont au format table (plutôt qu'au format texte), je vais donc utiliser la fonction html_table pour extraire la table incorporée dans le code html:
+
+```{r}
+
+health_rankings<-html_table(Section_wikipedia)
+
+head(health_rankings[,(1:2)])
+
+```
+
+
+Comme le montre la sortie ci-dessus, je dispose enfin des données souhaitées sous la forme d'un bloc de données ou d'un jeu de données appelé «health_rankings». Il s'agissait toutefois d'un travail fastidieux, mais rappelez-vous qu'il s'agissait d'un type de page Web très simple. En outre, il convient de noter que les groupes de pages Wikipedia ont un format très similaire, ce qui les rend très propices à la suppression d'écran. Si, en revanche, je cherchais une liste de sites appartenant à plusieurs domaines, chacun ayant sa propre structure complexe, je pourrais passer des jours ou des semaines à écrire du code pour le supprimer. Dans ce scénario, de nombreuses personnes peuvent trouver qu'il est plus facile de collecter les données manuellement ou d'engager du personnel sur Amazon Mechanical Turk pour extraire les informations que vous souhaitez peut-être d'une liste de pages Web.
+
+Une dernière remarque: souvent, la page Web que vous souhaitez gratter contient du XML au lieu de HTML (ou en plus du HTML). Dans ce cas, le package rvest dispose d'une série de fonctions permettant d'analyser XML, telles que xml et xml_node.
+
+En résumé:
+
+1. Lire la page: read_html
+2. Trouver la partie qui vous concerne et copier le xpath: developpers_tools
+3. Sélectionner cette partie avec html_node
+4. Télécharger le sous le format approprié html_table si table
+
+
+## Exemple 2: gratter une grille
+
+Maintenant, nous allons scrapper la page du département de sociologie de l'uqam
+
+```{r}
+
+# 1. Charger le site
+socio1 <- read_html("https://sociologie.uqam.ca/corps-professoral/professeurs-es/")
+socio1
+
+# 2. Chercher la partie à scrapper
+
+socio_prof1 <- html_node(socio1, xpath = '//*[@id="post-967"]/div/div')
+socio_prof1
+
+# 3. Transformer cela en données
+socio_prof_list <- html_text(socio_prof1)
+socio_prof_list
+
+```
+
+
+
+
+## 2. Collecter avec le sélecteur CSS
+
+Il est souvent le cas, en particulier avec des pages Web plus complexes, que les procédures décrites ci-dessus ne fonctionneront pas. Dans ce cas, il est utile de connaître une alternative au code Xpath décrit ci-dessus: le «sélecteur CSS», qui est un autre extrait de code qui vous aide à trouver le nugget de HTML que vous souhaitez extraire d'une page Web.
+
+Voyons un exemple d’extraction d’une liste «d’événements» de la page Web principale de l’Université Duke. Si vous visitez cette page, vous verrez que l'exemple est considérablement plus complexe que l'exemple de Wikipedia susmentionné. Il y a non seulement plus de types d'informations présentés sur la page, mais de multiples façons d'y accéder. Dans notre exemple hypothétique, les informations que nous souhaitons changer quotidiennement (la liste des événements majeurs qui se produiront chez Duke ce jour-là).
+
+Pour identifier le sélecteur CSS, nous allons utiliser un plug-in Chrome très répandu appelé le sélecteur Gadget. Il s'agit d'un outil interactif, semblable à l'outil de développeur Chrome décrit ci-dessus, qui permet d'interagir avec une page Web afin de révéler le sélecteur CSS. Après l’installation de l’outil, une petite icône apparaît dans la barre d’outils de Google Chrome, à savoir une main tenant un microscope. Lorsque vous cliquez sur cet outil, un nouveau volet apparaîtra en bas de la fenêtre de votre navigateur et révélera le CSS Selector. Il peut également être utilisé pour identifier le Xpath. Ce volet est illustré au bas de la figure ci-dessous:
+
+Cliquez sur l'une des parties jaunes jusqu'à ce qu'il ne reste que la partie verte que vous avez initialement sélectionnée. Lorsque vous cliquez sur, vous pouvez constater que le sélecteur CSS sélectionné en bas de la page change. Cela peut prendre quelques essais et erreurs, et le gadget sélecteur est imparfait. Cela fonctionne mieux lorsque vous essayez de cliquer sur différentes parties surlignées en jaune, puis d'essayer les sélecteurs CSS résultants qu'il identifie de manière itérative à l'aide du code ci-dessous.
+
+Une fois que nous avons identifié le sélecteur CSS que nous pensons attaché à l’information souhaitée, nous pouvons le transmettre comme argument dans la fonction html_nodes de rvest, comme suit:
+
+### Exemple 1: page Wikipedia
+
+```{r}
+
+wikipedia_page <- read_html("https://en.wikipedia.org/wiki/World_Health_Organization_ranking_of_health_systems_in_2000")
+
+#.jquery-tablesorter td , .headerSort
+Section_wikipedia1 <- html_node(wikipedia_page, css = '#mw-content-text > div.mw-parser-output > table')
+Section_wikipedia1
+
+table_wiki1 <- html_table(Section_wikipedia1)
+
+table_wiki1
+
+
+```
+
+
+
+### Exemple 2: Télécharger les acteurs du film lego: utilisation de SelectorGadget
+
+
+
+```{r}
+
+lego <- read_html("https://www.imdb.com/title/tt1490017/")
+
+acteurs <- html_nodes(lego, xpath = '.primary_photo+ td a')
+
+acteurs <-
+  lego %>% 
+  html_node(css = '.primary_photo+ td a')
+acteurs
+
+.primary_photo+ td
+.primary_photo+ td
+
+length(acteurs)
+acteurs[1:2]
+
+# Collecter les noms
+acteurs_nom <- html_text(acteurs, trim = TRUE)
+acteurs_nom
+
+# Collecter les liens des pages des acteurs
+acteur_attr <- html_attrs(acteurs)
+acteur_attr
+
+length(acteur_attr)
+acteur_attr[1:2]
+
+# Relative url
+acteurs_rel_url <- html_attr(acteurs, "href")
+length(acteurs_rel_url)
+acteurs_rel_url
+
+# Absolute url
+
+acteurs_abs_url <-
+  html_attr(acteurs, "href") %>% 
+  url_absolute(lego)
+
+```
+
+## Exemple 4: Collecter les informations sur les formateurs d'un site
+
+
+```{r}
+
+thinkr_url <- read_html("https://thinkr.fr/equipe/")
+
+#.orange a span
+thinkr_formateurs_nodes <- html_node(thinkr_url, css = '.orange span')
+
+length(thinkr_formateurs_nodes)
+
+thinkr_formateurs_nodes[1:3]
+
+formateur <- html_text(thinkr_formateurs_nodes)
+length(formateur)
+formateur[1]
+
+
+# Département de sociologie
+
+sociouqam_url <- read_html("https://sociologie.uqam.ca/corps-professoral/professeurs-es/")
+
+profs <-
+  sociouqam_url %>% 
+  html_nodes('.nom a') %>% 
+  html_text(trim = TRUE)
+
+head(profs)
+
+
+profs[1]
+profs[2]
+
+
+prof_table <- as_data_frame(c(profs[1:35]))
+prof_table
+
+```
+
+
+
+## Exemple 6: Collecter les discours sur l'état de l'union aux US
+
+https://francojc.github.io/2015/03/01/web-scraping-with-rvest-in-r/
+
+
+Comme le montre la sortie ci-dessus, nous avons maintenant collecté des informations sur les événements souhaités. Notez, cependant, qu'il inclut des caractères en désordre avec des barres obliques inverses, ts et ns. Celles-ci s'appellent des «balises html», et nous allons apprendre à les nettoyer dans un prochain tutoriel sur le traitement de base du texte en R.
+
+Maintenant vous essayez !!!
+
+Pour vous exercer, choisissez une autre page Web et extrayez-en des informations. Astuce: si vous choisissez de gratter du texte, la fonction html_text de rvest peut s'avérer très utile. De plus, si vous ne parvenez pas à extraire l’information souhaitée, cela risque de ne pas être possible et vous devrez peut-être utiliser l’une des techniques décrites ci-dessous pour le nettoyage d’écran.
+
+# Ressources
+
+1. https://thinkr.fr/rvest/ 
+2. https://www.datacamp.com/community/tutorials/r-web-scraping-rvest
+3. https://blog.rstudio.com/2014/11/24/rvest-easy-web-scraping-with-r/
+4. https://selectorgadget.com/
+5. https://cran.r-project.org/web/packages/rvest/vignettes/selectorgadget.html
+
+
+## 3. Screen-scraping avec Selenium
+
+Parfois, notre intérêt à gratter les pages Web implique plus d’interaction avec un navigateur Web. Par exemple, supposons que nous voulions visiter les pages Web principales d’une série d’universités et lancer une recherche sur «la science des données». Cela nécessiterait de saisir des données dans une barre de recherche sur une série de sites, puis de collecter les données obtenues. Afin d'accomplir de telles tâches, il est parfois utile d'automatiser l'intégralité de votre navigateur Web. Cela signifie que nous écrirons du code qui indiquera à notre ordinateur: a) d'ouvrir un navigateur Web; b) charger une page Web; c) interagissez avec la page Web en cliquant sur la barre de recherche et en entrant du texte; et c) télécharger les données résultantes.
+
+RSelenium est un puissant package pour automatiser des tâches sur votre ordinateur. Il peut également être utilisé avec un peu de graisse pour coude pour automatiser votre navigateur et effacer des informations. Pour écrire du code pour Rselenium, vous devez saisir les touches du clavier, telles que «Tabulation», «Ctrl» ou «Entrée», puis les intercaler avec le texte que vous souhaitez saisir (dans l'exemple ci-dessus, nous pourrions passer le texte «données scientifiques». ).
+
+Malheureusement, installer RSelenium peut être un peu compliqué, car il nécessite un interfaçage plus sophistiqué entre votre session RStudio et votre système d’exploitation par rapport au paquet R typique. Les instructions qui suivent vous aideront à installer R Selenium sur Mac OSX.13.4. Tout d'abord, vous devrez installer un autre logiciel appelé Java SE Development Kit. Choisissez la version la plus appropriée pour votre machine sur ce [lien](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). Ensuite, vous devrez télécharger Docker et l’installer sur votre ordinateur. Lorsque vous êtes invité à entrer vos identifiants de connexion, vous devrez fournir le nom d'utilisateur que vous avez configuré pour télécharger Docker, pas votre adresse électronique. Une fois que cela sera fait, Docker sera disponible pour RSelenium à l’aide de la commande suivante:
+
+```{r}
+
+system('docker run -d -p 4445:4444 selenium/standalone-chrome')
+
+```
+
+<!--
+En résumé:
+1. [Java SE Development Kit](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+2. télécharcher et installer [Docker](https://www.docker.com/products/docker-desktop)
+3. Lancer system('docker run -d -p 4445:4444 selenium/standalone-chrome')
+-->
+
+Ensuite, vous devrez installer RSelenium, qui est enfin à nouveau hébergé sur CRAN. (Pendant quelques mois plus tôt cette année, ce n'était pas le cas, mais vous avez pu utiliser une solution de contournement pour l'installer à partir de Github à l'aide du package devtools.) Après avoir téléchargé et chargé le package, nous démarrons le serveur Selenium et ouvrons Chrome avec commandes ci-dessous (Si vous n'avez pas installé Chrome, vous pouvez démarrer Firefox à la place en utilisant la commande suivante rD <- rsDriver (browser = "firefox").
+
+Remarque: Lorsque vous exécutez la fonction **rsDriver** pour configurer une session RSelenium, RSelenium choisira la dernière version disponible de chromedriver par défaut. Souvent, cette dernière version reflète une version développeur de Chrome qui n'est peut-être pas encore disponible, même en version bêta, ce qui entraîne une incompatibilité qui empêchera RSelenium de fonctionner. Pour résoudre ce problème, utilisez **binman :: list_versions ("chromedriver")** pour identifier la version de chromedriver correspondant à votre version installée de Chrome (dans Chrome, sélectionnez "À propos de Google Chrome" pour identifier votre version installée). Une fois identifiée, spécifiez cette version comme valeur de l'argument chromever dans rsDriver. Merci à cette page [Stack Overflow](https://stackoverflow.com/questions/55201226/session-not-created-this-version-of-chromedriver-only-supports-chrome-version-7/56173984#5617398) pour le correctif!
+
+```{r}
+
+
+#install.packages("RSelenium")
+library(RSelenium)
+
+# Check available versions of chromedriver
+binman::list_versions("chromedriver")          # Ne marche pas
+
+# start a Selenium server
+#78.0.3904.105
+rD <- rsDriver(browser = c("chrome"), chromever = "92.0.4515.43")
+
+
+# open the browser
+remDr <- rD$client
+
+```
+
+Maintenant, nous pouvons lancer la page Web Duke ci-dessus comme suit:
+
+```{r}
+
+remDr$open() 
+remDr$navigate("https://www.duke.edu")
+
+```
+
+Ensuite, nous devons utiliser le gadget de sélection ou une autre méthode pour identifier la partie de la page Web où se trouve la barre de «recherche». Après quelques essais et erreurs, j'ai découvert que le sélecteur CSS était **fieldset input**:
+
+```{r}
+
+search_box <- remDr$findElement(using = 'css selector', 'fieldset input')
+
+```
+
+
+Vous verrez maintenant que la barre de recherche est mise en surbrillance dans votre navigateur. La seule chose qui reste à faire est de demander à RSelenium de taper «data science» dans la zone de requête, puis d'appuyer sur le bouton de retour à l'aide de la fonction sendKeysToElement. Le code du trait de touche "Entrée" ou "Retour" est le deuxième argument que nous transmettons à la fonction susmentionnée (\ uE007)
+
+```{r}
+
+search_box$sendKeysToElement(list("data science", "\uE007"))
+
+```
+
+Ce code devrait entraîner une recherche de «data science» sur la page Web de Duke.
+
+Et finalement, vous quittez l'application
+
+```{r}
+remDr$close() 
+rD$server$stop()
+```
+
+
+## Exemple 1: Scrapper la base d'incendie des forêts
+
+
+```{r}
+rD <- rsDriver(browser = c("chrome"), chromever = "78.0.3904.105")
+remDr <- rD$client
+
+
+```
+
+## Ressources
+
+https://freakonometrics.hypotheses.org/tag/rselenium
+http://rpubs.com/johndharrison/RSelenium-Basics
+
+
+## Scraping d'écran dans une boucle
+Quelle que soit l'approche de capture d'écran que vous utilisez, vous souhaiterez souvent gratter non pas une seule page, mais plusieurs pages. Dans ce cas, vous pouvez simplement intégrer l'une des techniques ci-dessus dans une boucle **for** qui lit une liste de pages Web que vous souhaitez gratter. Encore une fois, sachez que les sites Web ont souvent des structures différentes, de sorte que la façon dont vous extrayez des informations sur un site peut être très différente d'un autre. C'est l'une des principales raisons pour lesquelles le grattage d'écran peut être difficile - et aussi une autre raison pour laquelle le grattage d'écran est passé de mode en plus des problèmes juridiques soulignés ci-dessus. Si vous continuez à gratter une grande liste de pages Web, vous souhaiterez peut-être intégrer une «gestion des erreurs» dans votre code, afin qu'il ne se casse pas à chaque fois que votre code ne fonctionne pas. Notez que certaines erreurs peuvent également être créées en violant les conditions d'utilisation d'un site Web.
+
+## Alors… Quand dois-je utiliser le grattage d'écran?
+Il est à présent clair, espérons-le, que la capture d'écran peut souvent poser plus de problèmes que ce qu'elle vaut, en particulier à l'ère des interfaces de programmation d'applications, dont je parlerai dans un autre didacticiel. Pourtant, il y a des cas où la capture d'écran reste utile. Un cas d'utilisation idéal est celui où vous grattez différentes pages d'un même site Web. Un exemple pourrait inclure un site Web du gouvernement local qui publie des informations sur les événements. Un tel site Web peut avoir la même URL «racine», mais différents suffixes qui décrivent différents jours, mois, etc. En supposant que la structure des pages est identique, on peut alors écrire une boucle qui commute la fin de l'URL pour différentes dates (en utilisant la convention de dénomination utilisée par le site).
+
+Une autre raison courante de gratter une page Web est qu'il est extrêmement difficile de copier et coller les informations que vous recherchez sur un site Web. Les exemples sont des morceaux de texte extrêmement longs, ou ceux qui sont incorporés dans des tableaux complexes (mais encore une fois, l'analyse du code HTML pour identifier le texte précis dont vous avez besoin peut également prendre beaucoup de temps). Dans de tels cas, il peut être utile de considérer les employés d'Amazon Mechanical Turk comme une approche alternative pour collecter vos données.
