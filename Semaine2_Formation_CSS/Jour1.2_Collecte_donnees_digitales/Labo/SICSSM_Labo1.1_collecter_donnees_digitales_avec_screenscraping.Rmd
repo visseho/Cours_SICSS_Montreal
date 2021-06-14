@@ -94,6 +94,7 @@ Maintenant que j'ai le xpath, je peux utiliser ces informations pour affiner ma 
 ```{r}
 
 Section_wikipedia <- html_node(wikipedia_page, xpath = '//*[@id="mw-content-text"]/div[1]/table')
+
 Section_wikipedia
 
 ```
@@ -108,7 +109,10 @@ health_rankings<-html_table(Section_wikipedia)
 
 head(health_rankings[,(1:2)])
 
+ggplot(health_rankings) +
+  geom_histogram(aes(x = `Attainment of goals / Health / Level (DALE)`))
 ```
+
 
 
 Comme le montre la sortie ci-dessus, je dispose enfin des données souhaitées sous la forme d'un bloc de données ou d'un jeu de données appelé «health_rankings». Il s'agissait toutefois d'un travail fastidieux, mais rappelez-vous qu'il s'agissait d'un type de page Web très simple. En outre, il convient de noter que les groupes de pages Wikipedia ont un format très similaire, ce qui les rend très propices à la suppression d'écran. Si, en revanche, je cherchais une liste de sites appartenant à plusieurs domaines, chacun ayant sa propre structure complexe, je pourrais passer des jours ou des semaines à écrire du code pour le supprimer. Dans ce scénario, de nombreuses personnes peuvent trouver qu'il est plus facile de collecter les données manuellement ou d'engager du personnel sur Amazon Mechanical Turk pour extraire les informations que vous souhaitez peut-être d'une liste de pages Web.
@@ -166,7 +170,11 @@ Une fois que nous avons identifié le sélecteur CSS que nous pensons attaché �
 wikipedia_page <- read_html("https://en.wikipedia.org/wiki/World_Health_Organization_ranking_of_health_systems_in_2000")
 
 #.jquery-tablesorter td , .headerSort
+
+
 Section_wikipedia1 <- html_node(wikipedia_page, css = '#mw-content-text > div.mw-parser-output > table')
+
+
 Section_wikipedia1
 
 table_wiki1 <- html_table(Section_wikipedia1)
@@ -321,8 +329,9 @@ binman::list_versions("chromedriver")          # Ne marche pas
 
 # start a Selenium server
 #78.0.3904.105
-rD <- rsDriver(browser = c("chrome"), chromever = "92.0.4515.43")
+rD <- rsDriver(browser = c("chrome"), chromever = "85.0.4183.87", port= 4835L)
 
+#driver <- rsDriver(browser=c("chrome"), chromever="86.0.4240.22", port= 4835L)
 
 # open the browser
 remDr <- rD$client
@@ -360,7 +369,9 @@ Ce code devrait entraîner une recherche de «data science» sur la page Web de 
 Et finalement, vous quittez l'application
 
 ```{r}
+
 remDr$close() 
+
 rD$server$stop()
 ```
 
@@ -382,9 +393,21 @@ http://rpubs.com/johndharrison/RSelenium-Basics
 
 
 ## Scraping d'écran dans une boucle
+
 Quelle que soit l'approche de capture d'écran que vous utilisez, vous souhaiterez souvent gratter non pas une seule page, mais plusieurs pages. Dans ce cas, vous pouvez simplement intégrer l'une des techniques ci-dessus dans une boucle **for** qui lit une liste de pages Web que vous souhaitez gratter. Encore une fois, sachez que les sites Web ont souvent des structures différentes, de sorte que la façon dont vous extrayez des informations sur un site peut être très différente d'un autre. C'est l'une des principales raisons pour lesquelles le grattage d'écran peut être difficile - et aussi une autre raison pour laquelle le grattage d'écran est passé de mode en plus des problèmes juridiques soulignés ci-dessus. Si vous continuez à gratter une grande liste de pages Web, vous souhaiterez peut-être intégrer une «gestion des erreurs» dans votre code, afin qu'il ne se casse pas à chaque fois que votre code ne fonctionne pas. Notez que certaines erreurs peuvent également être créées en violant les conditions d'utilisation d'un site Web.
 
 ## Alors… Quand dois-je utiliser le grattage d'écran?
 Il est à présent clair, espérons-le, que la capture d'écran peut souvent poser plus de problèmes que ce qu'elle vaut, en particulier à l'ère des interfaces de programmation d'applications, dont je parlerai dans un autre didacticiel. Pourtant, il y a des cas où la capture d'écran reste utile. Un cas d'utilisation idéal est celui où vous grattez différentes pages d'un même site Web. Un exemple pourrait inclure un site Web du gouvernement local qui publie des informations sur les événements. Un tel site Web peut avoir la même URL «racine», mais différents suffixes qui décrivent différents jours, mois, etc. En supposant que la structure des pages est identique, on peut alors écrire une boucle qui commute la fin de l'URL pour différentes dates (en utilisant la convention de dénomination utilisée par le site).
 
 Une autre raison courante de gratter une page Web est qu'il est extrêmement difficile de copier et coller les informations que vous recherchez sur un site Web. Les exemples sont des morceaux de texte extrêmement longs, ou ceux qui sont incorporés dans des tableaux complexes (mais encore une fois, l'analyse du code HTML pour identifier le texte précis dont vous avez besoin peut également prendre beaucoup de temps). Dans de tels cas, il peut être utile de considérer les employés d'Amazon Mechanical Turk comme une approche alternative pour collecter vos données.
+
+
+```{r}
+
+nyt <- read_html("https://www.nytimes.com/")
+section <- html_node(nyt, xpath = '//*[@id="site-content"]/div[1]/div[1]/div[2]/div/section')
+section
+texte <- html_text(section)
+texte
+```
+
