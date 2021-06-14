@@ -8,6 +8,10 @@ output:
   pdf_document: default
 ---
 
+## Remerciements
+
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+
 # Enquête sociale générale, 1996
 
 - Il s'agit du CROP Socio-Cultural Survey de 1996
@@ -27,7 +31,7 @@ output:
 
 rm(list = ls())
 
-# Installer les package dont vous avez besoin
+# Installer les packages dont vous avez besoin
 
 #install.packages("tidyverse")
 #install.packages("summarytools")
@@ -173,7 +177,7 @@ Paramètres de tendances centrales et de dispersion
 
 ## Avec base R
 
-La commande summary nous donne une premieère indication sur l'ensemble des variables de notre base de données.
+La commande summary nous donne une première indication sur l'ensemble des variables de notre base de données.
 Il faut préter attention aux variables manquantes.
 
 ```{r}
@@ -204,7 +208,7 @@ Cette approche n'est pas la bonne car elle nous demande beaucoup de coding (avec
 ## Paramètres de position - tidyverse
 
 La fonction `summarise` permet de calculer l'ensemble des indicateurs dont nous avons besoin.
-Dans toute étude, il est important de résumé l'information contenue dans les variables pour se faire une première idée.
+Dans toute étude, il est important de résumer l'information contenue dans les variables pour se faire une première idée.
 
 ```{r}
 
@@ -293,7 +297,7 @@ age_position_age4
 
 ```
 
-## Statistiques univariés sur plusieurs variables, solution alternative
+## Statistiques univariées sur plusieurs variables, solution alternative
 
 On regarde les statistiques pas sur une seule variable mais sur plusieurs variables.
 On peut combiner plusieurs tableaux avec les fonctions `binds_row` et `binds_col`.
@@ -333,7 +337,7 @@ summary(Davis)
 
 ```
 
-Ce fichier comprend les informations sur le poids et la taille de 200 individues ainsi que leur poids et taille autodéclaré. On veut voir de quelle manière les poids auto-déclarés sont fiables. 
+Ce fichier comprend les informations sur le poids et la taille de 200 individus ainsi que leur poids et taille autodéclarés. On veut voir de quelle manière les poids auto-déclarés sont fiables. 
 
 On ne l'a pas encore vu, mais on peut rapidement voir les variables deux par deux dans un graphique
 
