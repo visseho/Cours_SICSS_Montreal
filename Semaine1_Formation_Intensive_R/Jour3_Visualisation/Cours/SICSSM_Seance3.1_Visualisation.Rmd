@@ -18,6 +18,10 @@ header-includes:
 options(tinytex.verbose = TRUE)
 ```
 
+## Remerciements
+
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+
 ## Plan
 
 - Introduction
@@ -66,7 +70,7 @@ Type de graphiques pour les distributions univariées et bivariées
 
 ## Les types de graphiques
 
-- Dépend en général du type de variable (qualitative ou quantitative) et du nombre de variable
+- Dépendent en général du type de variable (qualitative ou quantitative) et du nombre de variables
 
 - Graphiques pour representer une seule variable:
 
@@ -85,7 +89,7 @@ ggplot
 
 ## Forme générale
 
-- La forme générale d'un code de graphique est le suivant:
+- La forme générale d'un code de graphique est la suivante:
 
 ![](../données/ggplot_forme_generale.jpg)
 
@@ -109,7 +113,7 @@ ggplot
 
 ## Forme générale
 
-- La forme générale d'un code de graphique est le suivant:
+- La forme générale d'un code de graphique est la suivante:
 
 ![](../données/ggplot_forme_generale.jpg)
 
@@ -185,7 +189,7 @@ ggplot(crsc96_small) +
 
 ## Exemple: histogramme
 
-- Dans le cadre de cette présentation, je mets des options dans le **chunk** (Vous ne les voyez pas dans la présentation regarder le fichier .rmd)
+- Dans le cadre de cette présentation, je mets des options dans le **chunk** (Vous ne les voyez pas dans la présentation, regarder plutôt le fichier .rmd)
 
  - **out.width** pour préciser la largeur du graphique
  - **message = FALSE** : pour ne pas afficher des messages
@@ -285,8 +289,8 @@ ggplot(crsc96_small) +
 
 ```
 
-- Ce graphique nous donne pour chaque sexe, le nombre de personne qui sont dans chaque catégorie de la variable dépendante.
-- Il a cependant un problème, c'est difficile de comparer le nombres bruts. Il faut des pourcentages.
+- Ce graphique nous donne pour chaque sexe, le nombre de personnes qui sont dans chaque catégorie de la variable dépendante.
+- Il a cependant un problème, c'est difficile de comparer les nombres bruts. Il faut des pourcentages.
 
 
 ## Croisement de deux variables qualitatives
@@ -316,7 +320,7 @@ ggplot(crsc96_small) +
 
 ## Croisement d'une variable quantitative et d'une variable qualitative
 
-- Croiser une variable quantitative et une variable qualitative, c’est essayé de voir si les valeurs de la variable quantitative se répartissent différemment selon les catégories d’appartenance de la variable qualitative.
+- Croiser une variable quantitative et une variable qualitative, c’est essayer de voir si les valeurs de la variable quantitative se répartissent différemment selon les catégories d’appartenance de la variable qualitative.
 
 ## Croisement d'une variable quantitative et d'une variable qualitative
 
@@ -351,7 +355,7 @@ a +
 
 ## Exemple: Diagramme de quartile 
 
-- Le diagramme de quartile permet de synthétiser l'information contenue dans ce nuage de point pour une comparaison plus efficiente.
+- Le diagramme de quartile permet de synthétiser l'information contenue dans ce nuage de points pour une comparaison plus efficiente.
 
 ```{r, out.width = '60%', message = FALSE, warning=FALSE, fig.align='center'}
 
