@@ -13,6 +13,11 @@ output:
 ---
 
 
+## Remerciements
+
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+
+
 ## Plan de présentation
 
 - Exemples graphiques
@@ -38,7 +43,7 @@ Nom             Description
 `beat_burnfood`  Pourcentage de femmes dans chaque pays qui pensent qu'un mari 
                   a le droit de battre sa femme si elle brûle sa nourriture.  
 `no_media`       Pourcentage de femmes dans chaque pays qui ont rarement accès
-                  un journal, une radio ou une télévision.
+                 à un journal, une radio ou une télévision.
 `sec_school`     Pourcentage de femmes dans chaque pays ayant un niveau
                   d'éducation secondaire ou supérieur.
 `year`           Année de l'enquête
@@ -124,7 +129,7 @@ ggplot(dhs_ipv) +
 
 ## Association entre beat-burnfood et niveau d'éducation
 
-- Maintenant, simulons un ensemble de droite pour voir si la meilleure candidate figure parmi elles.
+- Maintenant, simulons un ensemble de droites pour voir si la meilleure candidate figure parmi elles.
 - Pour ce faire, je crée 150 intersections (intercept) et 150 pentes (slopes), selon une loi uniforme.
 - On parle de loi uniforme quand tous les éléments ont les mêmes probabilités d'être choisis.
 (Dire qu'une variable aléatoire X suit une loi uniforme sur l'intervalle [a, b]) signifie que sa densité f est la fonction constante égale à 1/(b-a).
