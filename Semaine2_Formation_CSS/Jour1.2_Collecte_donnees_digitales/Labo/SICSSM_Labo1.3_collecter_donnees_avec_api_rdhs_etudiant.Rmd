@@ -1,0 +1,68 @@
+---
+title: 'Labo 1.3: Collete de données avec API - rdhs'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r, warning=FALSE}
+rm(list = ls())         # Clear your environment
+
+getwd()                 # Tell you your working directory
+
+
+library(tidyverse)      # The most important packages
+library(rio)            # To read Stata, SPSS and other files in R
+library(ggpubr)         # help to combine figure
+library(haven)          # To read Stata, SPSS and other files in R
+library(broom)
+library(readstata13)
+library(stargazer)      # Produce regression table as in articles
+
+library(summarytools)   # For descriptive analysis
+library(scales)
+library(srvyr)
+library(survey)
+library(plotrix)
+library(foreign)        # To read Stata, SPSS and other files in R
+```
+
+```{r}
+library(rdhs)
+
+#Finding the right datasets and relevant info:
+
+datasets <- dhs_datasets(
+  countryIds = c("ZW"),
+  selectSurveys = T,
+  surveyIds = NULL,
+  surveyYear = NULL,
+  surveyYearStart = NULL,
+  surveyYearEnd = NULL,
+  surveyType = "DHS",
+  fileFormat = "stata",
+  fileType = c("HR", "IR","PR"),
+  f = NULL,
+  returnFields = NULL,
+  perPage = NULL,
+  page = NULL,
+  client = NULL,
+  force = FALSE,
+  all_results = TRUE
+) %>%
+  select(CountryName, SurveyYear, SurveyId, FileType, FileName) %>%
+  group_by(CountryName) %>%
+  filter(SurveyYear == max(SurveyYear)) %>%
+  ungroup()
+  
+#DHS credentials:
+set_rdhs_config(email = "",
+                project = "",
+                config_path = "~/.rdhs.json",
+               global = TRUE,
+               verbose_download = TRUE)
+
+#Getting datasets
+downloads <- get_datasets(datasets$FileName)
+
+```

@@ -1,0 +1,33 @@
+---
+title: "Exercice 2.1: Accès à l'information et attitudes face à la violence conjugale"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+
+Nous avons couvert un large éventail de sujets sur la collecte des données digitales, notamment le grattage d'écran (screen-scraping) et l'utilisation des API. Cet exercice vous invite non seulement à mettre en pratique vos compétences en matière de codage, mais également à réfléchir à la manière de poser des questions qui apportent de nouvelles connaissances aux sciences sociales.
+
+Certains d'entre vous ont déjà eu de l'expérience avec la collecte de données digitales, mais pour d'autres, c'était peut-être la première fois qu'ils collectaient des données digitales. 
+
+Cet exercice de groupe est destiné à trouver un équilibre entre la pratique de compétences basiques (pour ceux d'entre vous qui n'ont que peu ou pas d'expérience dans ce domaine) et des avancées (pour ceux d'entre vous qui ont une grande expertise dans ce domaine). En outre, cet exercice vous invite non seulement à mettre en pratique vos compétences en matière de codage, mais aussi à réfléchir à la manière de poser des questions qui apportent de nouvelles connaissances à la théorie des sciences sociales.
+
+1. Identifier une question de recherche qui, selon vous, peut être résolue à l'aide de certaines des méthodes évoquées ci-dessus. Pensez à quelques choses en lien avec votre intérêt de recherche.
+
+2. Trouvez un article qui utile les approches traditionnelles de recherche (régression...) et un autre qui utilise les nouvelles approches pour répondre à la question.
+
+3. Identifiez une **base de sondage** pour vous aider à répondre à cette question de recherche en utilisant les données digitales. Par exemple, si votre question concerne la politique, votre cadre d'échantillonnage pourrait être une liste d'élus sur Twitter;
+
+4. Utilisez des techniques de grattage d’écran pour collecter les noms de comptes individuels, de mots-clés ou de domaines pour alimenter votre échantillon.
+
+5. Écrivez un code pour collecter les données (de twitter principalement) de chaque unité d’analyse de votre échantillon (par exemple, les tweets des chercheurs dans le domaine qui vous concerne, les tweets des élus, ...)
+
+6. Évaluez les forces et les faiblesses des données que vous avez collectées et des données traditionnelles qui ont été utilisées pour répondre à votre question au 1.
+
+
+4. Présentez un modèle de recherche hybride (par exemple, une application ou un robot, une enquête en ligne supplémentaire ou d'autres méthodes qualitatives) qui pourrait être utilisé pour remédier aux faiblesses des données que vous avez collectées ou pour améliorer votre capacité à répondre à la question de recherche.
+
