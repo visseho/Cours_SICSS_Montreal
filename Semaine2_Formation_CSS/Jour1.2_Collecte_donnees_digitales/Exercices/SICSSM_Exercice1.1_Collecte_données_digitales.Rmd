@@ -28,6 +28,5 @@ Cet exercice de groupe est destiné à trouver un équilibre entre la pratique d
 
 6. Évaluez les forces et les faiblesses des données que vous avez collectées et des données traditionnelles qui ont été utilisées pour répondre à votre question au 1.
 
-
 4. Présentez un modèle de recherche hybride (par exemple, une application ou un robot, une enquête en ligne supplémentaire ou d'autres méthodes qualitatives) qui pourrait être utilisé pour remédier aux faiblesses des données que vous avez collectées ou pour améliorer votre capacité à répondre à la question de recherche.
 
