@@ -8,6 +8,12 @@ output:
   pdf_document: default
 ---
 
+
+## Remerciements
+
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+
+
 ## Plan
 
 1. Créer manuellement une base de données
@@ -63,7 +69,7 @@ Dans la création de la variable `sexe_classe_factor`, on a utilisé une fonctio
 ?factor
 ```
 
-On voit ainsi dans RStudio, dans la fenêtre **Help**, la description de cette fonction et son usage. Certains de ces arguments (ce qui se trouve dans la parenthèse) sont optionnelles, alors que d'autres sont obligatoires. La fonction factor permet de créer une variable **qualitative** ou **categorielle** ou **factorielle**, à partir d'une autre variable. Il faut donc lui indiquer cette variable à partir de laquelle on créer la nouvelle variable factorielle. Dans notre cas (chunk ligne 47, il s'agit de la variable c(1, 0, 0, 1, 0). De manière optionnelle, il faut lui indiquer à quoi représentent les valeurs de l'ancienne variable. ce;a se fait avec **labels**. Finalement, il faut indiquer l'ordre dans lequel les valeurs dela nouvelle variables vont être affichées. Si on ne lui indique rien, il va les afficher par ordre alphabétique. Autrement, il faut lui indiquer l'ordre que vous souhaitez, avec l'option **levels**. Vous avez plusieurs autres arguments que vous pouvez aller consulter vous-mêmes. Finalement, la description se termine toujours par des exemples d'utilisation.
+On voit ainsi dans RStudio, dans la fenêtre **Help**, la description de cette fonction et son usage. Certains de ces arguments (ce qui se trouve dans la parenthèse) sont optionnels, alors que d'autres sont obligatoires. La fonction factor permet de créer une variable **qualitative** ou **categorielle** ou **factorielle**, à partir d'une autre variable. Il faut donc lui indiquer cette variable à partir de laquelle on crée la nouvelle variable factorielle. Dans notre cas (chunk ligne 47, il s'agit de la variable c(1, 0, 0, 1, 0). De manière optionnelle, il faut lui indiquer à quoi représentent les valeurs de l'ancienne variable. cela se fait avec **labels**. Finalement, il faut indiquer l'ordre dans lequel les valeurs de la nouvelle variable vont être affichées. Si on ne lui indique rien, il va les afficher par ordre alphabétique. Autrement, il faut lui indiquer l'ordre que vous souhaitez, avec l'option **levels**. Vous avez plusieurs autres arguments que vous pouvez consulter vous-mêmes. Finalement, la description se termine toujours par des exemples d'utilisation.
 
 
 ## Base de données
@@ -79,7 +85,7 @@ base_classe
 ```
 
 
-Pour créer cette base de données, j'ai utilisé la fonction **data.frame**. cette fonction comme la fonction factor viennent de base R. Cela signifie qu'elles sont incorporées directement dans votre R, une fois que vous télécharger R pour la première fois. Par contre, plusieurs autres fonctions qui ne figurent pas dans la base R, vous devez télécharger leur package avant de les utiliser. C'est ce que nous avons fait avec le package **tidyverse**. Et la fonction de tidyverse pour créer une base de données est data_frame. Avez-vous remarqué là où se trouve la différence. Dans bien des cas, quand une fonction se trouve dans la base R et dans une autre package, la différence va être celle là (_ au lieu de .) ou sur la capitalisation de la première lettre (Factor au lieu de factor). Chaque fois que vous tapez une fonction, prenez la peine d'observer de quel packahe provient la fonction. 
+Pour créer cette base de données, j'ai utilisé la fonction **data.frame**. Cette fonction, comme la fonction factor, vient de base R. Cela signifie qu'elles sont incorporées directement dans votre R, une fois que vous téléchargez R pour la première fois. Par contre, pour plusieurs autres fonctions qui ne figurent pas dans la base R, vous devez télécharger leur package avant de les utiliser. C'est ce que nous avons fait avec le package **tidyverse**. Et la fonction de tidyverse pour créer une base de données est data_frame. Avez-vous remarqué là où se trouve la différence. Dans bien des cas, quand une fonction se trouve dans la base R et dans une autre package, la différence va être celle là (_ au lieu de .) ou sur la capitalisation de la première lettre (Factor au lieu de factor). Chaque fois que vous tapez une fonction, prenez la peine d'observer de quel package provient la fonction. 
 
 ## Comme dans une matrice
 
@@ -113,7 +119,7 @@ class(base_classe$education)      # numeric
 - Il s'agit du CROP Socio-Cultural Survey de 1996
 - Dans cette partie, nous allons apprendre à :
     - Sélectionner les variables 
-    - Sélectionnez les observations
+    - Sélectionner les observations
     - Réorganiser les données
     - Créer de nouvelles variables avec des fonctions de variables existantes (mutate ())
     - Recoder des variables existantes
@@ -121,7 +127,7 @@ class(base_classe$education)      # numeric
 
 ## Maintenant, on va travailler avec une base de donnée plus simple.
 
-Nous allons travaillé avec les données issues des enquêtes socioculturelles. Les enquêtes socioculturelles font partie d'une grande série d'études internationales comparatives sur les valeurs fondamentales. Des enquêtes parallèles sont effectuées chaque année dans plusieurs pays européens et aux États-Unis. CROP Inc. a commencé cette série au Canada en 1983. Ces enquêtes portent sur un large éventail d’attitudes fondamentales - sociales, culturelles, économiques et politiques. Ces données sont disponibles sur le site suivant:  https://www.queensu.ca/cora/our-data/data-holdings
+Nous allons travailler avec les données issues des enquêtes socioculturelles. Les enquêtes socioculturelles font partie d'une grande série d'études internationales comparatives sur les valeurs fondamentales. Des enquêtes parallèles sont effectuées chaque année dans plusieurs pays européens et aux États-Unis. CROP Inc. a commencé cette série au Canada en 1983. Ces enquêtes portent sur un large éventail d’attitudes fondamentales - sociales, culturelles, économiques et politiques. Ces données sont disponibles sur le site suivant:  https://www.queensu.ca/cora/our-data/data-holdings
 
 
 ## Dressons la table
@@ -241,7 +247,7 @@ Signification du code:
 - la dernière ligne donne les indications sur la manière dont vous voulez créer le fichier de la **première ligne**.
 
 
-## Sélectionnons les données les données qui nous intéressent
+## Sélectionnons les données qui nous intéressent
 
 
 - Select 
@@ -331,9 +337,9 @@ class(crsc96_small$age)
 
 ```
 
-- Allons voir si cette variable est vraiment numérique. Cette information se trouve dans le codebook (dictionnaire) de cette étude. Ces variables ont donc besoin d’être recodé correctement si elles ne sont pas numériques. Le recodage d'une variable signifie qu'on change les modalités de cette variable. Mais, une bonne pratique consiste `toujours` à créer une nouvelle variable à partir de l'ancienne variable et à recoder cette dernière. de ce fait, on ne risque pas de commettre des erreurs et d'écraser par mégarde une variable de notre base de données.
+- Allons voir si cette variable est vraiment numérique. Cette information se trouve dans le codebook (dictionnaire) de cette étude. Ces variables ont donc besoin d’être recodées correctement si elles ne sont pas numériques. Le recodage d'une variable signifie qu'on change les modalités de cette variable. Mais, une bonne pratique consiste `toujours` à créer une nouvelle variable à partir de l'ancienne variable et à recoder cette dernière. De ce fait, on ne risque pas de commettre des erreurs et d'écraser par mégarde une variable de notre base de données.
 
-Avant d'aller recoder/créer des variables factorielles, voyons les chagements qu'on peut faire à partir d'une variable conitibue
+Avant d'aller recoder/créer des variables factorielles, voyons les chagements qu'on peut faire à partir d'une variable continue
 
 ## Changement d'échelle d'une variable numérique
 
@@ -397,11 +403,11 @@ Si vous tapez **?factor** dans le chunk (c'est quoi un chunk?), il vous indiquer
 
 ```
 
-On voit ainsi dans RStudio, dans la fenêtre **Help**, la description de cette fonction et son usage. Certains de ces arguments (ce qui se trouve dans la parenthèse) sont optionnelles, alors que d'autres sont obligatoires. La fonction factor permet de créer une variable **qualitative** ou **categorielle** ou **factorielle**, à partir d'une autre variable. Il faut donc lui indiquer cette variable à partir de laquelle on créer la nouvelle variable factorielle. Dans notre cas (chunk ligne 47, il s'agit de la variable c(1, 0, 0, 1, 0). De manière optionnelle, il faut lui indiquer à quoi représentent les valeurs de l'ancienne variable. ce;a se fait avec **labels**. 
+On voit ainsi dans RStudio, dans la fenêtre **Help**, la description de cette fonction et son usage. Certains de ses arguments (ce qui se trouve dans la parenthèse) sont optionnels, alors que d'autres sont obligatoires. La fonction factor permet de créer une variable **qualitative** ou **categorielle** ou **factorielle**, à partir d'une autre variable. Il faut donc lui indiquer cette variable à partir de laquelle on crée la nouvelle variable factorielle. Dans notre cas (chunk ligne 47, il s'agit de la variable c(1, 0, 0, 1, 0). De manière optionnelle, il faut lui indiquer à quoi représentent les valeurs de l'ancienne variable. Cela se fait avec **labels**. 
 
 ## Recodage et création de variables facorielles
 
-Finalement, bien qu'il soit une variable factorielle, on ne sait pas ce que signifie ses modalités. Il nous faut chaque fois retourner dans le codebook pour ce faire.  On peut faire simplement avec la fonction factor qui prend au moins deux arguments: la variable et le labels des modalités. Observer que ce label se fait selon l'ordre des modalités.
+Finalement, bien qu'il soit une variable factorielle, on ne sait pas ce que signifie ses modalités. Il nous faut chaque fois retourner dans le codebook pour ce faire. On peut faire simplement avec la fonction factor qui prend au moins deux arguments: la variable et le labels des modalités. Observer que ce label se fait selon l'ordre des modalités.
 
 
 ```{r}
@@ -424,7 +430,7 @@ freq(crsc96_small$q1_new)
 ```
 
 
-Finalement, il faut indiquer l'ordre dans lequel les valeurs dela nouvelle variables vont être affichées. Si on ne lui indique rien, il va les afficher par ordre alphabétique. Autrement, il faut lui indiquer l'ordre que vous souhaitez, avec l'option **levels**. Vous avez plusieurs autres arguments que vous pouvez aller consulter vous-mêmes. Finalement, la description se termine toujours par des exemples d'utilisation.
+Finalement, il faut indiquer l'ordre dans lequel les valeurs de la nouvelle variable vont être affichées. Si on ne lui indique rien, il va les afficher par ordre alphabétique. Autrement, il faut lui indiquer l'ordre que vous souhaitez, avec l'option **levels**. Vous avez plusieurs autres arguments que vous pouvez consulter vous-mêmes. Finalement, la description se termine toujours par des exemples d'utilisation.
 
 
 ## Si on veut changer toutes les variables qui sont catégorielles
