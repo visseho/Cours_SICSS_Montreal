@@ -14,6 +14,12 @@ header-includes:
   - \usepackage{color}
 ---
 
+
+## Remerciements
+
+Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+
+
 ## Plan de présentation
 
 1. Manipuler et transformer les données avec base R
@@ -209,8 +215,8 @@ include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/r4ds.jpg")
 ## Processus d'analyse des données  
 
 - Les gras dans le diapositif précédent indique le langage que le logiciel comprend pour faire les étapes décrites plus haut
-- Il comprend que l'Anglais. Chaque fois que vous voulez faire quelque chose, chercher le mot en anglais
-- Il respecte une certaine manière de **parler**. Il va utiliser des symbole pour se simplifier la vie comme celui-ci par exemple **%>%**
+- Il ne comprend que l'Anglais. Chaque fois que vous voulez faire quelque chose, chercher le mot en anglais
+- Il respecte une certaine manière de **parler**. Il va utiliser des symboles pour se simplifier la vie comme celui-ci par exemple **%>%**
 
 ## Packages de Tidyverse
 
@@ -261,7 +267,7 @@ https://www.lemagit.fr/conseil/Quest-ce-que-le-Data-Wrangling
     - **sringr** : pour travailler avec les données caractères
     - **forcat** : pour travailler avec les facteurs : http://perso.ens-lyon.fr/lise.vaudor/manipulation-de-facteurs-avec-forcats/
     - **purrr** : pour travailler avec les fonctions
-    - **tibble** : transformer les données en tribble.
+    - **tibble** : transformer les données en tibble.
   
 La documentation est éparse sur chacun de ces packages.
 
