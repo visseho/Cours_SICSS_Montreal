@@ -13,6 +13,8 @@ output:
 
 L'exercice d'hier nous a permis d'utiliser plusieurs techniques pour collecter les données digitales. Nous allons poursuivre au cours de la dernière semaine pour aller en profondeur de nos collectes et analyses. Aujourd'hui, nous allons avoir un exercice de groupe plus structuré destiné à comparer les avantages et les désavantages de différentes techniques d'analyse de texte lorsqu'elles sont appliquées à un ensemble de données.
 
+Pour cet exercice, vous pouvez aussi utiliser les données collectées aujourd'hui sur les senateurs américains (Senators_twitter_data).
+
 1.	Nous allons garder les mêmes groupes qu'hier
 2.	Chargez la base de données des tweets du président Trump. Ces données peuvent être chargées directement avec le code suivant. Autrement, ces données sont disponibles sur le Github dans les données.
 
