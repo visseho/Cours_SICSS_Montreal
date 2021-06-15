@@ -1,0 +1,43 @@
+---
+title: "Exercice 2.1: Accès à l'information et attitudes face à la violence conjugale"
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+*Adapté de l'exercice de SICSS-PRINCETON*
+
+L'exercice d'hier nous a permis d'utiliser plusieurs techniques pour collecter les données digitales. Nous allons poursuivre au cours de la dernière semaine pour aller en profondeur de nos collectes et analyses. Aujourd'hui, nous allons avoir un exercice de groupe plus structuré destiné à comparer les avantages et les désavantages de différentes techniques d'analyse de texte lorsqu'elles sont appliquées à un ensemble de données.
+
+1.	Nous allons garder les mêmes groupes qu'hier
+2.	Chargez la base de données des tweets du président Trump. Ces données peuvent être chargées directement avec le code suivant. Autrement, ces données sont disponibles sur le Github dans les données.
+
+```{r}
+
+ load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
+
+```
+
+Notez que cette base de données comprend également le nombre de fois où chacun de ses tweets a été retweeté ou "liked". 
+NOTE : SI VOUS PRÉFÉREZ UTILISER UN ENSEMBLE DE DONNÉES QUE VOTRE GROUPE A COLLECTÉ LORS DE L'EXERCICE D'HIER, VOUS POUVEZ ÉGALEMENT L'UTILISER. 
+
+3.	Utilisez au moins deux des techniques présentées aujourd'hui pour extraire des caractéristiques du texte des tweets de Trump (par exemple, des thèmes, des sujets, des sentiments), ou sur la base de données textuelles que vous avez collecté hier.
+
+4.	Travaillez ensemble pour déterminer si certaines **caractéristiques du langage** Twitter de Trump permettent de prédire le nombre de retweets ou des likes que ses messages reçoivent. Si vous travaillez avec d'autres données Twitter, n'hésitez pas à prédire également les likes d'autres utilisateurs.
+
+5.	La base de données des cotes d'approbation quotidiennes du président Trump disponible sur le site Web five-thirty-eight (https://projects.fivethirtyeight.com) est disponoble sur le github du cours. Vous pouvez encore une fois le télécharger directement à partir de ce lien.
+
+```{r}
+
+library(tidyverse)
+trump_approval <- read_csv("https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv")
+
+```
+
+6.	Travaillez ensemble pour déterminer s'il existe des **caractéristiques du langage** Twitter de Trump qui ont un lien avec sa **cote de popularité globale**.
+
+7.	Produisez une visualisation qui décrit les résultats de votre analyse et déposez-la dans le google drive du cours avec une brève description de ce que vous avez fait.

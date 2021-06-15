@@ -1,0 +1,238 @@
+---
+title: 'Séance 2.2: Analyse données digitales'
+subtitle: 'Les principales méthodes'
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  slidy_presentation: default
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Antibes
+  ioslides_presentation: default
+---
+
+## Plan de présentation
+
+1. Introduction
+2. Méthodes
+  - Analyse de sentiment (sentiments analysis)
+  - Analyse des sujets (Topic modelling)
+  - Analyse structurelle des topics (Structural topic modelling)
+  - Analyse des réseaux de texte (Texnet)
+3. Packages
+  - tidytext
+  - tm
+  - quanteda
+
+
+
+Méthodes
+====================================================
+
+
+Analyse de sentiments (sentiments analysis)
+===================================================
+
+## Labo
+
+
+
+Analyse des termes (Topic modelling)
+======================================
+
+## Définition
+
+- Une procédure automatisée pour coder le contenu des textes (y compris de très grands corpus) dans un ensemble de catégories significatives, ou «sujets».
+
+- Un modèle génératif qui permet d'expliquer des ensembles d'observations (textes) par des groupes non observés (sujets) qui expliquent pourquoi certaines parties (mots) des données sont similaires.
+
+
+## Définition
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/topic_modeling.png)
+
+
+## Comment ça fonctionne
+
+- Document (Document): un panier de mots produit selon un mélange de thèmes ou de sujets que l'auteur du texte entendait aborder.
+
+- Sujet (Topic): une distribution sur tous les mots observés dans le corpus.
+
+- Les mots fortement associés aux sujets dominants du document ont plus de chances d'être sélectionnés et placés dans le sac de documents (c'est-à-dire plus de chances d'apparaître dans le document).
+
+- Utilise l'analyse Bayesienne notamment le "Latent Dirichet Allocation"
+
+- Il s'agit d'un cas d'**apprentissage automatique non supervisé** (unsupervised machine learning)
+
+## Apprentissage automatique (machine learning)
+
+1. Apprentissage supervisé
+  - Classification
+  - Prédiction
+  - Régression
+  
+2. Apprentissage non supervisé
+  - Clustering
+  - Analyse en composantes principales
+
+
+## Latent Dirichet Allocation (LDA)
+
+- LDA, comme tous les modèles de sujets, suppose qu'il existe des sujets (termes) qui forment les éléments constitutifs d'un corpus. 
+- Les sujets sont des distributions sur les mots et sont souvent présentés sous la forme d'une liste de mots classés, avec les mots les plus probables en haut de la liste 
+- Cependant, nous ne savons pas quels sont les sujets a priori; le défi est de découvrir ce qu'ils sont.
+
+
+## Latent Dirichet Allocation (LDA)
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/lda1.png)
+
+## Latent Dirichet Allocation (LDA)
+
+- En plus de supposer qu'il existe un certain nombre de sujets qui expliquent un corpus, LDA suppose également que chaque document d'un corpus peut être expliqué par un petit nombre de sujets.
+
+## Latent Dirichet Allocation (LDA)
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/lda2.png)
+<!-- L'ensemble des sujets utilisées par un document est appelé allocation du document (Figure 7.2). Cette terminologie explique le nom d'allocation de Dirichlet latente: chaque document a une allocation sur des sujets latents régie par une distribution de Dirichlet.-->
+
+
+## Latent Dirichet Allocation (LDA)
+
+- Algorithmiquement, le problème peut être considéré comme une boîte noire (d'où le terme méthode non supervisé). 
+- Étant donné un corpus et un entier K de termes (en entrée), fournissez les sujets qui décrivent le mieux la collection de documents: un processus appelé inférence postérieure. 
+- L'algorithme le plus courant pour résoudre ce problème est une technique appelée **échantillonnage de Gibbs**.
+
+## Échantillonnage de Gibbs
+
+- L'échantillonnage de Gibbs fonctionne au niveau du mot pour découvrir les sujets qui décrivent le mieux une collection de documents. 
+- Chaque mot est associé à un seul sujet, expliquant pourquoi ce mot est apparu dans un document.
+
+## Échantillonnage de Gibbs
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/lda3.png)
+
+
+## Échantillonnage de Gibbs
+
+- C'est là que nous devrions finalement arriver. 
+- Cependant, nous ne savons pas cela pour commencer. 
+- Nous pouvons donc initialement attribuer des mots aux sujets de manière aléatoire. 
+- Cela entraînera des sujets médiocres, mais nous pouvons améliorer ces sujets. 
+- Nous améliorons ces sujets en prenant chaque mot, en faisant semblant de ne pas connaître le sujet et en sélectionnant un nouveau sujet pour le mot.
+
+
+## Échantillonnage de Gibbs
+
+- Un modèle de sujet veut faire deux choses: 
+  - il ne veut pas utiliser beaucoup de sujets dans un document et 
+  - il ne veut pas utiliser beaucoup de mots dans un sujet.
+
+
+## Échantillonnage de Gibbs: formule
+
+- Soit :
+  - $N_{d,k}$ le nombre de fois que le document **d** a utilisé un sujet **k**, et
+  - $V_{k,w}$ le nombre de fois qu'un sujet **k** a utilisé un mot **w**.
+
+- On a donc:
+  - $N_{d,.} = \sum_kN_{d,k}$ le nombre de sujets dans le document, et 
+  - $V_{k,.} = \sum_wV_{k,w}$ le nombre de mots associé au sujet k
+
+## Échantillonnage de Gibbs: formule
+
+- L'algorithme supprime les comptes pour un mot de $N_{d,k}$ et $V_{k,w}$ puis change le sujet d'un mot (avec un peu de chance en un meilleur sujet que celui qu'il avait auparavant). 
+- Grâce à plusieurs milliers d'itérations de ce processus, l'algorithme peut trouver des sujets cohérents, utiles et bien caractériser les données.
+
+- Les deux objectifs de la modélisation de sujets - équilibrer les allocations de documents aux sujets et la distribution des sujets sur les mots - se rejoignent dans une équation qui les multiplie ensemble. 
+- Un bon sujet sera à la fois commun dans un document et expliquera bien l’apparence d’un mot.  
+  
+## Échantillonnage de Gibbs: formule
+
+L'affectation de sujet $z_{d,n}$ du mot n dans le document d au sujet k est proportionnelle à :
+
+$$p(z_{d,n = k}) {\displaystyle \propto }[\underset{\text{combien le doc aime le sujet}}{\frac{N_{d,k} + \alpha}{N_{d,.} + K\alpha}}][\underset{\text{combien le sujet aime le mot}}{\frac{V_{k,n} + \beta}{N_{k,.} + V\beta}}]$$
+
+- où $\alpha$ et $\beta$ sont des facteurs de lissage qui empêchent un sujet d'avoir une probabilité nulle si un sujet n'utilise pas de mot ou si un document n'utilise pas de sujet <!--[390]. 
+- Le jeton n que nous échantillonnons n'est pas inclus dans les décomptes pour N ou V. -->
+
+## Échantillonnage de Gibbs: exemple
+
+- Par souci de concrétisation, supposons que nous ayons trois documents avec les affectations de sujets suivantes:
+
+- Document1 : $^Achien_3$ $^Bchat_2$ $^Cchat_3$ $^Dporc_1$
+- Document2 : $^Esandwich_2$ $^Fchien_3$ $^Gsandwich_1$ $^Dporc_1$
+- Document3 : $^Hfer_1$ $^Ifer_3$ $^Jporc_2$ $^Kfer_2$
+
+- Supposons que nous mettons le mot B ($^Bchat_2$) dans le sujet 1, alors:
+
+## En conclusion
+
+**Objectif**: étant donné un corpus de textes et un nombre précis de sujets, trouver les paramètres qui l'ont probablement généré.
+
+**Entrée principale**: texte et nombre de sujets à découvrir.
+
+**Processus simplifié**: choisissez à plusieurs reprises un sujet, puis un mot dans ce sujet, et placez-les dans le sac de mots représentant le document jusqu'à ce qu'un document soit complet (c'est-à-dire «inférence» ou rétro-ingénierie de l'intention originale d'un auteur).
+
+**Sortie**: distributions de mots pour chaque sujet, distributions de sujets pour le corpus.
+
+
+Structural Topic Model 
+========================================
+
+## Labo
+
+
+
+
+Analyse de réseaux et analyse des réseaux de texte
+===========================================
+
+## Labo
+
+
+
+Packages
+=============================
+
+## Tidytext
+
+- Package
+  - https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html
+
+- Application
+  - https://www.tidytextmining.com/tidytext.html
+
+
+## tm
+
+- Package
+  - https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf
+
+- Application
+  - http://edutechwiki.unige.ch/fr/Tutoriel_tm_text_mining_package
+
+## quanteda
+
+- Package
+  - https://joss.theoj.org/papers/10.21105/joss.00774
+
+- Application
+  - https://tutorials.quanteda.io/
+
+## STM
+
+- Package
+  - https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf
+
+- Application
+  - https://warin.ca/shiny/stm/#section-the-structural-topic-model
+  
+## Références + ressources
+
+- https://www.tidytextmining.com/
+- https://www.tidytextmining.com/sentiment.html
+- https://www.datacamp.com/community/tutorials/sentiment-analysis-R
+- https://www.datacamp.com/community/tutorials/R-nlp-machine-learning
