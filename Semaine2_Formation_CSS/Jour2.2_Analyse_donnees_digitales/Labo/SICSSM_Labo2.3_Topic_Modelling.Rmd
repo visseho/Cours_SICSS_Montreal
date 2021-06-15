@@ -28,10 +28,11 @@ library(topicmodels)
 
 trumptweets <- readRDS("../Données/trumptweets.Rdata")
 
+
 tidy_trump_tweets <- 
   trumptweets %>% 
   select(created_at, text) %>% 
-  unnest_tokens("word", text)     # Tokenise the data
+  unnest_tokens("word", text)    
 
 tidy_trump_tweets <- 
   tidy_trump_tweets %>% 
@@ -66,7 +67,7 @@ inspect(trump_tweets_dtm[1:5,1:8])
 
 ```{r}
 
-trump_tweet_lda <- LDA(trump_tweets_dtm, k = 3, control = list(seed = 3425))
+trump_tweet_lda <- LDA(trump_tweets_dtm, k = 5, control = list(seed = 3425))
 trump_tweet_lda
 
 ```

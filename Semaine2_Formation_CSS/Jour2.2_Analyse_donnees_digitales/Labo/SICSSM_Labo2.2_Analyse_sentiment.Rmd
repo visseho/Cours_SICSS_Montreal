@@ -8,7 +8,7 @@ output: html_document
 
 # Analyse de sentiments
 
-L'anlyse de sentiment est une technique d'extraction d'information dans un corpus. Le but est de détecter les mots chrechés/voulus dans le corpus. Pour cela, on va se baser sur les dictionnaires qui exsitent ou définir son propre dictionnaire.
+L'analyse de sentiment est une technique d'extraction d'information dans un corpus. Le but est de détecter les mots cherchés/voulus dans le corpus. Pour cela, on va se baser sur les dictionnaires qui exsitent ou définir son propre dictionnaire.
 
 
 ```{r}
@@ -33,20 +33,11 @@ Nous allons charger les données de trump tweet
 
 ```{r}
 
-Senator_data <- read_csv("../Données/Senators_Twitter_Data.csv")
-
-```
-
-
-```{r}
-
 load(url("https://cbail.github.io/Trump_Tweets.Rdata")) #```{r} I activated this one and commented the following code. The trumptweets <- readRDS("trumptweets.RData") throws error.
 
 
-# trumptweets <- readRDS("trumptweets.RData")
+trumptweets <- readRDS("../Données/trumptweets.RData")
 
-library(tidytext) #```{r} I added the library function for tidytext and dplyr. Without them the pipe operator was not                          operating 
-library(dplyr) 
 
 tidy_trump_tweets <- 
   trumptweets %>% 
@@ -66,7 +57,7 @@ tidy_trump_tweets %>%
 ```{r}
 
 data("stop_words")
-# head(stopwords()) #```{r} I corrected the head function in the following line. 
+# head(stopwords()) 
 head(stop_words) 
 
 tidy_trump_tweets <- 
@@ -124,7 +115,7 @@ tidy_trump_tweets %>%
   count(word, sort = TRUE)
 
 
-tidy_trump_tweets %>%          # Same as previously but with arrange
+tidy_trump_tweets %>%          
   count(word) %>% 
   arrange(desc(n))
 
@@ -195,7 +186,7 @@ economic_dictionary1 <- "Togo|Cameroon"
 
 
 ```{r}
-library(tidyverse) #```{r} I added library function for tidyverse so that the pipe operator would function 
+
 economic_tweets <- 
   trumptweets %>% 
   filter(str_detect(text, economic_dictionary))
@@ -206,7 +197,7 @@ head(economic_tweets$text)
 ```
 
 ```{r}
-library(tidytext)
+
 head(get_sentiments("afinn"), 24)
 
 summary(get_sentiments("afinn"))

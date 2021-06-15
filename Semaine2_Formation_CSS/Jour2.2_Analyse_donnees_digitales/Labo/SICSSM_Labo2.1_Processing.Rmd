@@ -93,7 +93,7 @@ trump_corpus
 View((trump_corpus))
 
 # Les informations de chaque document
-trump_corpus[["2"]][["content"]]    
+trump_corpus[[2]][["content"]]    
 trump_corpus[[2]][["meta"]]
 
 # Enlever les chiffres
@@ -114,10 +114,11 @@ trump_corpus  <- tm_map(trump_corpus, content_transformer(stemDocument), languag
 trump_DTM <- DocumentTermMatrix(trump_corpus, control = list(wordLengths = c(3, Inf)))
 inspect(trump_DTM[1:5,1:8])
 
+?DocumentTermMatrix()
 
 
 trump_DTM_matrix <- as.matrix(trump_DTM)
-
+trump_DTM_matrix[1:5,1:8]
 ```
 
 
@@ -149,7 +150,7 @@ Pour enlever les mots "inutiles", on va merget notre base de données avec la ba
 ```{r}
 
 data("stop_words")
-head(stopwords())
+head(stopwords(), 15)
 
 tidy_trump_tweets <- 
   tidy_trump_tweets %>% 
