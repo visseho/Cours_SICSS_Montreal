@@ -9,12 +9,41 @@ output:
   html_document: default
 ---
 
-*Adapté de l'exercice de SICSS-PRINCETON*
+
+**Exercice 1**
 
 L'exercice d'hier nous a permis d'utiliser plusieurs techniques pour collecter les données digitales. Nous allons poursuivre au cours de la dernière semaine pour aller en profondeur de nos collectes et analyses. Aujourd'hui, nous allons avoir un exercice de groupe plus structuré destiné à comparer les avantages et les désavantages de différentes techniques d'analyse de texte lorsqu'elles sont appliquées à un ensemble de données.
 
-Pour cet exercice, vous pouvez aussi utiliser les données collectées aujourd'hui sur les senateurs américains (Senators_twitter_data).
+Pour cet exercice, vous aller utiliser les données que j'ai collectées sur les tweets des senateurs américains (Senators_twitter_data).
 
+1. Charger ces données 
+
+```{r}
+
+```
+
+
+2. Créer une base de données où vous indiquez le nombre de followers des sénateurs et le nombre de friends. Ajouter ces informations dans la base de données des sénateurs.
+
+3. Présenter ces informations dans un graphique
+
+4. Développer un modèle pour expliquer le nombre de retweet et de likes généré par les tweets.
+
+5. Utilisez les techniques présentées aujourd'hui (à l'exception de la STM) pour extraire des caractéristiques du texte des tweets des sénateurs
+
+6. Comment ces résultats diffèrent-ils selon le parti politique?
+
+7. Comment ces résultats diffèrent-ils selon le sexe?
+
+8. Considérer dans vos résultats changent-ils selon la période d'études (avant le 10 novembre/après le 10 novembre)
+
+9. Faites une STM sur ces données en considérant dans les métadonnées les variables de parti politiques, de genre et de temps.
+
+10. Commenter chacun de vos résultats
+
+
+
+<!-- A NE PAS FAIRE / DON'T DO THIS PART
 1.	Nous allons garder les mêmes groupes qu'hier
 2.	Chargez la base de données des tweets du président Trump. Ces données peuvent être chargées directement avec le code suivant. Autrement, ces données sont disponibles sur le Github dans les données.
 
@@ -43,3 +72,5 @@ trump_approval <- read_csv("https://projects.fivethirtyeight.com/trump-approval-
 6.	Travaillez ensemble pour déterminer s'il existe des **caractéristiques du langage** Twitter de Trump qui ont un lien avec sa **cote de popularité globale**.
 
 7.	Produisez une visualisation qui décrit les résultats de votre analyse et déposez-la dans le google drive du cours avec une brève description de ce que vous avez fait.
+
+-->
