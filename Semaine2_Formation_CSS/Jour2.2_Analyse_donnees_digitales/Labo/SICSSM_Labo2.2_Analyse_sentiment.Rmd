@@ -6,9 +6,14 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 output: html_document
 ---
 
+# Analyse de sentiments
+
+L'anlyse de sentiment est une technique d'extraction d'information dans un corpus. Le but est de détecter les mots chrechés/voulus dans le corpus. Pour cela, on va se baser sur les dictionnaires qui exsitent ou définir son propre dictionnaire.
 
 
 ```{r}
+
+rm(list = ls())
 #install.packages("tidytext")
 #install.packages("textdata")
 
@@ -20,9 +25,18 @@ library(maps)
 library(SnowballC)
 library(wordcloud)
 
-data(package = "textdata")
 
 ```
+
+Nous allons charger les données de trump tweet
+
+
+```{r}
+
+Senator_data <- read_csv("../Données/Senators_Twitter_Data.csv")
+
+```
+
 
 ```{r}
 

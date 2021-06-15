@@ -24,9 +24,9 @@ library(topicmodels)
 
 ```{r}
 
-load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
+#load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
 
-#trumptweets <- readRDS("trumptweets.Rdata")
+trumptweets <- readRDS("../Données/trumptweets.Rdata")
 
 tidy_trump_tweets <- 
   trumptweets %>% 
@@ -61,6 +61,8 @@ trump_tweets_dtm <-
 inspect(trump_tweets_dtm[1:5,1:8])
 
 ```
+
+# trois sujets /topics
 
 ```{r}
 
@@ -100,6 +102,7 @@ tt_top_term %>%
 ```
 
 ```{r}
+
 library(topicmodels)
 
 data("AssociatedPress")
