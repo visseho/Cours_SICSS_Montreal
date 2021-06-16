@@ -1,0 +1,17 @@
+---
+title: 'Séance 2.1: Analyse données digitales'
+#subtitle: ''
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  slidy_presentation: default
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Antibes
+  ioslides_presentation: default
+---
+
+## Plan de présentation
+

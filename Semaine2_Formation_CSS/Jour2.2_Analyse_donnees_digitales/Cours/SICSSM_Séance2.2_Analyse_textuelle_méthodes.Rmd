@@ -282,6 +282,7 @@ Packages
   
 ## Références + ressources
 
+- https://www.irit.fr/IRIS-site/images/seminairs/Thonet2016.pdf
 - https://www.tidytextmining.com/
 - https://www.tidytextmining.com/sentiment.html
 - https://www.datacamp.com/community/tutorials/sentiment-analysis-R
