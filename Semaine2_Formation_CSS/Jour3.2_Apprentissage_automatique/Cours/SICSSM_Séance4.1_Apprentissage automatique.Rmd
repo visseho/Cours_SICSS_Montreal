@@ -1,0 +1,21 @@
+---
+title: 'Séance 3.1: Apprentissage automatique'
+#subtitle: ''
+author: "Visseho Adjiwanou, PhD."
+institute: "SICSS - Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  slidy_presentation: default
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Antibes
+  ioslides_presentation: default
+---
+
+## Plan de présentation
+
+https://glmnet.stanford.edu/articles/glmnet.html
+
+- 
+https://github.com/Labo-Lacourse/Code_chap_23_logistic_regression_regularization

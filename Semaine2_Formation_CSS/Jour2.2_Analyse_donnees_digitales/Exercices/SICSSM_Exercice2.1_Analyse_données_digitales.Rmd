@@ -19,7 +19,18 @@ Pour cet exercice, vous aller utiliser les données que j'ai collectées sur les
 1. Charger ces données 
 
 ```{r}
+library(tidyverse)
+library(lubridate)
 
+senator <- readRDS("../Données/Senators_tweets_data.Rdata")
+
+senator$annee_mois
+
+senator <-
+senator %>% 
+  mutate(annee_mois = format_ISO8601(created_at, precision = "ym"))
+
+liste <- readRDS("../Données")
 ```
 
 
