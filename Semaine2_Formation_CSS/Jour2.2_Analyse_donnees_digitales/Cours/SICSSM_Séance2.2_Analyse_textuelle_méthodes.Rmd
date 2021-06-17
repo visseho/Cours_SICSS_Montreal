@@ -146,7 +146,7 @@ Analyse des termes (Topic modelling)
   >- il ne veut pas utiliser beaucoup de sujets dans un document et 
   >- il ne veut pas utiliser beaucoup de mots dans un sujet.
 
-<!--
+
 ## Échantillonnage de Gibbs: formule
 
 - Soit :

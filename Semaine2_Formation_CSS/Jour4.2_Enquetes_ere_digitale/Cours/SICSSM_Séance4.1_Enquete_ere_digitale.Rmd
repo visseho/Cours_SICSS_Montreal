@@ -1,5 +1,5 @@
 ---
-title: 'Séance 2.1: Analyse données digitales'
+title: "Séance 4: Enquêtes à l'ère digitales"
 #subtitle: ''
 author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
@@ -13,5 +13,283 @@ output:
   ioslides_presentation: default
 ---
 
+## Introduction 
+
+>- We need surveys even in the digital age.
+>- We need surveys ---even--- especially in the digital age.
+
+
+>- Matthews Salganik
+
 ## Plan de présentation
 
+- Introduction
+- Évolution des enquêtes
+- Caractéristiques des enquêtes à l'ère digitale
+
+## Introduction
+
+- Avec l'abondance des données digitales et digitalisées, on peut penser que nous n'avons plus besoin d'enquêtes
+
+- La réponse est plutôt, à cause des données digitales, nous avons plus que besoin d'enquêtes
+
+- Nous aurons besoin d'enquêtes pour les raisons suivantes:
+  - les limites des données massives
+  - (internal states vs. external states)
+  - inaccessibilité des données massives
+
+- La différence va être la manière de poser les questions qui va être différente
+
+## Évolution des enquêtes
+
+                   Échantillonnage      Interviews
+------------------ -------------------- ----------------
+Première période   Probabiliste         Face à face
+
+
+## Évolution des enquêtes
+
+                   Échantillonnage      Interviews
+------------------ -------------------- ----------------
+Première période   Probabiliste         Face à face
+Deuxième période   Probabilité de       Téléphone
+                   numérotation numé-
+                   rique aléatoire
+
+
+## Évolution des enquêtes
+
+                   Échantillonnage      Interviews
+------------------ -------------------- ----------------
+Première période   Probabiliste         Face à face
+Deuxième période   Probabilité de       Téléphone
+                   numérotation numé-
+                   rique aléatoire
+Troisième période  Non probabiliste     Par ordinateur
+
+
+## Évolution des enquêtes
+
+                   Échantillonnage      Interviews      Environnement des données
+------------------ -------------------- --------------- --------------------------
+Première période   Probabiliste         Face à face     Autonome
+Deuxième période   Probabilité de       Téléphone       Autonome
+                   numérotation numé-
+                   rique aléatoire
+Troisième période  Non probabiliste     Par ordinateur  Lié
+
+
+Erreurs
+========================================
+
+## Aperçu 1: 
+
+- Biais et variance
+
+## Aperçu 2:
+
+https://academic.oup.com/poq/article/74/5/849/1817502
+
+- Erreur totale = erreur de mesure + erreur de couverture
+
+![](../Données/enq1.png)
+
+- Le cadre d'erreur totale d'enquête nous aide également à réfléchir à la façon dont l'ère numérique peut créer de nouvelles opportunités (à qui demander et comment demander)
+
+
+Échantillonnage probabiliste et non probabiliste
+==================================================
+
+
+## Non probabiliste
+
+
+                   Échantillonnage      Interviews      Environnement des données
+------------------ -------------------- --------------- --------------------------
+Première période   Probabiliste         Face à face     Autonome
+Deuxième période   Probabilité de       Téléphone       Autonome
+                   numérotation numé-
+                   rique aléatoire
+Troisième période  **Non probabiliste** Par ordinateur  Lié
+
+
+## Échantillonnage probabiliste
+
+- Échantillon probabiliste (approximativement) : chaque unité d'une population de base a une probabilité d'inclusion connue et non nulle
+
+- Tous les échantillons probabilistes ne ressemblent pas à des versions miniatures de la population
+
+- Mais, avec une pondération appropriée, les échantillons probabilistes peuvent produire des estimations non biaisées de la population de base
+
+## Échantillonnage probabiliste
+
+Principaux enseignements de l'échantillonnage probabiliste:
+- La façon dont vous collectez vos données a un impact sur la façon dont vous faites des inférences
+- Se concentre sur les propriétés des estimateurs et non sur les propriétés des échantillons
+
+## Principe
+
+
+$$ \hat{\bar y} = \frac{\sum y_i/\pi_i}{N} $$
+
+$\pi_i$ : probabilité d'inclusion de l'individu i
+
+encore appelé 
+- estimateur Horvitz-Thompson
+- estimateur $\pi_i$ 
+
+## Inférence
+
+- Echantillonnage probabiliste en théorie
+
+                                répondants 
+$\text{information connu sur l'échantillon} \Bigg\}$ estimateurs
+
+- Echantillonnage probabiliste en pratique
+
+                                  répondants 
+$\text{information estimée sur l'échantillon} \Bigg\}$ estimateurs
+Information auxilliaire + hypothèses
+
+
+- Echantillonnage non-probabiliste
+
+                                  répondants 
+$\text{information connu sur l'échantillon} \Bigg\}$ estimateurs
+Information auxilliaire + hypothèses
+
+## Exemple
+
+Imaginez que vous vouliez estimer la taille moyenne des étudiants de l'UQAM.
+- Supposons que 50% sont des hommes et 50% sont des femmes
+- Vous vous situez à l'extérieur de la Bibliothèque et recrutez un échantillon non aléatoire de 60 étudiants de l'UQAM
+- Mâles (n= 20) : Taille moyenne : 180cm
+- Femelles (n=40) : Taille moyenne : 170cm
+
+Quelle est l'estimé de la taille moyenne?
+
+## Exemple
+
+- Moyenne de l'échantillon = 173.3 cm = $\frac{180*20 + 170*40}{20 + 40}$
+- Moyenne pondérée = 175 cm = $(180*0.5 + 170*0.5)$
+
+- L'estimation pondérée utilise des informations auxiliaires et des hypothèses 
+- Comment cela pourrait-il mal tourner ?
+
+## Conclusion
+
+![](../Données/enq2.png)
+
+## Conclusion
+
+![](../Données/enq3.png)
+
+## Conclusion
+
+- Les échantillons n'ont pas besoin de ressembler à des mini-populations
+- La clé pour faire de bonnes estimations est que le processus d'estimation prenne en compte le processus d'échantillonnage
+- Il n'y a pas de différence nette entre l'échantillonnage probabiliste en pratique et l'échantillonnage non probabiliste
+- Pour en savoir plus : Lohr (2009) ou Sandal et al (2013)
+
+
+Enquêtes administrées par les machines
+=========================================
+
+## Administré par ordinateur
+
+
+                   Échantillonnage      Interviews         Environnement des données
+------------------ -------------------- ------------------ --------------------------
+Première période   Probabiliste         Face à face        Autonome
+Deuxième période   Probabilité de       Téléphone          Autonome
+                   numérotation numé-
+                   rique aléatoire
+Troisième période  Non probabiliste     **Par ordinateur** Lié
+
+
+
+Combiner les enquêtes avec les données massives
+=================================================
+
+
+## Lié
+
+
+                   Échantillonnage      Interviews         Environnement des données
+------------------ -------------------- ------------------ --------------------------
+Première période   Probabiliste         Face à face        Autonome
+Deuxième période   Probabilité de       Téléphone          Autonome
+                   numérotation numé-
+                   rique aléatoire
+Troisième période  Non probabiliste     Par ordinateur     **Lié**
+
+## Deux perspectives
+
+![](../Données/enq4.png)
+
+## cas 1:
+
+[Ansolabehere and Hersh (2012)](https://www.jstor.org/stable/23359641)
+
+![](../Données/enq5.png)
+
+## Cas 2: 
+
+[Blumenstock, Cadamuro, and On (2015)](https://science.sciencemag.org/content/350/6264/1073)
+
+![](../Données/Blumenstock.jpg)
+
+
+## Prédire la pauvreté}
+
+- Contexte: La répartition géographique de la pauvreté et de la richesse est utilisée pour prendre des décisions sur l'allocation des ressources et fournit une base pour l'étude des inégalités et des déterminants de la croissance économique.
+  - Problèmes en ASS: Enquête clairsemée sur la pauvreté 
+
+## Prédire la pauvreté}
+
+L'étude combine des données volumineuses (Big Data) avec des données d'enquête
+  - Big data: base de données contenant des enregistrements de milliards d’interactions sur le plus grand réseau de téléphonie mobile du Rwanda auprès de 1,5 million d’individus uniques
+  - Enquête: enquêtes téléphoniques de suivi d'un échantillon aléatoire stratifié géographiquement de 856 abonnés individuels 
+  - Les données de téléphonie mobile sont utilisées par de plus en plus de personnes en Afrique subsaharienne
+  - Téléphones portables peuvent:
+    - Capturer des informations riches sur la fréquence et le calendrier des événements de communication
+    - Refléter la structure complexe du réseau social d’un individu
+    - Révéler le modèle de choix de lieu de voyage et
+    - Histoires de consommation et dépenses
+
+## Prédire la pauvreté}
+
+![](../Données/Matthews2.png)
+
+## Prédire la pauvreté}
+
+
+![](../Données/blum_pp.png) 
+
+
+## Prédire la pauvreté}
+
+![](../Données/blum_pp2.png)
+
+
+## Prédire la pauvreté}
+
+- Les estimations de Blumenstock et de ses collègues étaient environ 10 fois plus rapides et 50 fois moins chères (lorsque le coût est mesuré en termes de coûts variables)
+- Cette recette ne contient que deux ingrédients et deux étapes. Les ingrédients sont:
+  - Une source de données volumineuse qui est large mais mince (c’est-à-dire qu’elle a beaucoup de personnes mais pas les informations dont vous avez besoin sur chaque personne) et 
+ - Une enquête étroite mais dense (c’est-à-dire qu’elle n’a que quelques personnes, mais qu’elle a les informations dont vous avez besoin sur ces personnes)
+
+## Conclusion
+
+- Les sondages et les mégadonnées sont des compléments et non des substituts
+- Parfois on fait des "demandes enrichies" et parfois des demandes "amplifiées" (le rôle de la source de big data est di érent dans les deux cas)
+- Ressources : [chapitre 3 de bit by bit](https://www.bitbybitbook.com/en/1st-ed/asking-questions/)
+
+
+## Références
+
+[Galesic et al. Asking about social circles improves election predictions](https://www.nature.com/articles/s41562-018-0302-y)
+
+
+Additions et extensions
+===============================================
