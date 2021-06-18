@@ -135,6 +135,7 @@ $$ \hat{\bar y} = \frac{\sum y_i/\pi_i}{N} $$
 $\pi_i$ : probabilité d'inclusion de l'individu i
 
 encore appelé 
+
 - estimateur Horvitz-Thompson
 - estimateur $\pi_i$ 
 
@@ -161,6 +162,7 @@ Information auxilliaire + hypothèses
 ## Exemple
 
 Imaginez que vous vouliez estimer la taille moyenne des étudiants de l'UQAM.
+
 - Supposons que 50% sont des hommes et 50% sont des femmes
 - Vous vous situez à l'extérieur de la Bibliothèque et recrutez un échantillon non aléatoire de 60 étudiants de l'UQAM
 - Mâles (n= 20) : Taille moyenne : 180cm
@@ -171,9 +173,11 @@ Quelle est l'estimé de la taille moyenne?
 ## Exemple
 
 - Moyenne de l'échantillon = 173.3 cm = $\frac{180*20 + 170*40}{20 + 40}$
+
 - Moyenne pondérée = 175 cm = $(180*0.5 + 170*0.5)$
 
 - L'estimation pondérée utilise des informations auxiliaires et des hypothèses 
+
 - Comment cela pourrait-il mal tourner ?
 
 ## Conclusion

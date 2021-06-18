@@ -94,6 +94,26 @@ Calculer les moyennes de l'échantillon pour l'ensemble des variables de la base
 ## 1.1) Calculater les moyennes
 
 ```{r}
+#enlever les données socio-démographique 
+
+summary(data) #questions individuelles
+class(data$educ)
+names(data)
+
+data2 <-select(data, -c(sex, educ,race, age_cat,region))
+names(data2)
+
+data2_mean <- data2 %>% 
+  summarise_all(mean, na.rm = TRUE) #appliquer la même fonction sur toute la base de données
+
+#pivot_long
+
+data2_mean_pivot <- data2_mean %>%
+  pivot_longer(COVIDNEWSSWITCH.1 : ALG_JOBCANDIDATE.1, names_to = "qid", values_to = "mean")
+
+data2_pew_mean <- inner_join(pew, data2_mean_pivot, by ="qid")
+
+
 
 ```
 
@@ -104,6 +124,18 @@ Les résultats de Pews proviennent d'un échantillon représentatif de la popula
 
 ```{r}
 
+
+ggplot(data2_pew_mean) + 
+  geom_point(aes(x = mean, y = pew_estimate)) +
+  geom_smooth(aes(x = mean, y = pew_estimate, 
+                  color = mean), 
+              method = lm, se = FALSE,  formula = y ~ x) + 
+  labs(title = "Association entre les moyennes estimées et les moyennes calculées",
+       x = "Moyennes calculées",
+       y = "Moyennes estimées") +
+  theme(legend.position = "bottom", legend.direction = "horizontal")
+
+
 ```
 
 ## 1.3) Présenter un graphique de la différence 
@@ -111,6 +143,22 @@ Les résultats de Pews proviennent d'un échantillon représentatif de la popula
 Maintenant, présenté un graphique qui montre la différence entre les deux estimés pour chacun des indicateurs
 
 ```{r}
+#erreur <- data2_pew_mean %>%
+  #mutate_all("pew_estimate" - "mean")
+
+erreur <- data2_pew_mean$pew_estimate - data2_pew_mean$mean
+
+data2_pew_mean_erreur <- data2_pew_mean %>%
+  mutate(erreur = data2_pew_mean$pew_estimate - data2_pew_mean$mean)
+
+ggplot(data2_pew_mean_erreur, aes(x = erreur, y = qid)) +
+  geom_point() + 
+   labs(title = "Différence entre les moyennes estimées et les moyennes calcultées pour chaque indicateur",
+       x = "erreur",
+       y = "qid") +
+  theme(legend.position = "bottom", legend.direction = "horizontal")
+
+
 
 ```
 
@@ -127,21 +175,67 @@ Les poids de groupe peuvent être calculés comme $\frac{N_{h}}{N}$. Leur somme 
 ```{r}
 
 # obtenir la population totale du recensement
+sum_population <- sum(census$POP)
+
 # calculer les poids des groupes
-## regrouper les données de population par sexe et par région,
+
+## regrouper les données de population par sexe et par région
+
+population_sexe_region <- census %>%
+  group_by(sex, region) %>% 
+  summarise(pop_sex_region = sum(POP)) 
+
 ## obtenir la somme pour chaque cellule et diviser par la pop totale
+population_sexe_region <- population_sexe_region %>%
+  mutate(weight_pop = pop_sex_region/sum_population)
+
+
+#population_sexe_region <- population_sexe_region %>%
+  #mutate(weight_pop = pop_sex_region/sum_population)
+
 # vérifie que la somme des poids vaut un
+
+sum(population_sexe_region$weight_pop)
+
 # calculer les moyennes du groupe pour chaque réponse à la question
 ## regrouper les données par sexe et région
+
+data_sex_region <- data %>% 
+  select(-educ, -race, -age_cat) %>% 
+  group_by(sex, region) %>% 
+  summarise_all(mean, na.rm = TRUE)
+  
 ## supprimer les variables non numériques (vars démographiques)
+
 ## calculer les moyennes du groupe pour chaque colonne
+
+
 # vérifie qu'il n'y a pas de cellules vides
-# fusionner les dénombrements de population avec les dénombrements d'échantillons
+
+# fusionner les dénombrements de population  avec les dénombrements d'échantillons 
+data_census <- inner_join(data_sex_region, population_sexe_region, by = c("sex", "region"))
+
+##calculer les moyennes selon le sexe et la région
+
 # gauche rejoindre et conserver tous les groupes dans la population
+
 # multiplie les moyennes de groupe et les poids de groupe dans la trame de données cell_based_long
 # et appelez ce weighted_mean
+
+data_census_long <- data_census %>% 
+  pivot_longer(cols = COVIDNEWSSWITCH.1:ALG_JOBCANDIDATE.1, names_to = "qid", values_to = "mean")
+
+
+
 # moyennes pondérées par la somme, regroupement par question
 
+data_mean2 <- data_census_long %>% 
+  mutate(mean2 = mean * weight_pop) %>% 
+  group_by(qid) %>% 
+  summarise(new_mean = sum(mean2))
+  
+ ?mean 
+  
 # get total census population
 # calculate group weights 
 ## group population data by sex and region,
@@ -160,36 +254,32 @@ Les poids de groupe peuvent être calculés comme $\frac{N_{h}}{N}$. Leur somme 
 
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## 2.2) Comparer les moyennes calculée précédemment avec les "vrais estimés" (graphique)
 
 Comme vous êtes amenés à faire le graphie=que de la partie 1.2 encore une fois, il aurait été mieux de créer une fonction pour pouvoir repliquer ce graphique.
 
 ```{r}
+
+graph_association <- ggplot(data2_pew_mean) + 
+  geom_point(aes(x = mean, y = pew_estimate)) +
+  geom_smooth(aes(x = mean, y = pew_estimate, 
+                  color = mean), 
+              method = lm, se = FALSE,  formula = y ~ x) + 
+  labs(title = "Association entre les moyennes estimées et les moyennes calculées",
+       x = "Moyennes calculées",
+       y = "Moyennes estimées") +
+  theme(legend.position = "bottom", legend.direction = "horizontal")
+
 # fusionner les estimations pondérées basées sur les cellules mturk avec le benchmark
+install.packages("rbenchmark")
+library(rbenchmark)
+install.packages("MTurkR")
+library(MturkR)
+??Mturk
+
+
 # plot (vous pouvez utiliser la fonction que nous avons créée ci-dessus)
+graph_association
 ```
 
 ## 2.3) Présenter un graphique de la différence
@@ -213,6 +303,8 @@ Vous aurez maintenant 160 groupes (2 x 4 x 5 x 4). Certains groupes peuvent êtr
 Tout d'abord, calculez les nouvelles moyennes de groupe, les poids de groupe et les moyennes pondérées comme vous l'avez fait ci-dessus dans l'approche 2. Nous fournissons des conseils dans les commentaires pour vous aider à analyser les données.
 
 ```{r}
+
+summary()
 
 ## Étape 1 : regrouper les données de population par sexe et région, groupe d'âge et race
 ## Pour obtenir le poids du groupe, obtenez la somme pour chaque cellule et divisez par la pop totale
