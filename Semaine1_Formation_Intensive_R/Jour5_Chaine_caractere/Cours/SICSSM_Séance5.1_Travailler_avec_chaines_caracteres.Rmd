@@ -319,7 +319,6 @@ coffee1 <-
 coffee1 %>% distinct(Name) %>% head()
 
 
-
 ```
 
 <!--
