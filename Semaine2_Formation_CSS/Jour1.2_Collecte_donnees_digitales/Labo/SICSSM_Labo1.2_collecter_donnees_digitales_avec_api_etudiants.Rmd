@@ -111,15 +111,17 @@ Tout d’abord, voyons ses 5 derniers tweets:
 
 
 ```{r}
+
 sanders_tweets <- get_timelines(c("sensanders"), n = 5)
 head(sanders_tweets$text)
 
 trudeau_tweets <- get_timeline("JustinTrudeau", n = 5)
 head(trudeau_tweets$text)
+
 ```
 
 
-Notez que vous êtes limité à demander les 3 200 derniers tweets. Il peut donc être impossible d'obtenir une base de données complète de tweets pour une personne qui tweete très souvent, ou vous devrez peut-être acheter les données de Twitter lui-même:
+Notez que vous êtes limité à demander les 3 200 derniers tweets. Il peut donc être impossible d'obtenir une base de données complète de tweets pour une personne qui twitte très souvent, ou vous devrez peut-être acheter les données de Twitter lui-même:
 
 Maintenant, obtenons des informations plus générales sur Sanders en utilisant la fonction lookup_users:
 
