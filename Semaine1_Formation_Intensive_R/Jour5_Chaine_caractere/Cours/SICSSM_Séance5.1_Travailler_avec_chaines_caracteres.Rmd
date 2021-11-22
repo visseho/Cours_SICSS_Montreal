@@ -590,6 +590,7 @@ http://edrub.in/CheatSheets/cheatSheetStringr.pdf
 
 - https://regexr.com/
 
+- https://regenerativetoday.com/a-complete-beginners-guide-to-regular-expressions-in-r/
 
 **Remarques**
 
