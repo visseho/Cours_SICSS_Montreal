@@ -287,7 +287,7 @@ Remarque: `mutate_if(x, y)` applique la fonction `y` à chaque colonne pour laqu
 
 # Que sont les expressions régulières?
 
-**Les expressions régulières** ou **regex** sont la façon dont nous décrivons les modèles que nous recherchons dans le texte d'une manière qu'un ordinateur peut comprendre. Nous écrivons une **expression**, l'appliquons à une entrée de chaîne, puis on peut faire des choses avec **correspond ** que nous trouvons.
+**Les expressions régulières** ou **regex** sont la façon dont nous décrivons les modèles que nous recherchons dans le texte d'une manière qu'un ordinateur peut comprendre. Nous écrivons une **expression**, l'appliquons à une entrée de chaîne, puis on peut faire des choses avec **correspond** que nous trouvons.
 
 
 - **Les caractères littéraux** sont des extraits définis à rechercher comme `SEA` ou `206`
@@ -395,8 +395,7 @@ Faites juste attention à ne pas charger un long vecteur / variable entier ou ce
 code_206_pattern <- "^\\(?206"
 
 restaurants %>% 
-  mutate(contient_nombre_206 = 
-           str_detect(Phone, code_206_pattern)) %>% 
+  mutate(contient_nombre_206 = str_detect(Phone, code_206_pattern)) %>% 
   group_by(contient_nombre_206) %>% 
   tally()
 
