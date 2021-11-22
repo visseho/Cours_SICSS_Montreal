@@ -138,12 +138,15 @@ paste0(1:5, letters[1:5])
 
 ## `paste()` 
 
-`sep =` contrôle ce qui se passe lorsque vous écrasez en entrée les vecteurs que vous donnez à `paste()`, tandis que `collapse =` contrôle si / comment ils passent d'un vecteur à une seule chaîne.
+`paste()` a deux options: sep et collapse.
+- `sep =` indique le séparateur à utiliser pour créer un nouveau vecteur en combinant plusieurs vecteurs, 
+- `collapse =` indique le séparateur à utiliser pour combiner des vecteurs en une seule chaîne.
 
 Voici quelques exemples; assurez-vous de comprendre comment chaque ensemble d'arguments produit leurs résultats:
 
 ```{r paste_practice, eval=TRUE, results="hold"}
-paste(letters[1:5])
+
+paste(letters[1:5], sep = "+")
 paste(1:5, letters[1:5], sep = "+")
 
 paste(letters[1:5], collapse = "!")
@@ -151,6 +154,7 @@ paste0(1:5, letters[1:5], collapse = "???")
 paste(1:5, "Z", sep = "*")
 paste(1:5, "Z", sep = "*", collapse = " ~ ")
 
+?paste
 ```
 
 
@@ -164,7 +168,7 @@ https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
 
 Il fournit des fonctions qui:
 
-- Remplace certaines fonctions de chaîne de base comme `paste ()` et `nchar ()` d'une manière un peu moins délicate avec des valeurs ou des facteurs manquants
+- Remplace certaines fonctions de chaîne de base comme `paste ()` et `nchar ()` d'une manière un peu moins difficile avec des valeurs ou des facteurs manquants
 - Supprimer les espaces ou remplissez-les
 - Effectuer des tâches liées à **la correspondance de modèles**: 
   - Detect, 
@@ -187,15 +191,17 @@ De façon pratique, **la plupart** des fonctions `stringr` commence par "`str_`"
 str
 
 str_sub("Washington", 3, 8)
-str_sub("Washington", -3, -1)
+str_sub("Washington", 8, 3) # Pourquoi ceci ne marche pas?
 
+str_sub("Washington", -5, -3)
+str_sub("Washington", -3, -5) # Pourquoi ceci ne marche pas?
 
 ?str_sub
 
 ```
 
 
-- `str_c ()` ("string combine") est exactement comme `paste()` mais où la valeur par défaut est `sep =" "` (comme `paste0()`)
+- `str_c ()` ("string combine") est exactement comme `paste()` mais où la valeur par défaut est `sep =""` (comme `paste0()`)
 
 ```{r str_c_example}
 letters
@@ -231,16 +237,18 @@ head(unique(restaurants$City))
 head(unique(restaurants$Name))
 head(unique(restaurants$Address))
 
+restaurants <- 
+  restaurants %>%
+  mutate(Name = str_to_upper(Name),
+         Address = str_to_upper(Address),
+         City = str_to_upper(City))
+
+# Plus simplement avec mutate_at
 
 restaurants <- 
   restaurants %>%
   mutate_at(vars(Name, Address, City), ~ str_to_upper(.))
 
-#restaurants <- 
-#  restaurants %>%
-#  mutate(Name = str_to_upper(),
-#         Address = str_to_upper(),
-#         City = str_to_upper())
 
 #restaurants <- 
 #  restaurants %>%
@@ -274,7 +282,6 @@ restaurants <-
 
 head(unique(restaurants$Name), 4)
 
-
 ```
 
 Remarque: `mutate_if(x, y)` applique la fonction `y` à chaque colonne pour laquelle `x` est `TRUE`.]
@@ -287,12 +294,27 @@ Remarque: `mutate_if(x, y)` applique la fonction `y` à chaque colonne pour laqu
 
 **Les expressions régulières** ou **regex** sont la façon dont nous décrivons les modèles que nous recherchons dans le texte d'une manière qu'un ordinateur peut comprendre. Nous écrivons une **expression**, l'appliquons à une entrée de chaîne, puis on peut faire des choses avec **correspond** que nous trouvons.
 
+Page 2 de ceci: https://github.com/rstudio/cheatsheets/blob/main/strings.pdf
 
 - **Les caractères littéraux** sont des extraits définis à rechercher comme `SEA` ou `206`
 
-- **Métacaractères** soyons flexibles dans la description des modèles:
-  - barre oblique inversée `\`, caret `^`, signe dollar `$`, point `.`, pipe `|`, point d'interrogation `? `, astérisque `*', plus signe `+`, parenthèses `(` et `)`, crochets `[` et `]`, accolades `{` et `}`
+- **Métacaractères** :
+  - barre oblique inversée **\**, 
+  - caret **^**, 
+  - signe dollar **$**, 
+  - point **.**, 
+  - pipe `|`, 
+  - point d'interrogation `? `, 
+  - astérisque `*', 
+  - signe signe `+`, 
+  - parenthèses `(` et `)`, 
+  - crochets `[` et `]`, 
+  - accolades `{` et `}`
   - Pour traiter un métacaractère comme un caractère littéral, vous devez **l'échapper** avec deux barres obliques inverses `\\`, par ex. pour faire correspondre `(206)` avec les parenthèses, vous utiliseriez `\\(206\\)` dans votre expression régulière
+
+
+![](../Figures/Regex.png)
+
 
 ## `str_detect()`
 
@@ -313,7 +335,7 @@ coffee %>% distinct(Name) %>% head()
 
 coffee1 <- 
   restaurants %>% 
-  filter(grepl("COFFEE|ESPRESSO|ROASTER", Name))
+  filter(grepl("COFFEE|ESPRESSO|ROASTER|CAFE", Name))
 
 coffee1 %>% distinct(Name) %>% head()
 
@@ -359,9 +381,10 @@ exemple_test
 
 str_detect(exemple_test, "^\\(?206")
 
+str_detect(exemple_test, "206")  # Voyez la différence
+
 str_detect(exemple_test, code_206_pattern)
 
-str_detect(exemple_test, "206")
 
 
 ```
@@ -437,9 +460,10 @@ str_extract(direction_exemples, direction_pattern)
 
 ```{r extract_directions}
 
+#restaurants <-
 restaurants %>% 
   distinct(Address) %>% 
-  mutate(city_region = 
+  mutate(city_region = #str_extract(Address, direction_pattern)) %>% 
           str_trim(str_extract(Address, direction_pattern))) %>% 
   count(city_region) %>% arrange(desc(n))
 
@@ -466,6 +490,7 @@ str_replace(address_number_test_examples,
 
 ```
 
+La rue 10AA 1ST AVE donne le même résultat avec le numéro de l'immeuble. Comment corriger cela.
 
 ## Comment fonctionne l'expression regex du numéro de bâtiment?
 
@@ -528,6 +553,9 @@ Décomposons `" (|#|STE|SUITE|SHOP|UNIT).*$"`:
 # Suppression d'unités / suites
 
 ```{r replace_units}
+
+address_unit_pattern <- " (#|STE|SUITE|SHOP|UNIT).*$"
+
 
 restaurants <- 
   restaurants %>% 
@@ -622,9 +650,6 @@ grep("^[P]", wikipedia_scrape)    #Find a special character
 wikipedia_scrape[grep("^[P]", wikipedia_scrape)]
 
 
-
-
-wikipedia_scrape
 
 
 
