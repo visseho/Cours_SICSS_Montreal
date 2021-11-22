@@ -46,7 +46,11 @@ Voici à quoi ressemble la page Web liée ci-dessus lorsque nous la visitons via
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10who.png)
 
 
-Mais ce n'est pas ce que la page Web ressemble réellement à notre navigateur. Pour afficher le «code source» de la page Web, nous pouvons utiliser le menu déroulant de Chrome appelé «développeur», puis cliquer sur «Afficher la source». Nous voyons ensuite la page dans sa forme la plus élémentaire, appelée fichier HTML, qui est une longue fichier contenant à la fois le texte de la page Web et une longue liste d'instructions sur la manière dont le texte, les images et les autres composants de la page Web doivent être restitués par le navigateur:
+Mais ce n'est pas ce que la page Web ressemble réellement à notre navigateur. Pour afficher le «code source» de la page Web, nous pouvons utiliser le menu déroulant de Chrome appelé «développeur», puis cliquer sur «Afficher la source». 
+
+Aller dans **Views** ==> **Developper** ==> **Developper tools**
+
+Nous voyons ensuite la page dans sa forme la plus élémentaire, appelée fichier HTML, qui est une longue fichier contenant à la fois le texte de la page Web et une longue liste d'instructions sur la manière dont le texte, les images et les autres composants de la page Web doivent être restitués par le navigateur:
 
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10code.png)
 
@@ -55,6 +59,7 @@ Pour télécharger le code source dans R, nous pouvons utiliser la fonction read
 
 ```{r}
 
+rm(list = ls())
 library(tidyverse)
 library(rvest)
 
@@ -97,6 +102,8 @@ Section_wikipedia <- html_node(wikipedia_page, xpath = '//*[@id="mw-content-text
 
 Section_wikipedia
 
+
+#//*[@id="mw-content-text"]/div[1]/table
 ```
 
 
@@ -111,11 +118,12 @@ head(health_rankings[,(1:2)])
 
 ggplot(health_rankings) +
   geom_histogram(aes(x = `Attainment of goals / Health / Level (DALE)`))
+
 ```
 
 
 
-Comme le montre la sortie ci-dessus, je dispose enfin des données souhaitées sous la forme d'un bloc de données ou d'un jeu de données appelé «health_rankings». Il s'agissait toutefois d'un travail fastidieux, mais rappelez-vous qu'il s'agissait d'un type de page Web très simple. En outre, il convient de noter que les groupes de pages Wikipedia ont un format très similaire, ce qui les rend très propices à la suppression d'écran. Si, en revanche, je cherchais une liste de sites appartenant à plusieurs domaines, chacun ayant sa propre structure complexe, je pourrais passer des jours ou des semaines à écrire du code pour le supprimer. Dans ce scénario, de nombreuses personnes peuvent trouver qu'il est plus facile de collecter les données manuellement ou d'engager du personnel sur Amazon Mechanical Turk pour extraire les informations que vous souhaitez peut-être d'une liste de pages Web.
+Comme le montre la sortie ci-dessus, je dispose enfin des données souhaitées sous la forme d'un bloc de données ou d'un jeu de données appelé «health_rankings». Il s'agissait toutefois d'un travail fastidieux, mais rappelez-vous qu'il s'agissait d'un type de page Web très simple. En outre, il convient de noter que les groupes de pages Wikipedia ont un format très similaire, ce qui les rend très propices au grattage d'écran. Si, en revanche, je cherchais une liste de sites appartenant à plusieurs domaines, chacun ayant sa propre structure complexe, je pourrais passer des jours ou des semaines à écrire du code pour le gratter. Dans ce scénario, de nombreuses personnes peuvent trouver qu'il est plus facile de collecter les données manuellement ou d'engager du personnel sur Amazon Mechanical Turk pour extraire les informations que vous souhaitez peut-être d'une liste de pages Web.
 
 Une dernière remarque: souvent, la page Web que vous souhaitez gratter contient du XML au lieu de HTML (ou en plus du HTML). Dans ce cas, le package rvest dispose d'une série de fonctions permettant d'analyser XML, telles que xml et xml_node.
 
