@@ -102,6 +102,7 @@ Section_wikipedia <- html_node(wikipedia_page, xpath = '//*[@id="mw-content-text
 
 Section_wikipedia
 
+#//*[@id="mw-content-text"]/div[1]/table
 
 #//*[@id="mw-content-text"]/div[1]/table
 ```
@@ -112,7 +113,7 @@ Comme le montre la sortie ci-dessus, je me rapproche maintenant, mais je ne suis
 
 ```{r}
 
-health_rankings<-html_table(Section_wikipedia)
+health_rankings <- html_table(Section_wikipedia)
 
 head(health_rankings[,(1:2)])
 
@@ -183,12 +184,21 @@ wikipedia_page <- read_html("https://en.wikipedia.org/wiki/World_Health_Organiza
 Section_wikipedia1 <- html_node(wikipedia_page, css = '#mw-content-text > div.mw-parser-output > table')
 
 
+# .headerSort , .jquery-tablesorter td
+
 Section_wikipedia1
 
 table_wiki1 <- html_table(Section_wikipedia1)
 
 table_wiki1
 
+
+
+
+#Section_wikipedia2 <- html_node(wikipedia_page, css = '.headerSort , .jquery-tablesorter td')
+
+
+# .headerSort , .jquery-tablesorter td
 
 ```
 
@@ -238,6 +248,7 @@ acteurs_abs_url <-
   url_absolute(lego)
 
 ```
+
 
 ## Exemple 4: Collecter les informations sur les formateurs d'un site
 
