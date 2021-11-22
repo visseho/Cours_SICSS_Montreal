@@ -120,6 +120,7 @@ restaurants <-
            paste(Address, ", ", City, ", WA ", ZIP_5, sep = ""))
 
 restaurants %>% distinct(mailing_address) %>% head()
+
 ```
 
 
