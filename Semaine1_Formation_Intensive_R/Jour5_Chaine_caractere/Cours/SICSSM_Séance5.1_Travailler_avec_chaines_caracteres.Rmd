@@ -12,8 +12,6 @@ institute: SICSS - Montréal
 
 ## Remerciements
 
-Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
-
 
 # Introduction
 
