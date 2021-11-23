@@ -1,0 +1,170 @@
+---
+title: 'Exercice 10: Collete de données digitales par screen-scraping'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+
+## Exemple 1: Télécharger les informations sur les professeurs de sociologie de l'uqam
+  
+
+```{r}
+
+socio1 <- read_html("https://sociologie.uqam.ca/corps-professoral/professeurs-es/")
+socio1
+socio_prof1 <- html_node(socio1, xpath = '//*[@id="post-967"]/div/div/div[1]/div[2]/div[1]')
+
+
+socio_prof_list <- html_text(socio_prof1)
+socio_prof_att <- html_attr(socio_prof1, name = "nom")
+
+
+socio_prof2 <- html_node(socio1, xpath = '//*[@id="post-967"]/div/div')
+
+
+socio_prof2_table <- html_table(socio_prof2)
+
+
+socio_prof1[
+```
+
+
+## Exemple 2: Télécharger les rankings des films
+
+```{r}
+
+lego_film <- read_html("https://www.imdb.com/title/tt1490017/")
+lego_film
+
+lego_section <- html_node(lego_film, css = '.primary_photo+ td a')
+lego_section
+
+Nom_acteur <- html_text(lego_section)
+head(Nom_acteur)
+
+
+
+# Selon le modele tidyverse
+
+ranking1 <-
+  lego_film %>% 
+  html_node(xpath = '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/div[1]/strong/span') %>% 
+  html_text() %>% 
+  as.numeric()
+
+```
+
+
+
+
+## Exemple 3: Télécharger les acteurs du film lego: utilisation de SelectorGadget
+
+```{r}
+
+lego <- read_html("https://www.imdb.com/title/tt1490017/")
+
+acteurs <-
+  lego %>% 
+  html_nodes(css = ".primary_photo+ td a")
+acteurs
+
+length(acteurs)
+acteurs[1:2]
+
+# Collecter les noms
+acteurs_nom <- html_text(acteurs, trim = TRUE)
+acteurs_nom
+
+# Collecter les liens des pages des acteurs
+acteur_attr <- html_attrs(acteurs)
+acteur_attr
+
+length(acteur_attr)
+acteur_attr[1:2]
+
+# Relative url
+acteurs_rel_url <- html_attr(acteurs, "href")
+length(acteurs_rel_url)
+acteurs_rel_url
+
+# Absolute url
+
+acteurs_abs_url <-
+  html_attr(acteurs, "href") %>% 
+  url_absolute(lego)
+
+```
+
+## Exemple 4: Collecter les informations sur les formateurs d'un site
+
+
+```{r}
+
+thinkr_url <- read_html("https://thinkr.fr/equipe/")
+
+thinkr_formateurs_nodes <- html_nodes(thinkr_url, css = '.orange , .orange span')
+
+length(thinkr_formateurs_nodes)
+
+thinkr_formateurs_nodes[1:3]
+
+formateur <- html_text(thinkr_formateurs_nodes)
+length(formateur)
+formateur[3]
+
+
+# Département de sociologie
+
+sociouqam_url <- read_html("https://sociologie.uqam.ca/corps-professoral/professeurs-es/")
+
+profs <-
+  sociouqam_url %>% 
+  html_nodes('.nom a') %>% 
+  html_text(trim = TRUE)
+
+head(profs)
+
+
+profs[1]
+profs[2]
+
+
+prof_table <- as_data_frame(c(profs[1:35]))
+prof_table
+
+```
+
+
+## Exemple 5: Télécharger les commentaires sur New York Time
+
+```{r}
+
+nyt_url <- read_html("https://www.nytimes.com/2019/11/28/opinion/thanksgiving-trump.html#commentsContainer")
+
+nyt_nodes <- 
+  nyt_url %>% 
+  html_nodes('.css-aa7djq :nth-child(1)')
+
+lenght(nyt_nodes)
+
+     
+  
+```
+
+
+## Exemple 6: Collecter les discours sur l'état de l'union aux US
+
+https://francojc.github.io/2015/03/01/web-scraping-with-rvest-in-r/
+
+
+
+## Exemple 1: Scrapper la base d'incendie des forêts
+
+
+```{r}
+rD <- rsDriver(browser = c("chrome"), chromever = "78.0.3904.105")
+remDr <- rD$client
+
+
+```
