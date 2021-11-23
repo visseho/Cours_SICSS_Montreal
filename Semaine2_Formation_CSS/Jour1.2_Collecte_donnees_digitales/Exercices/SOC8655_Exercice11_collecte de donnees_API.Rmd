@@ -1,0 +1,50 @@
+---
+title: "RDHS"
+author: "Visseho Adjiwanou, PhD."
+date: "23/11/2020"
+output: html_document
+---
+
+
+```{r}
+# install.packages("rdhs")
+
+library(tidyverse)
+library(rdhs)
+
+#Finding the right datasets and relevant info:
+
+datasets <- dhs_datasets(
+  countryIds = c("ZW","ZM","UG","TZ","TG","SZ","SL","SN","RW","NG","NI","NM","MZ","ML","MW","LB","LS","KE","GN","GH","GM","GA", "ET","CI","CD","CG","KM","TD","CM","BU","BF","BJ","BF"),
+  selectSurveys = T,
+  surveyIds = NULL,
+  surveyYear = NULL,
+  surveyYearStart = NULL,
+  surveyYearEnd = NULL,
+  surveyType = "DHS",
+  fileFormat = "stata",
+  fileType = c("HR", "IR","PR"),
+  f = NULL,
+  returnFields = NULL,
+  perPage = NULL,
+  page = NULL,
+  client = NULL,
+  force = FALSE,
+  all_results = TRUE
+) %>%
+  select(CountryName, SurveyYear, SurveyId, FileType, FileName) %>%
+  group_by(CountryName) %>%
+  filter(SurveyYear == max(SurveyYear)) %>%
+  ungroup()
+  
+#DHS credentials:
+#set_rdhs_config(email = "visseho09@yahoo.fr",
+#                project = "Reproductive health behavior and child survival in developing countries",
+#                config_path = "~/.rdhs.json",
+#               global = TRUE,
+#               verbose_download = TRUE)
+
+#Getting datasets
+downloads <- get_datasets(datasets$FileName)
+
+```
