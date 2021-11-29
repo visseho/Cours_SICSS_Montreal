@@ -5,11 +5,11 @@ author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  slidy_presentation: default
   beamer_presentation:
     colortheme: beaver
     fonttheme: structurebold
     theme: Antibes
+  slidy_presentation: default
   ioslides_presentation: default
 ---
 
@@ -55,18 +55,30 @@ Introduction
 
 
 
-## Évolution des techniques
+## Évolution de l'analyse quantitative du texte
 
 Années 1600 : l'église catholique suit la proportion de textes imprimés non religieux
+
 1934 : Laswell produit le premier compte de mots-clés
+
 Années 1940: les chercheurs en sciences sociales utilisent des méthodes similaires
+
 1950 : Turin applique l'IA au texte
+
 1952 : Bereleson publie le premier manuel sur l'analyse de contenu
+
 1954 : Première traduction automatique de texte (Georgetown Experiment)
+
 1966 : Stone & Bales utilisent un ordinateur central pour mesurer les propriétés psychométriques du texte
+
+## Évolution de l'analyse quantitative du texte
+
 1980 : Apprentissage automatique appliqué à la NLP
+
 1985 : Schrodt introduit le codage automatisé des événements
+
 1986 : Pennebaker développe LIWC
+
 1989 : Franzosi apporte l'analyse narrative quantitative aux sciences sociales
 
 <!--
@@ -85,13 +97,20 @@ Années 1940: les chercheurs en sciences sociales utilisent des méthodes simila
 
 ## Évolution des techniques
 
-1998 : premiers modèles thématiques développés
+1998 : Premiers modèles thématiques développés
+
 1998 : Mohr effectue la première analyse quantitative des visions du monde
+
 1999: Bearman et al. appliquer les méthodes de réseau aux récits
+
 2001: Blei et al. développer LDA
+
 2003 : Création de MALLET
+
 2005 : Quin et al utilisent l'analyse des discours politiques à l'aide de modèles thématiques
+
 2010: King/Hopkins introduisent les modèles thématiques dans le courant dominant
+
 2014: Margaret Roberts et coll. ont développé des modèles thématiques structurels
 
 <!--
@@ -111,16 +130,18 @@ Années 1940: les chercheurs en sciences sociales utilisent des méthodes simila
 ## Difficulté du langage humain
 
 >- Le langage humain est complexe et nuancé
+
   >- humour
   >- double négation
   >- Variation des termes selon les différents contexte
-    - *valise* pour désigner le coffre d'une voiture au Québec
+  >- *valise* pour désigner le coffre d'une voiture au Québec
     
 >- Le but de l'analyse de texte est de réduire cette complexité pour extraire des messages compréhensifs et importants
 
+
 ## Type d'analyse
 
->- La réduction de la complexité peut se faire à partir :
+- La réduction de la complexité peut se faire à partir :
 
 >1. de la catégorisation de texte ou de la classification automatique
   - exemple: segmentation des sujets dans un débat politique
@@ -151,11 +172,17 @@ Années 1940: les chercheurs en sciences sociales utilisent des méthodes simila
 ## Traitement des données
 
 - Voici les différentes terminologies et techniques
+
 >1. Corpus de texte (text corpora)
+
 >2. Tokenisation (tokenization)
+
 >3. Stop words (mots rares ou vide)
+
 >4. N-grams (mots composés)
+
 >5. Stemming (même racine ou radical) and lemmatization (même forme canonique)
+
 >6. Autres aspect important du prétraitement des données.
 
 ## 1. Corpus de texte
@@ -167,7 +194,7 @@ Années 1940: les chercheurs en sciences sociales utilisent des méthodes simila
   >- **afinn** qui comprend une liste de mots chargés de sentiments qui sont apparus dans les discussions de Twitter sur le changement climatique; 
   >- **bing** qui comprend des mots sensibles identifiés sur les forums en ligne; et 
   >- **nrc** qui est un dictionnaire qui a été créé en demandant aux travailleurs d'Amazon Mechanical Turk de coder la valence émotionnelle d'une longue liste de termes.
-  >-**Lexicoder Sentiment Dictionary (LSD)** qui est un lexique large noté pour le ton positif et négatif et adapté principalement aux textes politiques (Newspaper,...). Il contient plus de 4 500 mots positifs et négatifs utilisés pour transmettre des sentiments. (https://quanteda.io/reference/data_dictionary_LSD2015.html)
+  >- **Lexicoder Sentiment Dictionary (LSD)** qui est un lexique large noté pour le ton positif et négatif et adapté principalement aux textes politiques (Newspaper,...). Il contient plus de 4 500 mots positifs et négatifs utilisés pour transmettre des sentiments. (https://quanteda.io/reference/data_dictionary_LSD2015.html)
 >- La présentation sur Wikipedia vaut la peine d'être lue : https://fr.wikipedia.org/wiki/Corpus
 
 ## 1. Corpus de texte
@@ -286,9 +313,9 @@ inspect(document_DTM)
 >- L'utilisation de principes de données bien rangées est un moyen puissant de rendre la gestion des données plus facile et plus efficace, et cela n'est pas moins vrai lorsqu'il s'agit de traiter du texte. 
 >- Comme décrit par Hadley Wickham (Wickham 2014), les données bien rangées ont une structure spécifique:
 
->- Chaque variable est une colonne
->- Chaque observation est une rangée
->- Chaque type d'unité d'observation est un tableau
+  >- Chaque variable est une colonne
+  >- Chaque observation est une rangée
+  >- Chaque type d'unité d'observation est un tableau
 
 >- Nous définissons donc le format de texte bien rangé (tidy-text) comme étant une table avec un jeton (token) par ligne. 
 
