@@ -35,7 +35,7 @@ Introduction
 
 >- Que nous renseignent les agendas des garderies sur le bien-être des enfants?
 
->- Qu'est-ce que se dit sur les médias sociaux sur la liberté académique et la lutte contre le racisme?
+>- Qu'est-ce qui se dit sur les médias sociaux sur la liberté académique et la lutte contre le racisme?
 
 >- Que pensent les québécois sur la perte du français à Montréal, qu'en est-il des Montréalais ?
 
@@ -194,6 +194,9 @@ Années 1940: les chercheurs en sciences sociales utilisent des méthodes simila
   >- **afinn** qui comprend une liste de mots chargés de sentiments qui sont apparus dans les discussions de Twitter sur le changement climatique; 
   >- **bing** qui comprend des mots sensibles identifiés sur les forums en ligne; et 
   >- **nrc** qui est un dictionnaire qui a été créé en demandant aux travailleurs d'Amazon Mechanical Turk de coder la valence émotionnelle d'une longue liste de termes.
+
+## 1. Corpus de texte
+
   >- **Lexicoder Sentiment Dictionary (LSD)** qui est un lexique large noté pour le ton positif et négatif et adapté principalement aux textes politiques (Newspaper,...). Il contient plus de 4 500 mots positifs et négatifs utilisés pour transmettre des sentiments. (https://quanteda.io/reference/data_dictionary_LSD2015.html)
 >- La présentation sur Wikipedia vaut la peine d'être lue : https://fr.wikipedia.org/wiki/Corpus
 
@@ -400,7 +403,7 @@ tidy_texte
 >- Filtrage sur les fréquences des mots afin d’éviter l’influence de certains mots qui apparaissent très souvent, d’autres très rarement. 
 
 
-## Conclusion
+
 
 >- Toutes les étapes de traitement de texte sont essentielles à une analyse réussie. 
 >- Certains d'entre eux ont plus d'importance que d'autres, en fonction de l'application spécifique, des questions de recherche et des propriétés du corpus. 
@@ -408,6 +411,9 @@ tidy_texte
 >- Certaines règles simples doivent être suivies pour éviter les erreurs typiques.
   >- Par exemple, il faut convertir les mots en minuscule avant d'appliquer la tokenisation (parfois, certaines fonctions incluent cela)
   >- Autre exemple, les mots vides ne doivent pas être supprimés avant d'effectuer une indexation n-gramme, 
+
+## Conclusion
+
   >- Un radical ne doit pas être utilisé lorsque les données sont complexes et nécessitent la prise en compte de toutes les formes et significations possibles des mots. 
 >- L'examen des résultats intermédiaires à chaque étape du processus peut être utile.
 

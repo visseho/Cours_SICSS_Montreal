@@ -191,17 +191,38 @@ Remarquons que tidytext transforme le texte en minuscule. Donc, nous n'avons plu
 ```{r}
 # Enlever les chiffres
 
-tidy_trump_tweets <- tidy_trump_tweets[-grep("\\b\\d+\\b", tidy_trump_tweets$word),]
+#tidy_trump_tweets <- tidy_trump_tweets[-grep("\\b\\d+\\b", tidy_trump_tweets$word),]
+
+tidy_trump_tweets <-
+  tidy_trump_tweets %>% 
+  filter(!grepl("\\b\\d+\\b", word))
 
 
 # Enlever les espaces
-tidy_trump_tweets$word <- gsub("\\s+","",tidy_trump_tweets$word)    
+
+#tidy_trump_tweets$word <- gsub("\\s+","",tidy_trump_tweets$word)    
+
+tidy_trump_tweets <-
+  tidy_trump_tweets %>% 
+  mutate(word = gsub("\\s+","", word))
+
 
 # Stemming
 library(SnowballC)
 
 tidy_trump_tweets<-tidy_trump_tweets %>%
   mutate_at("word", funs(wordStem((.), language="en")))
+
+
+tidy_trump_tweets <-
+  tidy_trump_tweets %>% 
+  filter(!grepl("https|t.co|amp|rt", word))
+
+tidy_trump_tweets %>% 
+  count(word) %>% 
+  arrange(desc(n))
+
+
 
 ```
 

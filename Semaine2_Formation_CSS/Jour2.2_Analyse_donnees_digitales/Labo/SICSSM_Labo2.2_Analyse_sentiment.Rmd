@@ -8,7 +8,7 @@ output: html_document
 
 # Analyse de sentiments
 
-L'analyse de sentiment est une technique d'extraction d'information dans un corpus. Le but est de détecter les mots cherchés/voulus dans le corpus. Pour cela, on va se baser sur les dictionnaires qui exsitent ou définir son propre dictionnaire.
+L'analyse de sentiment est une technique d'extraction d'information dans un corpus. Le but est de détecter les mots cherchés/voulus dans le corpus. Pour cela, on va se baser sur les dictionnaires qui existent ou définir notre propre dictionnaire.
 
 
 ```{r}
@@ -32,9 +32,6 @@ Nous allons charger les données de trump tweet
 
 
 ```{r}
-
-load(url("https://cbail.github.io/Trump_Tweets.Rdata")) #```{r} I activated this one and commented the following code. The trumptweets <- readRDS("trumptweets.RData") throws error.
-
 
 trumptweets <- readRDS("../Données/trumptweets.RData")
 
@@ -97,7 +94,7 @@ tidy_trump_tweets <-
 
 #tidy_trump_tweets <- tidy_trump_tweets[-grep("\\b\\d+\\b", tidy_trump_tweets$word),]
 
-# OUne fois de plus, tidytext rend automatiquement tous les mots en minuscules.
+# Une fois de plus, tidytext transforme automatiquement tous les mots en minuscules.
 
 # Enlever l'espace
 
@@ -134,7 +131,6 @@ top_20
 ```
 
 ```{r}
-library(ggplot2) # ```{r} I added the library function for ggplot.
 
 ggplot(top_20) +
   geom_bar(aes(x = word, y = n, fill = word), stat = "identity") +
@@ -172,6 +168,7 @@ top_tfidf
 
 ```
 
+## Notre propre dictionnaire
 
 ```{r}
 
@@ -184,6 +181,7 @@ economic_dictionary1 <- "Togo|Cameroon"
 
 ```
 
+## Sélectionnons les tweets qui contiennent les mots relatifs à l'économie
 
 ```{r}
 
@@ -195,6 +193,8 @@ head(economic_tweets$text)
 
 
 ```
+
+## Analyse de sentiments avec les dictionnaires
 
 ```{r}
 
@@ -221,14 +221,16 @@ head(trump_tweet_sentiment)
 
 #head(tidy_trump_tweets)
 
-ggplot(trump_tweet_sentiment, aes(x=created_at, y=n, color=sentiment))+
-  geom_line(size=.5)+
+ggplot(trump_tweet_sentiment) +
+  geom_line(aes(x=created_at, y=n, color=sentiment), size=.5) +
   theme_minimal()+
   labs(x = "Date", y = "Nombre de publications", title = "Evolution des sentiments") +
 #  facet_wrap(~sentiment)+
   theme_bw()
 
 ```
+
+## On peut penser regrouper les dates pour avoir plusieurs données par jour
 
 ```{r}
 
@@ -246,14 +248,17 @@ trump_tweet_sentiment1 <-
   inner_join(get_sentiments("bing")) %>%
   count(date, sentiment) 
 
-ggplot(trump_tweet_sentiment1, aes(x=date, y=n, color=sentiment))+
-  geom_line(size=.5)+
-  theme_minimal()+
+ggplot(trump_tweet_sentiment1) +
+  geom_line(aes(x=date, y=n, color=sentiment), size=.5) +
+  theme_minimal() +
   labs(x = "Date", y = "Nombre de publications", title = "Evolution des sentiments") +
 #  facet_wrap(~sentiment)+
   theme_bw()
 
 ```
+
+
+## Tweet avec sentiments négatifs
 
 ```{r}
 
@@ -293,6 +298,8 @@ negatif
 
 ```
 
+## Est-ce que la fréquence de mots négatifs est associé à la popularité de Trump?
+
 ```{r}
 
 trump_approval <- read.csv("https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv")
@@ -318,20 +325,24 @@ head(approval_plot)
 # Graphique
 
 approval <-
-  ggplot(approval_plot)+
-  geom_line(aes(x = date, y = approval))+
+  ggplot(approval_plot) +
+  geom_line(aes(x = date, y = approval)) +
   #theme_minimal()+
   labs(x = "Date", y = "% des Américains qui aprouvent Trump")
 
 approval
+
 ```
 
 ```{r}
+
 library(ggpubr)
 
 ggarrange(negatif, approval, nrow = 2)
 
 ```
+
+## Analyse avec le dictionnaire NRC
 
 ```{r}
 
@@ -345,8 +356,6 @@ trump_tweet_sentiment_nrc <-
 
 trump_tweet_sentiment_nrc
 
-
-
 # Roue des sentiments
 
 tidy_trump_tweets_nrc1 <-
@@ -356,11 +365,11 @@ tidy_trump_tweets_nrc1 <-
   count() %>% 
   ungroup()%>% 
   arrange(desc(sentiment)) %>%
-  mutate(percentage = round(n/sum(n),4)*100,
+  mutate(percentage = round(n/sum(n), 4)*100,
          lab.pos = cumsum(percentage)-.5*percentage)
 
-ggplot(data = tidy_trump_tweets_nrc1, 
-       aes(x = 2, y = percentage, fill = sentiment))+
+
+ggplot(data = tidy_trump_tweets_nrc1, aes(x = 2, y = percentage, fill = sentiment))+
   geom_bar(stat = "identity")+
   coord_polar("y", start = 200) +
   geom_text(aes(y = lab.pos, label = paste(percentage,"%", sep = "")), col = "white") +
@@ -373,7 +382,7 @@ ggplot(data = tidy_trump_tweets_nrc1,
 
 
 
-Il existe de nombreux autres types d'analyse des sentiments, que nous n'avons pas le temps de couvrir ici. Cependant, vous devez savoir que différents outils d'analyse des sentiments fonctionnent mieux pour certains corpus que pour d'autres. Voici une figure d'un article récent qui applique une variété de dictionnaires de sentiments différents à différents corpus:
+Il existe de nombreux autres types d'analyse de sentiments, que nous n'avons pas le temps de couvrir ici. Cependant, vous devez savoir que différents outils d'analyse des sentiments fonctionnent mieux pour certains corpus que pour d'autres. Voici une figure d'un article récent qui applique une variété de dictionnaires de sentiments à différents corpus:
 
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/comparaison.png)
 Source: http://homepages.dcc.ufmg.br/~fabricio/download/cosn127-goncalves.pdf
