@@ -149,6 +149,8 @@ tidy_trump_tweets %>%
 
 Pour enlever les mots "inutiles", on va merger (fusionner) notre base de données avec la base de données de ces mots. Cette base de données de mots inutiles existe sous le nom de **stopwords**. Une fusion par **anti_join**, où n'est retenu que ce qui se trouve dans la base A et pas dans la base B est retenue.
 
+![](../Figs/join_cheat.png)
+
 ```{r}
 
 data("stop_words")
@@ -164,7 +166,7 @@ tidy_trump_tweets %>%
 
 ```
 
-On se rend compte qu'il existe toujours toujours des termes qui ne veulent rien dire. Nous pouvons donc créer une base de données à partir de ces mots et continuer l'anti_join.
+On se rend compte qu'il existe toujours des termes qui ne veulent rien dire. Nous pouvons donc créer une base de données à partir de ces mots et continuer l'anti_join.
 
 ```{r}
 http_trump <- data.frame(word = c("https", "t.co", "amp", "rt"))
@@ -184,7 +186,7 @@ Maintenant, il faut continuer la transformation en :
 - enlevant les chiffres
 - les espaces
 
-Remarquons que tidytext transforme le texte en miniscule. Donc, nous n'avons plus besoin de faire de changement en ce niveau.
+Remarquons que tidytext transforme le texte en minuscule. Donc, nous n'avons plus besoin de faire de changement à ce niveau.
 
 ```{r}
 # Enlever les chiffres
@@ -203,7 +205,7 @@ tidy_trump_tweets<-tidy_trump_tweets %>%
 
 ```
 
-Finalement, à partir des données tydy, on peut créer une matrice document-terme
+Finalement, à partir des données tidy, on peut créer une matrice documents-termes
 
 
 ```{r}
@@ -218,7 +220,7 @@ inspect(tidy_trump_DTM[1:5, 1:8])
 
 ```
 
-Maintenant que nous avons transofmer notre texte en base de données/matrice, nous pouvons en sortir rapidement quelques caractéristiques.
+Maintenant que nous avons transformer notre texte en base de données/matrice, nous pouvons en sortir rapidement quelques caractéristiques.
 
 # Analyse: Découverte des topics
 
@@ -234,7 +236,7 @@ Parmi les formes les plus élémentaires d'analyse quantitative de texte figuren
 tidy_trump_tweets %>% 
   count(word, sort = TRUE)
 
-tidy_trump_tweets %>%          # Same as previously but with arrange
+tidy_trump_tweets %>%          
   count(word) %>% 
   arrange(desc(n))
 
@@ -255,7 +257,7 @@ ggplot(top_20) +
   theme(axis.text = element_text(angle = 90, hjust = 1)) +
   ylab("Number of time a word appears in a tweet") +
   xlab("word") +
-  guides(fill = FALSE)
+  guides(fill = FALSE) 
 
 
 ```
@@ -265,7 +267,7 @@ ggplot(top_20) +
 Que vaut finalement un mot: la statistique tfidf
 
 
-Bien que nous ayons déjà supprimé les «mots vides» très courants de notre analyse, il est courant dans l'analyse quantitative de texte d'identifier les mots inhabituels qui pourraient différencier un document des autres (cela deviendra particulièrement important lorsque nous passerons à des formes plus avancées de reconnaissance des formes dans le texte plus tard). La métrique la plus communément utilisée pour identifier ces mots inhabituels est «Term Frequency Frequency Inverse Document Frequency» (tf-idf). Nous pouvons calculer le tf-idf pour les tweets Trump basés sur des données en tidytext comme suit:
+Bien que nous ayons déjà supprimé les «mots vides» très courants de notre analyse, il est courant dans l'analyse quantitative de texte d'identifier les mots inhabituels qui pourraient différencier un document des autres (cela deviendra particulièrement important lorsque nous passerons à des formes plus avancées de reconnaissance des formes dans le texte plus tard). La métrique la plus communément utilisée pour identifier ces mots inhabituels est «Term Frequency - Inverse Document Frequency» (tf-idf). Nous pouvons calculer le tf-idf pour les tweets Trump basés sur des données en tidytext comme suit:
 
 
 ```{r}
@@ -317,27 +319,31 @@ Le tfidf augmente à mesure qu'un terme apparaît dans un document, mais il est 
 
 ```{r}
 
-# Wordcount   (Work with document-term Matrix)
+# Wordcount   (Marche avec document-term Matrix)
 
 head(tidy_trump_tweets)
 
 dtm_trumptweets <- 
   tidy_trump_tweets %>% 
-  count(created_at, word) #%>% 
-  #cast_dtm(created_at, word, n)
+  count(created_at, word) %>% 
+  cast_dtm(created_at, word, n)
 
 dtm_trumptweets
 
-dtm_trumptweets %>% {
+inspect(dtm_trumptweets[1:5,1:8])
+
+# Comme une matrice
+
+dtm_trumptweets_matrix <- as.matrix(dtm_trumptweets)
+
+dtm_trumptweets_matrix[1:5,1:8]
+
+
+dtm_trumptweets_matrix %>% {
   wordcloud(.$word, .$n, max.words = 20)
 }
 
 
-inspect(trump_DTM[1:5,1:8])
-
-trump_DTM %>% {
-  wordcloud(.$word, .$n, max.words = 20)
-}
 ```
 
 
