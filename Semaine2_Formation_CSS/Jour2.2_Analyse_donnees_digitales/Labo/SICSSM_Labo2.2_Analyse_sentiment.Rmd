@@ -102,7 +102,7 @@ tidy_trump_tweets <-
   tidy_trump_tweets %>% 
   mutate(word = gsub("\\s+","", word))
 
-tidy_trump_tweets$word <- gsub("\\s+","",tidy_trump_tweets$word)    
+#tidy_trump_tweets$word <- gsub("\\s+","",tidy_trump_tweets$word)    
 
 ```
 
@@ -174,7 +174,7 @@ top_tfidf
 
 #economic_dictionary <- c("economy","unemployment","trade","tariffs")
 
-economic_dictionary <- "economy|unemployment|trade|tariffs|employment"
+economic_dictionary <- "economy|unemployment|trade|tariffs|employment|tax"
 
 economic_dictionary1 <- "Togo|Cameroon"
 
@@ -205,6 +205,7 @@ summary(get_sentiments("afinn"))
 head(get_sentiments("bing"), 24)
 summary(get_sentiments("bing"))
 
+head(get_sentiments("nrc"), 24)
 ```
 
 ```{r}
@@ -223,7 +224,7 @@ head(trump_tweet_sentiment)
 
 ggplot(trump_tweet_sentiment) +
   geom_line(aes(x=created_at, y=n, color=sentiment), size=.5) +
-  theme_minimal()+
+  theme_minimal() +
   labs(x = "Date", y = "Nombre de publications", title = "Evolution des sentiments") +
 #  facet_wrap(~sentiment)+
   theme_bw()

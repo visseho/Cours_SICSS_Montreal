@@ -39,6 +39,12 @@ L'utilisation de principes de données bien rangées est un moyen puissant de re
 Nous définissons donc le format de texte bien rangé (tidy-text) comme étant une table avec un jeton (token) par ligne. Un jeton est une unité de texte significative, comme un mot, que nous souhaitons utiliser pour l'analyse, et la **tokenisation** est le processus de division du texte en jetons (mots). Cette structure d'un jeton par ligne contraste avec la façon dont le texte est souvent stocké dans les analyses actuelles, peut-être sous forme de chaînes ou dans une matrice documents-termes. Pour l'exploration de texte ordonnée, le jeton qui est stocké dans chaque ligne est le plus souvent un seul mot, mais peut également être un n-gramme, une phrase ou un paragraphe. Nous utiliserons le packaqge **tidytext** convertir les documents en un seul terme par ligne.
 
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c11tidytextdata.png)
+## Ressources
+
+https://quanteda.io/reference/dictionary.html
+https://rpubs.com/tsholliger/301914
+https://www.tidytextmining.com/tidytext.html
+https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf
 
 
 ## 1. Dressons la table
@@ -50,7 +56,7 @@ Nous définissons donc le format de texte bien rangé (tidy-text) comme étant u
 rm(list = ls())
 
 # Installer les différents packages
-
+install.packages("tm")
 
 # Charger les packages
 
@@ -75,10 +81,11 @@ Pour transformer les textes en matrice documents-termes, nous aurons besoin des 
 
 ```{r}
 
- load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
+ #load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
 
 trumptweets <- readRDS("../Données/trumptweets.Rdata")
 head(trumptweets)
+trumptweets$text[2]
 
 ```
 
@@ -94,10 +101,11 @@ trump_corpus
 View((trump_corpus))
 
 # Les informations de chaque document
-trump_corpus[[2]][["content"]]    
+trump_corpus[[1]][["content"]]    
 trump_corpus[[2]][["meta"]]
 
 # Enlever les chiffres
+
 trump_corpus <- tm_map(trump_corpus, content_transformer(removeNumbers))  
 
 # Transformer en minuscule
@@ -114,13 +122,15 @@ trump_corpus  <- tm_map(trump_corpus, content_transformer(stemDocument), languag
 
 
 trump_DTM <- DocumentTermMatrix(trump_corpus, control = list(wordLengths = c(3, Inf)))
-inspect(trump_DTM[1:5,1:8])
+
+inspect(trump_DTM[24:42,24:50])
 
 ?DocumentTermMatrix()
 
 
 trump_DTM_matrix <- as.matrix(trump_DTM)
 trump_DTM_matrix[1:5,1:8]
+
 ```
 
 
@@ -154,7 +164,7 @@ Pour enlever les mots "inutiles", on va merger (fusionner) notre base de donnée
 ```{r}
 
 data("stop_words")
-head(stopwords(), 15)
+head(stopwords(), 24)
 
 tidy_trump_tweets <- 
   tidy_trump_tweets %>% 
@@ -189,6 +199,7 @@ Maintenant, il faut continuer la transformation en :
 Remarquons que tidytext transforme le texte en minuscule. Donc, nous n'avons plus besoin de faire de changement à ce niveau.
 
 ```{r}
+
 # Enlever les chiffres
 
 #tidy_trump_tweets <- tidy_trump_tweets[-grep("\\b\\d+\\b", tidy_trump_tweets$word),]
@@ -208,21 +219,23 @@ tidy_trump_tweets <-
 
 
 # Stemming
-library(SnowballC)
+#library(SnowballC)
 
-tidy_trump_tweets<-tidy_trump_tweets %>%
+tidy_trump_tweets <- tidy_trump_tweets %>%
   mutate_at("word", funs(wordStem((.), language="en")))
 
 
-tidy_trump_tweets <-
-  tidy_trump_tweets %>% 
-  filter(!grepl("https|t.co|amp|rt", word))
+#tidy_trump_tweets <-
+#  tidy_trump_tweets %>% 
+#  filter(!grepl("https|t.co|amp|rt", word))
 
 tidy_trump_tweets %>% 
   count(word) %>% 
   arrange(desc(n))
 
 
+country
+countries
 
 ```
 
@@ -232,7 +245,7 @@ Finalement, à partir des données tidy, on peut créer une matrice documents-te
 ```{r}
 
 # Document-term matrix
-tidy_trump_DTM<-
+tidy_trump_DTM <-
   tidy_trump_tweets %>%
   count(created_at, word) %>%
   cast_dtm(created_at, word, n)
@@ -327,6 +340,7 @@ tidy_trump_tfidf<- trumptweets %>%
 top_tfidf <- tidy_trump_tfidf %>%
   arrange(desc(tf_idf))
 
+top_tfidf
 top_tfidf$word[1]
 
 
