@@ -52,7 +52,7 @@ rm(list = ls())
 # Installer les différents packages
 
 
-# Charger le packages
+# Charger les packages
 
 library(tidyverse)
 library(tidytext)
@@ -87,6 +87,7 @@ Maintenant, on va créer le corpus avec ces tweets. Chaque tweet va être consid
 
 ```{r}
   
+
 trump_corpus <- Corpus(VectorSource(as.vector(trumptweets$text)))     
 
 trump_corpus
@@ -110,6 +111,7 @@ trump_corpus  <- tm_map(trump_corpus, content_transformer(stemDocument), languag
 
 
 # Document-term matrix
+
 
 trump_DTM <- DocumentTermMatrix(trump_corpus, control = list(wordLengths = c(3, Inf)))
 inspect(trump_DTM[1:5,1:8])
@@ -145,7 +147,7 @@ tidy_trump_tweets %>%
 
 ### 4. Text pre-processing
 
-Pour enlever les mots "inutiles", on va merget notre base de données avec la base de données de ces mots. Cette base existe sous le nom stop-word. Une fusion par **anti_join**, où n'est retenu que ce qui se trouve dans la base A et pas dans la base B est retenu.
+Pour enlever les mots "inutiles", on va merger (fusionner) notre base de données avec la base de données de ces mots. Cette base de données de mots inutiles existe sous le nom de **stopwords**. Une fusion par **anti_join**, où n'est retenu que ce qui se trouve dans la base A et pas dans la base B est retenue.
 
 ```{r}
 

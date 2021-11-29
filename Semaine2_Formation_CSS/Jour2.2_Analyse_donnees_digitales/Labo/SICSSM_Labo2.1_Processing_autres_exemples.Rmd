@@ -7,39 +7,6 @@ output: html_document
 ---
 
 
-# Processing des données
-
-Dans ce labo, je vais vous apprendre comment transformer vos données textuelles en une base prête pour l'analyse. 
-Cette base peut prendre deux formes:
-
-- Matrice documents-termes
-- Données tidy
-
-
-## Introduction
-
-Nous utiliserons deux packages pour faire l'analyse quantitative du texte: tm qui travaille sur les `document text-matrix` et *tidytext* qui utilise `tidy-data`. D'autres packages sont le [stm](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf), [topicsmodels](https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf) et [quanteda](https://quanteda.io/)
-
-## Type de données
-
-1. Matrice Documents-termes 
-
-Une façon rapide d'explorer des données textuelles consiste à simplement compter les occurrences de chaque mot ou terme. Le nombre de fois qu'un mot particulier apparaît dans un document donné est appelé *term frequence* (tf) en anglais ou fréquence des termes. La statistique tf peut être résumée dans une matrice nommée Documents-termes, qui est un tableau rectangulaire avec des lignes représentant des documents et des colonnes représentant des termes uniques. L'élément (i, j) de cette matrice donne les décomptes du $j^{ème}$ terme (colonne) dans le $i^{ème}$ document (ligne). Nous pouvons également inverser les lignes et les colonnes et convertir une matrice documents-termes en une matrice de termes-documents où les lignes et les colonnes représentent respectivement les termes et les documents.
-
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c11term_matrix.png)
-
-  2. Tidy-data
-
-L'utilisation de principes de données bien rangées est un moyen puissant de rendre la gestion des données plus facile et plus efficace, et cela n'est pas moins vrai lorsqu'il s'agit de traiter du texte. Comme décrit par Hadley Wickham (Wickham 2014), les données bien rangées ont une structure spécifique:
-
-- Chaque variable est une colonne
-- Chaque observation est une rangée
-- Chaque type d'unité d'observation est un tableau
-
-Nous définissons donc le format de texte bien rangé (tidy-text) comme étant une table avec un jeton (token) par ligne. Un jeton est une unité de texte significative, comme un mot, que nous souhaitons utiliser pour l'analyse, et la **tokenisation** est le processus de division du texte en jetons (mots). Cette structure d'un jeton par ligne contraste avec la façon dont le texte est souvent stocké dans les analyses actuelles, peut-être sous forme de chaînes ou dans une matrice documents-termes. Pour l'exploration de texte ordonnée, le jeton qui est stocké dans chaque ligne est le plus souvent un seul mot, mais peut également être un n-gramme, une phrase ou un paragraphe. Nous utiliserons le packaqge **tidytext** convertir les documents en un seul terme par ligne.
-
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c11tidytextdata.png)
-
 
 ## 1. Dressons la table
 
@@ -55,6 +22,10 @@ rm(list = ls())
 # Charger le packages
 
 library(tidyverse)
+library(lubridate)
+library(stringr)
+library(forcats)
+library(modelr)
 library(tidytext)
 library(tm)
 library(maps)
@@ -75,10 +46,9 @@ Pour transformer les textes en matrice documents-termes, nous aurons besoin des 
 
 ```{r}
 
-load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
-
-trumptweets <- readRDS("../Données/trumptweets.Rdata")
-head(trumptweets)
+DIR_SOURCE <- system.file("extdata/federalist", package = "qss")
+corpus_raw <- VCorpus(DirSource(directory = DIR_SOURCE, pattern = "fp"))
+corpus_raw
 
 ```
 
