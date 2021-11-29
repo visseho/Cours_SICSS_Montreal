@@ -75,7 +75,7 @@ Pour transformer les textes en matrice documents-termes, nous aurons besoin des 
 
 ```{r}
 
- load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
+load(url("https://cbail.github.io/Trump_Tweets.Rdata"))
 
 trumptweets <- readRDS("../Données/trumptweets.Rdata")
 head(trumptweets)
