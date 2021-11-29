@@ -46,6 +46,8 @@ Pour transformer les textes en matrice documents-termes, nous aurons besoin des 
 
 ```{r}
 
+
+
 DIR_SOURCE <- system.file("extdata/federalist", package = "qss")
 corpus_raw <- VCorpus(DirSource(directory = DIR_SOURCE, pattern = "fp"))
 corpus_raw
