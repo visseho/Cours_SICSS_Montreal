@@ -1,0 +1,224 @@
+---
+title: 'Labo 2.4: Analyse quantitative de texte'
+subtitle: 'Topic discovery'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+## Code for the tokenization
+
+```{r}
+samples <- c("The cat sat on the mat.", "The dog ate my homework.")       
+token_index <- list()                                                     
+for (sample in samples)
+  for (word in strsplit(sample, " ")[[1]])                                
+    if (!word %in% names(token_index))
+      token_index[[word]] <- length(token_index) + 2                      
+max_length <- 10                                                          
+results <- array(0, dim = c(length(samples),
+                            max_length,
+                            max(as.integer(token_index))))                
+for (i in 1:length(samples)) {
+  sample <- samples[[i]]
+  words <- head(strsplit(sample, " ")[[1]], n = max_length)
+  for (j in 1:length(words)) {
+    index <- token_index[[words[[j]]]]
+    results[[i, j, index]] <- 1
+  }
+}
+```
+
+
+
+# Question 1
+
+L'utilisation généralisée d'Internet a conduit à une quantité astronomique de données textuelles numérisées qui s'accumulent chaque seconde via les e-mails, les sites Web et les médias sociaux. L'analyse des sites de blog et des publications sur les réseaux sociaux peut donner de nouvelles perspectives sur le comportement et les opinions humains. Dans le même temps, des efforts à grande échelle pour numériser des articles publiés, des livres et des documents gouvernementaux ont été en cours, offrant des opportunités intéressantes de revoir des questions déjà étudiées, en analysant de nouvelles données.
+
+Cet exercice est basé sur le papier de F. Mosteller and D.L. Wallace (1963) “Inference in an authorship problem.” Journal of the American Statistical Association, vol. 58, no. 302, pp. 275–309.
+
+Vous allez analyser le texte **The Federalist**, plus communément appelé **The Federalist Papers**. Les *Federalist*, dont la page de titre est affichée ci dessous se compose de 85 essais attribués à [Alexander Hamilton](https://www.penguinrandomhouse.com/authors/11693/alexander-hamilton/), [John Jay](https://www.penguinrandomhouse.com/authors/45268/john-jay/) et [James Madison](https://www.penguinrandomhouse.com/authors/18636/james-madison/) de 1787 à 1788 afin d'encourager les habitants de New York à ratifier la nouvelle constitution américaine. Parce que Hamilton et Madison ont contribué à la rédaction de la Constitution, les chercheurs considèrent les *Federalist Papers* comme un document principal reflétant les intentions des auteurs de la Constitution.
+
+Les *Federalist Papers* ont été initialement publiés dans divers journaux de l'État de New York sous le pseudonyme de «Publius». Pour cette raison, la paternité de chaque article a fait l'objet de recherches savantes. Selon la *Library of Congress*, deux experts estiment que Hamilton a écrit 51 essais tandis que Madison en a rédigé 15. De plus, Hamilton et Madison ont rédigé conjointement 3 articles tandis que John Jay a écrit 5. Les 11 essais restants ont été écrits soit par Hamilton soit par Madison, bien que les chercheurs contestent lequel. L'objectif de cet exercice esr d'analyser le texte des *Federalist Papers pour prédire les auteurs des 11 essais.* 
+
+Voici les documents connus pour être écrits par chaque auteur:
+
+  - Hamilton: les numéros 1, 6–9, 11–13, 15–17, 21–36, 59–61 et 65–85. 
+  - Madison: les numéros 10, 14, 37–48 et 58. 
+  - Hamilton et Madison: les numéros 18–20. 
+  - John Jay: les numéros  2–5 et 64.
+
+Le texte des 85 essais est extrait du site Web de la Bibliothèque du Congrès et stocké sous le nom **fpXX.txt**, où XX représente le numéro d'essai allant de 01 à 85. Chaque fichier de données contient les données textuelles de son essai correspondant. Voir le tableau 5.1, qui affiche la première et la dernière page de **The Federalist Paper no. 1** à titre d'exemple.
+
+![Table 1. The Federalist Papers Data](fed1.png)
+
+![Table 2. The Federalist Papers Data](fed2.png)
+
+
+1. Utiliser l'une des techniques de grattage apprises en classe pour gratter ce site https://guides.loc.gov/federalist-papers/full-text pour collecter les données et transformer le tableau en base de données. Vous pouvez remarquer que ces textes sont présentés par dizaine comme dans le lien ici: https://guides.loc.gov/federalist-papers/text-1-10
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+library(rvest)
+
+webpage <- "https://bra.areacodebase.com/number_type/M?page=0"
+
+# Approche 1
+
+for(i in 1:2) {
+  data <- read_html(webpage) %>%
+    html_nodes("table") %>%
+    .[[1]] %>% 
+    html_table()
+
+  webpage <- html_session(webpage) %>% follow_link(css = ".pager-next a") %>% .[["url"]]
+}
+
+?follow_link
+
+
+# Approche 2
+
+for(i in 0:1) {
+  webpage <- read_html(paste0("https://bra.areacodebase.com/number_type/M?page=", i))
+  data <- webpage %>%
+    html_nodes("table") %>%
+    .[[1]] %>% 
+    html_table()
+}
+
+
+webpage_section <- html_node(webpage, css = '.views-field')
+web_table <- html_text(webpage_section)
+web_table
+#//*[@id="block-system-main"]/div/div/div[1]/table/tbody
+
+
+```
+
+Maintenant, vous allez utiliser le package tidytext to analyser les données.
+Voici les premiers codes qui vous permettent de télécharger ces données. Pour cet exercice, vous aurez besoin d'un ensemble de package que je vous charge aussi en même temps:
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(forcats)
+library(modelr)
+library(tm)
+library(SnowballC)
+library(tidytext)
+library(wordcloud)
+
+
+```
+
+Ensuite, on va charger les données
+
+```{r}
+
+# Comment accéder aux données https://github.com/kosukeimai/qss-package/blob/master/README.md
+
+#federalist_dir <- system.file("extdata", "federalist", package = "qss")
+#dir(federalist_dir)
+#corpus.raw1 <- Corpus(DirSource(federalist_dir))
+#corpus.raw1
+#corpus.raw1[[1]][1]
+
+
+library(qss)
+
+data(package="qss")
+
+DIR_SOURCE <- system.file("extdata/federalist", package = "qss")
+
+corpus_raw <- VCorpus(DirSource(directory = DIR_SOURCE, pattern = "fp"))
+corpus_raw
+
+?VCorpus
+
+```
+
+Vous pouvez enfin utiliser la fonction tidy pour transformer le corpus en base de données:
+
+```{r}
+
+corpus_tidy <- tidy(corpus_raw, "corpus")
+
+```
+
+
+2. Créer un nouvel identifiant nommé **id_num** qui prend la partie numérique de la variable **id**
+
+3. Transformer cette base de données en tidytext en suivant l'ensemble du processus du pré-traitement vu en classe.
+
+4. Découverte des sujets
+
+La découverte de sujets est un exemple d'**apprentissage non supervisé** parce que nous n'avons pas accès à de véritables informations sur l'affectation des sujets. C'est-à-dire qu'on ne sait pas, a priori, quels sujets existent dans le corpus et caractérisent chaque document. Nous souhaitons découvrir des sujets en analysant la distribution de la fréquence des termes/mots au sein d'un document donné et entre les documents. En revanche, dans l'**apprentissage supervisé**, les chercheurs utilisent un échantillon avec une variable de résultat observé pour en savoir plus sur la relation entre le résultat et les prédicteurs. Par exemple, nous pouvons demander à des codeurs humains de lire certains documents et d'attribuer des sujets. Nous pouvons ensuite utiliser ces informations pour prédire les sujets d'autres documents qui n'ont pas été lus. De toute évidence, le manque d'informations sur les variables de résultat rend les problèmes d'apprentissage non supervisés plus difficiles que les problèmes supervisés.
+
+- Présenter le nuage des mots (wordcloud) qui utilise la fréquence des mots (tf) pour les documents 12 et 24. Commenter les résultats en essayant d'établir le/les sujets couverts par ces documents. Retenez les 20 mots les plus importants. N'oubliez pas que le package wordcloud utilise la matrice document-termes. Vous devez donc transformer votre donnée tidy au 3 en matrice document-termes que vous nommez **dtm**
+
+5. Dans l'analyse ci-dessus, vous avez visualisé la distribution de la fréquence des termes dans chaque document. Cependant, la fréquence élevée d'un certain terme dans un document ne signifie pas grand-chose si ce terme apparaît souvent dans les documents du corpus. Pour résoudre ce problème, nous devons réduire la pondération des termes qui apparaissent fréquemment dans les documents. Cela peut être fait en calculant la statistique appelée fréquence de terme-fréquence de document inverse, ou tf-idf en abrégé. La statistique tf–idf est une autre mesure de l'importance de chaque terme dans un document donné. 
+
+- Utiliser cette statistique pour présenter à nouveau les 20 mots les plus importants des documents 12 et 24. 
+
+6. Maintenant, vous aller considérer une approche alternative pour découvrir les sujets, en identifiant des groupes d'essais similaires, sur la base de la mesure tf-idf. 
+
+- Sélectionner les éssais écrits par Hamilton. 
+- Appliquer l'algorithme des k-moyennes [k-means](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/kmeans) à la matrice document-terme pondérée. Retenez 4 comme nombre de clusters. Bien qu'arbitraire, ce choix produit des clusters qui semblent raisonnables. 
+- Présenter les 10 mots de chaque centroïde des clusters.
+
+
+7. Maintenant utiliser la méthode des **topic modelling** vue en classe pour déterminer les sujets dans les éssais de Hamilton. 
+
+Cet exercice utilise **The Federalist Papers** pour illustrer comment les analyses de texte peuvent révéler des sujets. Bien sûr, étant donné que nous pouvons facilement lire tous les Federalist Papers, l'analyse de texte automatisée peut ne pas être nécessaire dans ce cas. Cependant, des techniques similaires et plus avancées peuvent être appliquées à un corpus beaucoup plus vaste que les humains auraient du mal à lire en entier en peu de temps. Dans de telles situations, l'analyse de texte automatisée peut jouer un rôle essentiel en aidant les chercheurs à extraire des informations significatives à partir de données textuelles.
+
+8. Prédire l'auteur des 11 essais sans auteur
+
+Comme mentionné précédemment, la paternité de certains des documents fédéralistes est inconnue. Nous utiliserons les 66 essais attribués à Hamilton ou à Madison pour prédire la paternité des 11 articles contestés. Étant donné que chaque article fédéraliste traite d'un sujet différent, vous allez vous concentrer sur l'utilisation des articles, des prépositions et des conjonctions. En particulier, vous allerz analyser la fréquence d'utilisation des 10 mots suivants par les deux auteurs: **although, always, commonly, consequently, considerable, enough, there, upon, while, whilst**. Ces mots sont sélectionnés sur la base de l'analyse présentée dans l'article académique qui a inspiré cet exercice. En conséquence, vous devez utiliser le corpus sans la stemmisation. 
+
+- Créer une base données avec les identifiants des essais de chaque auteur avec le nom des auteurs.Cette nouvelle base de données que vous appelez known_essays doit avoir deux variables (document et author) et com
+
+
+
+```{r}
+
+
+MADISON_ESSAYS <- c(10, 14, 37:48, 58)
+JAY_ESSAYS <- c(2:5, 64)
+known_essays <- bind_rows(tibble(document = MADISON_ESSAYS,
+                                 author = "Madison"),
+                         # tibble(document = HAMILTON_ESSAYS,
+                          #       author = "Hamilton"),
+                          tibble(document = JAY_ESSAYS,
+                                 author = "Jay"))
+
+known_essays
+
+
+
+STYLE_WORDS <-
+  tibble(word = c("although", "always", "commonly", "consequently",
+                  "considerable", "enough", "there", "upon", "while", "whilst"))
+
+hm_tfm <-
+  unnest_tokens(corpus_tidy, word, text) %>%
+  count(id, word) %>%
+  # term freq per 1000 words
+  group_by(id) %>%
+  mutate(count = n / sum(n) * 1000) %>%
+  select(-n) %>%
+  inner_join(STYLE_WORDS, by = "word") %>%
+  # merge known essays
+  left_join(known_essays, by = c("id", "document")) %>%
+  # make wide with each word a column
+  # fill empty values with 0
+  spread(word, count, fill = 0)
+
+```
+
+
+https://guides.loc.gov/federalist-papers/text-1-10#s-lg-box-wrapper-25493264
+https://guides.loc.gov/federalist-papers/text-1-10#s-lg-box-wrapper-25493265
