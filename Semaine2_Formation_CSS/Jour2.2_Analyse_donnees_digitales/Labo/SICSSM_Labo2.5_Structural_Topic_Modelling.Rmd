@@ -1,0 +1,931 @@
+---
+title: 'Labo 2.4: Analyse quantitative du texte'
+subtitle: 'Framing immigration and integration of immigrants: A computational text analysis of Canadian newspapers and sources of bias, 1977–2020'
+author: |
+  | *Robert Djogbenou*^[Département de Démographie, Université de Montréal]
+  | *Visseho Adjiwanou*^[Département de Sociologie, Université du Québec à Montréal]
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#Adjust your working directory here
+knitr::opts_knit$set(root.dir = '/Volumes/Workspace/OneDrive - Universite de Montreal/Canadian_Newspapers/Canadian newspaper')
+```
+
+############ LIBRARIES ############
+
+```{r}
+rm(list = ls())
+```
+
+
+```{r setup, load library, include=FALSE}
+
+install.packages("prettydoc")
+
+# Voici la liste des packages utilisés pour cet article
+library('data.table')
+library('tidytext')
+library('tidyverse') 
+library('lubridate') 
+library('furrr') 
+library('future') 
+library('prettydoc') 
+library('snakecase') 
+library('hrbrthemes') 
+library('quanteda') 
+library('ggrepel') 
+library('cowplot') 
+library('stm') 
+library('igraph') 
+library('RColorBrewer')
+library('scales') 
+library('ggthemes') 
+library('writexl') 
+library('wordcloud2') 
+library('extrafont') 
+library('readxl') 
+library('car') 
+library('ff') 
+library('wordcloud') 
+library('summarytools')
+library('htmlwidgets')
+library('webshot')
+library('textstem')
+
+plan(multiprocess)
+```
+
+# Loading the final dataset
+
+```{r include=FALSE}
+df1 <- read_csv("newspapers.csv")
+```
+
+
+```{r}
+# Change any column names you want to, all at once
+df <- df1 %>% 
+  rename(speechtext = `Texte intégral`, 
+         ID = `ID de document ProQuest`,
+         Resume= `Résumé`,
+         Pays= `Pays de publication`,
+         Date_publication= `Date de publication`,
+         Auteur= Auteur,
+         Type= `Type de source`,
+         Langue= `Langue de publication`,
+         Editeur= Éditeur,
+         Url= `URL du document`,
+         Base= `Base de données`)
+```
+
+
+```{r}
+df$year <- gsub('\\s+', '', df$`Année de publication`)
+df$ville <- gsub('\\s+', '', df$`Ville de publication`)
+df$province <- gsub('\\s+', '', df$`Province de publication`)
+
+```
+
+
+```{r}
+df <- df[!is.na(df$province), ]
+df <- df[!is.na(df$speechtext), ]
+df <- df[!is.na(df$year), ]
+```
+
+
+```{r recode of variable, include=FALSE}
+
+df <- df %>% 
+  mutate(source = case_when(Journal == 'Calgary Herald' ~ 'Calgary Herald',
+                            Journal == 'Chronicle - Herald' ~ 'The Chronicle Herald',
+                            Journal == 'Edmonton Journal' ~ 'Edmonton Journal',
+                            Journal == 'Kingston Whig - Standard' ~ 'The Kingston Whig-Standard',
+                            Journal == 'Leader Post' ~ 'The Leader Post',
+                            Journal == 'The Leader' ~ 'The Leader Post',
+                            Journal == 'Montreal Gazette' ~ 'Montreal Gazzette',
+                            Journal == 'The Gazette' ~ 'Montreal Gazzette',
+                            Journal == 'National Post' ~ 'National Post',
+                            Journal == 'New Brunswick Telegraph Journal' ~ 'Telegraph Journal',
+                            Journal == 'Now' ~ 'Now Magazine',
+                            Journal == 'Star - Phoenix' ~ 'The Star Phoenix',
+                            Journal == 'Sudbury Star' ~ 'The Sudbury Star',
+                            Journal == 'Telegraph-Journal' ~ 'Telegraph Journal',
+                            Journal == 'The Citizen' ~ 'The Ottawa Citizen',
+                            Journal == 'The Ottawa Citizen' ~ 'The Ottawa Citizen',
+                            Journal == 'The Globe and Mail' ~ 'The Globe and Mail',
+                            Journal == 'The Province' ~ 'The Province',
+                            Journal == 'The Tri - Cities Now' ~ 'Now Magazine',
+                            Journal == 'The Vancouver Sun' ~ 'The Vancouver Sun',
+                            Journal == 'The Whig - Standard' ~ 'The Kingston Whig-Standard',
+                            Journal == 'The Windsor Star' ~ 'The Windsor Star',
+                            Journal == 'Times - Colonist' ~ 'Times Colonist',
+                            Journal == 'Toronto Star' ~ 'Toronto Star',
+                            Journal == 'Winnipeg Free Press' ~ 'Winnipeg Free Press'),
+         province= case_when(province == 'Alta.' ~ 'Alberta',
+                            province == 'B.C.' ~ 'British Columbia',
+                            province == 'Man.' ~ 'Manitoba', 
+                            province == 'N.B.' ~ 'New Brunswick',
+                            province == 'N.S.' ~ 'Nova Scotia',
+                            province == 'Ont.' ~ 'Ontario', 
+                            province == 'Que.' ~ 'Quebec',
+                            province == 'Sask.' ~ 'Saskatchewan'),
+        partisan = case_when(source== 'Calgary Herald'~'Conservative',
+                             source== 'The Chronicle Herald'~'Conservative',
+                             source== 'Edmonton Journal'~'Conservative',
+                             source== 'The Kingston Whig-Standard'~'Moderate',
+                             source== 'The Leader Post'~'Conservative',
+                             source== 'Montreal Gazzette'~'Conservative',
+                             source== 'National Post'~'Conservative',
+                             source== 'Now Magazine'~'Liberal',
+                             source== 'The Star Phoenix'~'Conservative',
+                             source== 'The Sudbury Star'~'Moderate',
+                             source== 'Telegraph Journal'~'Moderate',
+                             source== 'The Ottawa Citizen'~'Conservative',
+                             source== 'The Globe and Mail'~'Conservative',
+                             source== 'The Province'~'Conservative',
+                             source== 'The Vancouver Sun'~'Conservative',
+                             source== 'The Windsor Star'~'Conservative',
+                             source== 'Times Colonist'~'Conservative',
+                             source== 'Toronto Star'~'Liberal',
+                             source== 'Winnipeg Free Press'~'Conservative'))%>%
+
+filter(year<2021)%>% 
+  distinct(ID, .keep_all = TRUE) 
+
+freq(df$partisan)
+
+# https://allthecanadianpolitics.tumblr.com/post/176027956154/this-chart-shows-which-political-party-various
+# https://www.mondotimes.com/1/world/ca/61/3114/7592
+```
+
+
+```{r include=FALSE}
+#https://thecanadaguide.com/basics/news-and-media/
+# https://en.wikipedia.org/wiki/List_of_newspapers_in_Canada#Daily_newspapers
+
+Local <- c('Calgary Herald', 'The Chronicle Herald', 'Edmonton Journal', 
+           'The Kingston Whig-Standard', 'The Leader Post', 
+           'Montreal Gazzette', 'Now Magazine', 'The Star Phoenix', 
+           'The Sudbury Star', 'Telegraph Journal', 
+           'The Ottawa Citizen', 'The Province', 'The Vancouver Sun',
+           'The Windsor Star', 'Times Colonist', 'Toronto Star', 'Winnipeg Free Press')
+
+National <- c('National Post', 'The Globe and Mail')
+
+df <- df %>% 
+  mutate(newspaper_scale = source,
+         newspaper_scale = case_when(
+         source %in% Local ~ "Regional",
+         source %in% National ~ "National"))
+
+freq(df$newspaper_scale)
+```
+
+
+```{r}
+df <- df %>% 
+  mutate(number_of_article_per_line = 1)  %>% # Create systematic one line for each article
+  group_by(source) %>%
+  mutate(number_article_per_source = sum(number_of_article_per_line)) %>% # number of article per source)
+  ungroup() %>%
+  arrange(desc(number_article_per_source))
+
+```
+
+# Graph for total number of articles per year 
+
+```{r number of articles, echo = FALSE, warning = FALSE, fig.height=4, fig.width=7}
+
+evolution_article <-  df %>% 
+  group_by(year) %>%
+  dplyr::summarise(number_of_article= n()) %>%
+  ungroup()%>%
+  ggplot(aes(x = year, y = number_of_article, group=1)) +
+  geom_line(stat = "identity", position = "identity", size=0.7)+
+  labs(caption = "") +
+  xlab("") + ylab("Number of articles") +
+  theme(axis.text.x = element_text(color = "black", size = 17))+
+  theme(axis.text.y = element_text(color = "black", size = 17))+
+  theme(axis.title  = element_text(color = "black", size = 17))+
+  theme(legend.position="top") +
+  scale_color_discrete(name = "")+ 
+  theme(plot.title = element_text(color = "black", size = 10, lineheight = 0.5),
+        legend.title.align = NULL) +
+  scale_x_discrete(breaks=seq(1977,2020,by=3)) 
+
+evolution_article
+
+#ggsave(number_articl, file = "/Volumes/Workspace/OneDrive - Universite de Montreal/GitHub/Article1_these_integration/Graphs/number_articl.png")
+
+```
+
+Moving away from single publications, the next plot shows the number of articles published per journal.
+
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.height=3.75, fig.width=6}
+
+df_source <- df %>% 
+  group_by(source) %>%
+  dplyr::summarise(number_of_article= n()) %>%
+  arrange(desc(number_of_article))%>%
+  ungroup()
+
+df_source %>%
+  arrange(desc(number_of_article)) %>%
+  group_by(source) %>%
+  ungroup() %>%
+  ggplot(aes(x = reorder(source,number_of_article), y=number_of_article))+
+  geom_col() + coord_flip()+
+  theme_ipsum(axis_title_size = 14, axis = 'Xx', grid = 'Xx')  + 
+  scale_y_comma(breaks = scales::pretty_breaks(n = 6)) +
+  labs(y = 'Number of Articles', x = 'Newspapers')+
+    theme(axis.text.x =element_text(color = "black", size = 12)) +
+    theme(axis.text.y =element_text(color = "black", size = 12))+
+    theme(axis.title  =element_text(color = "black", face = "bold", size = 13))
+```
+
+# Text as data
+
+#adds immigration and integration dictionary
+
+```{r}
+dict <- read_excel('dictionnary.xlsx')
+dict <- glue::trim(as.character(dict$words))
+```
+
+#adds stopwords
+
+```{r message=FALSE, warning=FALSE, results = 'hide'}
+
+#adds stopwords 
+
+mystopwords <- read_xlsx("stopwords_final_no_country_08_04_2021.xlsx")
+
+mystopwords <- mystopwords %>%
+  distinct(words, .keep_all = TRUE)
+  
+mystopwords <- glue::trim(as.character(mystopwords$words))
+
+```
+
+# Paste dictionnary
+
+```{r}
+dict_words <- paste(dict, collapse='|')
+
+# ref https://stackoverflow.com/questions/22850026/filtering-row-which-contains-a-certain-string-using-dplyr
+# ref https://stackoverflow.com/questions/7597559/grep-using-a-character-vector-with-multiple-patterns
+matches <- str_detect(df$speechtext, dict_words)
+speech_data <- df[matches,]
+```
+
+
+```{r}
+speech_data <- speech_data %>% 
+  select(ID, Titre, Resume, speechtext, Auteur, year, Date_publication, source, province, 
+         Type, Langue, Editeur, Base, Url, newspaper_scale, partisan)
+
+```
+
+
+#Creates a corpus
+
+```{r}
+# Stored as corpus
+mycorpus <- corpus(speech_data$speechtext)
+
+docvars(mycorpus, "Textno") <- sprintf("%02d", 1:ndoc(mycorpus))
+mycorpus
+```
+
+
+```{r message=FALSE, warning=FALSE, results = 'hide'}
+
+newspapers_tokens <- quanteda::tokens(mycorpus, use_lemma = TRUE) %>% 
+   quanteda::tokens(remove_punct = TRUE, 
+                    remove_numbers = TRUE, 
+                    nounphrase = TRUE, 
+                    remove_separators = FALSE, 
+                    remove_symbols = TRUE)%>% 
+  tokens_tolower()%>% 
+  tokens_replace(pattern = lexicon::hash_lemmas$token, 
+                 replacement = lexicon::hash_lemmas$lemma)%>% 
+  tokens_remove(pattern = mystopwords, valuetype = 'fixed')%>%
+  tokens_remove(c(stopwords('english')),
+                  min_nchar = 1L,  padding = TRUE) 
+```
+
+## Create document feature terms
+
+```{r message=FALSE, warning=FALSE, results = 'hide'}
+
+newspapers_tokens <- tokens_select(newspapers_tokens, 
+                                   pattern = "^([A-Z][a-z\\-]{2,})", 
+                                   valuetype = "regex",
+                                   padding = TRUE)
+
+bigrams <- c('per cent')
+unigrams <- c('percent')
+newspapers_tokens <- tokens_replace(newspapers_tokens, bigrams, unigrams)
+
+
+dfm_newspapers <- newspapers_tokens %>% 
+  tokens_remove("") %>% 
+  quanteda::tokens(remove_punct = TRUE) %>% 
+  dfm(remove_punct = TRUE, remove = stopwords('english')) %>% 
+  dfm_select(min_nchar = 2L) %>% 
+  dfm_trim(min_docfreq = 100) %>%  # Filter words that appear less than 100 documents (rare terms) 
+   dfm_trim(max_docfreq = 0.90, #Filter words that appear more than 90% of documents 
+            docfreq_type = 'prop') 
+
+cloud_dfm <- colSums(dfm_newspapers)
+
+sum(ntoken(dfm_newspapers))
+
+```
+
+The final document-feature matrix contains `r ndoc(dfm_integr)` observations (abstracts) and `r nfeat(dfm_integr)` different features (terms) for a total of `r sum(ntoken(dfm_integr))` tokens. 
+
+
+# Wordcloud visualization
+
+A wordcloud illustrates the most commonly used terms in all abstracts, where more frequent terms are larger in size.
+
+
+```{r fig.height=5, fig.width=7}
+
+#webshot::install_phantomjs(force = TRUE)
+
+set.seed(1234) # for reproducibility 
+
+# Make the graph
+my_graph <- wordcloud2(data.frame(names(cloud_dfm), cloud_dfm),
+           size = 1.6, ellipticity = 1, shuffle = FALSE, shape = 'circle',  color='random-dark') + WCtheme(1)
+
+my_graph
+
+# save it in html
+
+saveWidget(my_graph,'wordcloud.html', selfcontained = F)
+
+# and in png or pdf
+
+webshot('wordcloud.html','wordcloud.png', delay =5, vwidth = 480, vheight=480)
+```
+
+# Structural topic modeling
+
+## Convert Quanteda TFM to STM ready format
+
+
+```{r}
+# https://quanteda.io/articles/pkgdown/quickstart.html
+
+out <- quanteda::convert(dfm_newspapers, to = "stm")
+
+```
+
+# Combine dfm_integr with speech_data dataframe
+
+```{r}
+# We combine all metadata in dfm_integr with our df because, we don't have all metadata in dfm_integr 
+out$meta <- cbind(out$meta, speech_data) 
+
+# Verifier les valeurs manquantes après la fusion
+
+length(which(is.na(out$meta$year)))
+length(which(is.na(out$meta$province)))
+length(which(is.na(out$meta$partisan)))
+length(which(is.na(out$meta$newspaper_scale)))
+
+``` 
+
+# MODEL SELECTION
+
+## Model initialization for a fixed number of number of topics
+
+### Run diagnostic using function searchK
+
+# Number of topics is 50, maximal number of iteration is 75, used method is spectral as according to the guidelines it provides "optimal results". We identify the covariate we are interested in under prevalence.
+
+# Model initialization for a fixed number of number of topics, run diagnostic using function searchK
+
+```{r}
+kResult <-searchK(documents = out$documents, K=seq(5,50,by=5), vocab = out$vocab, 
+                  data = out$meta, prevalence =~ year + province + partisan + 
+                  newspaper_scale, init.type="Spectral", 
+                  max.em.its = 75, seed=TRUE, verbose = FALSE)
+```
+
+
+```{r}
+#save.image('kResult.RData')
+```
+
+# Plot diagnostic results using function plot
+
+```{r dev='png', fig.height=4, fig.width=7}
+
+load('kResult.RData') # loads diagnostic kResult
+
+par(mar = rep(2, 4))
+plot.searchK(kResult, cex.main=3, cex.lab=3, cex=1.5)
+```
+
+# Semantic coherence-exclusivity plotusing function plot()
+
+```{r dev='png', fig.height=3, fig.width=5}
+
+plot.new()
+
+plot(kResult$results$semcoh, kResult$results$exclus, 
+     xlab = "Semantic Coherence", ylab = "Exclusivity")# Add labels to semantic coherence-exclusivity plotusing function text()
+
+text(kResult$results$semcoh, kResult$results$exclus, labels = paste("K", kResult$results$K), 
+     pos = 1, cex = .7, cex.main=1, cex.lab=3)# Semantic coherence-exclusivity table
+```
+
+## MODELING
+
+# Specification for K topics using stm function 
+
+# Number of topics is 20, maximal number of iteration is 70, used method is spectral as according to the guidelines it provides "optimal results". Gamma prior is L1 as with such a small number of iterations the model would have otherwise not converged. Can be removed if the n. of iterations is increased to allow model to converge. We identify the covariate we are interested in under prevalence.
+
+
+```{r}
+#should identify the "optimal" number of topics. For me it suggests its 32
+topic_model <- stm(documents = out$documents, vocab = out$vocab, 
+                   K = 20, max.em.its = 70, 
+                   data = out$meta, init.type = "Spectral", 
+                   prevalence =~ year + province + partisan + newspaper_scale, 
+                   gamma.prior='L1', seed = 8458159)
+```
+
+
+# tidy the word-topic combinations
+
+```{r include=FALSE}
+
+# https://akramalturk.org/post/eric-topic-models/
+# https://rohanalexander.com/posts/2019-01-03-gathering-and-analysing-text-data/
+# https://github.com/mikajoh/tidystm
+
+td_beta <- tidy(topic_model)
+
+td_beta
+```
+
+# Interest in the probabilities that each document is generated from each topic, that gamma matrix
+
+```{r include=FALSE}
+
+# tidy the document-topic combinations, with optional document names
+
+td_gamma <- tidy(topic_model, matrix = "gamma",
+                 document_names = rownames(out))
+
+td_gamma
+```
+
+# Extract top 10 terms per topic
+
+```{r fig.height=1.5, fig.width=3, warning=FALSE, message=FALSE}
+
+library(ggplot2)
+library(dplyr)
+
+top_terms <- td_beta %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  dplyr::summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
+  unnest(cols = c(terms))
+
+gamma_terms <- td_gamma %>%
+  group_by(topic) %>%
+  dplyr::summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topics = reorder(topic, gamma))
+```
+
+# Plot topic graph
+
+```{r fig.height=3, fig.width=6, warning=FALSE}
+
+gamma_terms %>%
+  ggplot(aes(topics, gamma, label = terms, fill = topics)) +
+  geom_col(show.legend = FALSE, width=0.9, binwidth=5) +
+  geom_text(hjust = 0, nudge_y = 0.0025, size = 2.7, color = "black",
+            family = "IBMPlexSans") +
+  coord_flip() +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(0, 0.15),
+                     labels = percent_format()) +
+  theme_tufte(base_family = "IBMPlexSans-Bold", ticks = FALSE, base_size = 10) +
+  theme(plot.title = element_text(size = 15,
+                                  family="IBMPlexSans-Bold")) +
+  labs(x = NULL, y = "Expected Topic Proportions",
+       title = "20 topics by prevalence with 10 top words for each topic")
+```
+
+# Plot topic graph
+
+# Attribute name for each topic
+
+```{r echo = FALSE}
+
+gamma_20_top_topic <- gamma_terms %>%
+  top_n(20, gamma) 
+
+gamma_20_top_topic$topic_names <- fct_recode(gamma_20_top_topic$topics,
+  
+ "MULTICULTURALISM" = "Topic 12",
+ "FAMILY" = "Topic 14",
+ "LABOR MIGRATION" = "Topic 19",
+ "CULTURAL IDENTITY" = "Topic 20",
+ "BUDGET" = "Topic 7",
+ "DEMOGRAPHY AND ECONOMY" = "Topic 1",
+ "VOTING & CITIZENSHIP" = "Topic 3",
+ "INVESTMENT IN JOBS" = "Topic 17",
+ "QUEBEC & LANGUAGE" = "Topic 16",  
+ "REFUGEE & ASYLUM SETTLMENT" = "Topic 5", 
+ "LAW ENFORCEMENT" = "Topic 9",
+ "HELATH & WELFARE" = "Topic 11",
+ "VISIBLE MINORITY & DISCRIMINATION" = "Topic 8",
+ "LOCAL COMMUNITY" = "Topic 10",
+ "EDUCATION" = "Topic 2", 
+ "SECURITY & RESTRICTION" = "Topic 4",  
+ "RACIAL DISCRIMINATION" = "Topic 18",
+ "RELIGION & DIVERSITY" = "Topic 6",
+ "ETHNIC COMMUNITIES" = "Topic 13",
+ "HUMANITARIANISM" = "Topic 15")
+```
+
+# Plot 20 topics after naming topic
+
+```{r fig.height=3, fig.width=6, warning=FALSE}
+
+topic_plot <- gamma_20_top_topic %>%
+  top_n(35, gamma) %>%
+  ggplot(aes(topic_names, gamma, label = terms, fill = topic_names)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0025, size = 3.5, color = "black",
+            family = "IBMPlexSans") +
+  coord_flip() +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(0, 0.25),
+                     labels = percent_format()) +
+  theme_tufte(base_family = "IBMPlexSans-Bold", ticks = FALSE, base_size = 9) +
+  theme(plot.title = element_text(size = 13,
+                                  family="IBMPlexSans-Bold")) +
+  labs(x = NULL, y = "Expected Topic Proportions",
+       title = "20 Topics by prevalence with 10 top words for each topic", size = 15)
+
+topic_plot
+ggsave(topic_plot, file = "/Volumes/Workspace/OneDrive - Universite de Montreal/GitHub/Article1_these_integration/Graphs/topic_plot.png")
+
+```
+
+# Autres graphiques des topics
+
+```{r fig.height=7, fig.width=14, warning=FALSE}
+
+topic <- plot(topic_model, n= 10, type = "summary", xlim = c(0,.30), 
+              labeltype = c("prob"), 
+              topic.names = c("DEMOGRAPHY AND ECONOMY:  ", "EDUCATION:   ", 
+                              "VOTING & CITIZENSHIP:  ", "SECURITY & RESTRICTION:   ",
+                              "REFUGEE & ASYLUM SETTLMENT:  ", 
+                              "RELIGION & DIVERSITY:   ", "BUDGET:  ", 
+                              "VISIBLE MINORITY & DISCRIMINATION:   ", 
+                              "LAW ENFORCEMENT:  ",  "LOCAL COMMUNITY:  ", 
+                              "HELATH & WELFARE:  ", "MULTICULTURALISM:  ", "ETHNIC COMMUNITIES:   ",
+                              "FAMILY:   ", "HUMANITARIANISM:   ", "QUEBEC & LANGUAGE:   ", 
+                              "INVESTMENT IN JOBS:   ", "RACIAL DISCRIMINATION:   ", "LABOR MIGRATION:    ", 
+                              "CULTURAL IDENTITY:   "),
+              main="", text.cex=2, xlab="", cex.axis = 2.5)
+mtext("Expected Topic Proportion", side=1, line=3, cex=2.5) #adds custom Y-axis label
+
+topic
+```
+      
+# Look at all the topics, ordered by prevalence.
+
+```{r}
+library(kableExtra)
+
+gamma_20_top_topic %>%
+  dplyr::select(topics, topic_names, gamma, terms) %>%
+  knitr::kable(digits = 4, 
+        col.names = c("Topic", "Topic name", "Expected topic proportion", "Top 10 terms"), "html")%>%
+  kable_styling("striped") %>%
+  save_kable("test.html")
+```
+
+## Visualization of Words for some Topics (Wordcloud)
+
+```{r fig.height=6, fig.width=10,warning= FALSE, message=FALSE}
+
+set.seed(1) # for reproducibility 
+
+list_of_titles <- c("DEMOGRAPHY & ECONOMY", "VOTING & CITIZENSHIP", "RELIGION & DIVERSITY", "VISIBLE MINORITY & DISCRIMINATION",  
+                 "MULTICULTURALISM", "FAMILY", "QUEBEC & LANGUAGE",  "RACIAL DISCRIMINATION", "LABOR MIGRATION")
+
+plot.new()
+
+A= c(1, 3, 6, 8, 12, 14, 16, 18, 19)
+
+par(mfrow=c(3,3), mar=c(0, 0, 2, 0.5))
+for (i in A)
+{
+stm::cloud(topic_model, topic = i, scale = c(7,.7),rot.per=0,fixed.asp = FALSE, min.freq=10,random.order=FALSE,random.color=TRUE,  colors=brewer.pal(max(8,ncol(topic_model)),"Dark2"))
+#title(main=list_of_titles[i], font.main=4, col.main="black", cex.main=1.5) 
+}
+
+```
+
+# POST-ESTIMATION DIAGNOTICS
+
+# Displaying words associated with topics or documents highly associated with particular topics
+
+```{r echo=FALSE}
+
+# Find prototype documents using function findThoughts()
+
+thoughts12 <- findThoughts(topic_model, texts = out$meta$speechtext, topics = c(12),  n=1)$docs[[1]] # Religion
+thoughts16 <- findThoughts(topic_model, texts = out$meta$speechtext, topics = c(16),  n=1)$docs[[1]] # Discrimination
+
+```
+
+# Understanding topics through words and example documents
+
+```{r fig.height=2, fig.width=5, warning=FALSE}
+par(mfrow = c(1,2),mar = c(.5, .1, 1, .5))
+plotQuote(thoughts12, width = 90, text.cex = .70, main = "Multiculturalism")
+plotQuote(thoughts16, width = 90, text.cex = .70, main = "Quebec & language")
+```
+
+# Merge topics with full dataset
+
+```{r}
+
+# Create an identification for each article in Df dataset
+
+#https://www.storybench.org/how-news-media-are-setting-the-2020-election-agenda-chasing-daily-controversies-often-burying-policy/
+
+out_reserve <- out
+
+out$meta$ID <- seq.int(nrow(out$meta))
+
+# replace list number with best model
+theta <- data.frame(topic_model$theta)
+theta$ID <- seq.int(nrow(theta))
+
+integration_all <- merge(out$meta, theta)
+
+integration_cond <- integration_all %>% 
+  select(ID, Titre, speechtext, year, source, province, newspaper_scale,partisan, starts_with('X'))
+
+integration_long <- gather(data = integration_cond, key = topic, value = theta, starts_with('X'), factor_key=TRUE)
+```
+
+
+```{r, include= FALSE}
+
+integration_cols <- as.list(levels(integration_long$topic))
+
+# change first part of list to best model
+
+integration_words <- labelTopics(topic_model, n = 1000)[[1]]
+
+integration_topics_words <- data.frame(integration_words, row.names = integration_cols)
+
+# add column with words all together
+integration_topics_words <- integration_topics_words %>%
+  unite(topic_name_words, sep = ', ')
+
+integration_topics_words$topic <- rownames(integration_topics_words)
+
+integration_topics_words <- integration_topics_words %>%
+  mutate(topic_name = dplyr::case_when(
+           topic == "X4" ~  "SECURITY & RESTRICTION",
+           topic == "X3" ~  "VOTING & CITIZENSHIP",
+           topic == "X1" ~  "DEMOGRAPHY AND ECONOMY",
+           topic == "X8" ~  "VISIBLE MINORITY & DISCRIMINATION",
+           topic == "X16" ~ "QUEBEC & LANGUAGE",
+           topic == "X13" ~ "ETHNIC COMMUNITIES",
+           topic == "X7" ~  "BUDGET",
+           topic == "X5" ~  "REFUGEE SETTLMENT",
+           topic == "X10" ~ "LOCAL COMMUNITY",
+           topic == "X15" ~ "HUMANITARIANISM",
+           topic == "X2" ~  "EDUCATION",
+           topic == "X20" ~ "CULTURAL IDENTITY",
+           topic == "X18" ~ "RACIAL DISCRIMINATION",
+           topic == "X9" ~  "LAW ENFORCEMENT",
+           topic == "X17" ~ "INVESTMENT IN JOBS",
+           topic == "X14" ~ "FAMILY",
+           topic == "X19" ~ "LABOR MIGRATION",
+           topic == "X11" ~ "HELATH & WELFARE",
+           topic == "X12" ~ "MULTICULTURALISM",
+           topic == "X6" ~  "RELIGION & DIVERSITY"))
+
+full_integration_merged <- merge(integration_long, integration_topics_words, by = 'topic')
+full_integration_merged %>%
+    arrange(year, desc(theta)) 
+```
+
+# Evolution des topics selon les différentes variables indépendantes
+
+# Newspaper scale & topical prevalence
+
+```{r  fig.height=9, fig.width=20, warning=FALSE, message=FALSE}
+full_integration_merged %>%
+  ggplot(aes(year, theta, group=newspaper_scale,fill=factor(newspaper_scale))) +
+  geom_smooth(method = "loess", span = 0.15, method.args = list(degree=1)) +
+  labs(x = "Year",
+       y = "Expected Topic Proportion") +
+  theme(legend.position = "top") +
+  theme(axis.title.x  = element_text(color = "black", size = 35))+
+  theme(axis.text.x = element_text(color = "black", size = 30))+
+  theme(axis.text.y = element_text(color = "black", size = 25))+
+  theme(axis.title.y  = element_text(color = "black", size = 35))+
+  theme(legend.position="top") +
+  theme(legend.text = element_text(size = 34))+
+  theme(plot.title = element_text(color = "black", size = 35, lineheight = 0.5),
+        legend.title.align = NULL) +
+  scale_x_discrete(breaks=seq(1977,2020,by=10))+
+  facet_wrap(~ topic_name) +
+  theme(strip.text = element_text(size = 30)) + 
+  scale_fill_discrete(name="", labels=c("Local/Regional", "National"))
+```
+# Topic accross space
+
+```{r fig.height=9, fig.width=20, warning=FALSE, message=FALSE}
+full_integration_merged %>%
+  filter(province %in% c("Quebec","Alberta", "British Columbia","Ontario")) %>%
+  ggplot(aes(year, theta, group=province,fill=factor(province))) +
+  geom_smooth(method = "loess", span = 0.15, method.args = list(degree=1)) +
+  labs(x = "Year",
+       y = "Expected Topic Proportion") +
+  theme(legend.position = "top") +
+  theme(axis.title.x  = element_text(color = "black", size = 35))+
+  theme(axis.text.x = element_text(color = "black", size = 30))+
+  theme(axis.text.y = element_text(color = "black", size = 25))+
+  theme(axis.title.y  = element_text(color = "black", size = 35))+
+  theme(legend.position="top") +
+  theme(legend.text = element_text(size = 34))+
+  theme(plot.title = element_text(color = "black", size = 35, lineheight = 0.5),
+        legend.title.align = NULL) +
+  scale_x_discrete(breaks=seq(1977,2020,by=10))+
+  facet_wrap(~ topic_name) +
+  theme(strip.text = element_text(size = 30)) + 
+  scale_fill_discrete(name="")
+```
+# Partisan orientation & topical prevalence
+
+```{r  fig.height=9, fig.width=20, warning=FALSE, message=FALSE}
+full_integration_merged %>%
+  ggplot(aes(year, theta, group=partisan,fill=factor(partisan))) +
+  geom_smooth(method = "loess", span = 0.15, method.args = list(degree=1)) +
+  labs(x = "Year",
+       y = "Expected Topic Proportion") +
+  theme(legend.position = "top") +
+  theme(axis.title.x  = element_text(color = "black", size = 35))+
+  theme(axis.text.x = element_text(color = "black", size = 30))+
+  theme(axis.text.y = element_text(color = "black", size = 25))+
+  theme(axis.title.y  = element_text(color = "black", size = 35))+
+  theme(legend.position="top") +
+  theme(legend.text = element_text(size = 34))+
+  theme(plot.title = element_text(color = "black", size = 35, lineheight = 0.5),
+        legend.title.align = NULL) +
+  scale_x_discrete(breaks=seq(1977,2020,by=10))+
+  facet_wrap(~ topic_name) +
+  theme(strip.text = element_text(size = 30)) + 
+  scale_fill_discrete(name="", labels=c("Liberal", "Conservative"))
+```
+
+# Regression: Estimating topic relationships with covariables effects using function estimateEffect()
+
+```{r echo=FALSE}
+# Run a regression of topic prevalence on both year and citation per year
+
+prep <- estimateEffect(1:20 ~ year + province + partisan + newspaper_scale, topic_model, meta = out$meta, uncertainty = "Global")
+summary(prep)
+```
+
+# Topics clustering
+
+```{r include=FALSE}
+library('dendextend')
+library(compositions)
+
+theta20 <- topic_model$theta  #theta20 is the document-topic matrix
+
+cd<-acomp(theta20) #the transformation
+
+dd <- as.dist(variation(cd))
+
+hc = hclust(dd, method="ward.D2")
+
+```
+ 
+
+```{r fig.height=7, fig.width=10, warning=FALSE}
+library(dendextend)
+
+A2= c("VISIBLE MINORITY & DISCRIMINATION", "LAW ENFORCEMENT", 
+      "QUEBEC & LANGUAGE", "VOTING & CITIZENSHIP", "BUDGET", "REFUGEE & ASYLUM SETTLMENT",
+      "RACIAL DISCRIMINATION", "MULTICULTURALISM", "CULTURAL IDENTITY", "SECURITY & RESTRICTION",
+      "RELIGION & DIVERSITY", "DEMOGRAPHY AND ECONOMY", "LOCAL COMMUNITY", "INVESTMENT IN JOBS",
+      "LABOR MIGRATION", "ETHNIC COMMUNITIES", "FAMILY", "HUMANITARIANISM", "EDUCATION", "HELATH & WELFARE") # Les labels sont faits en ordre inverse d'apparition des topics sur le dendogramme 
+
+d=as.dendrogram(hc)
+d <- d %>% color_branches(k=6) %>% 
+  set("labels_cex", 1.2) %>%
+  #color_labels%>% 
+  set("labels", A2) 
+# horiz mirror version
+par(mar = c(3.5,17,0,1))
+plot_horiz.dendrogram(d, side = TRUE)
+```
+
+# Plot model graph using function plot()
+
+# Calculating topic correlations (topicCorr).
+
+```{r}
+# Topic correlations using function topicCorr()
+mod.out.coor <- topicCorr(topic_model, method = "simple", cutoff = 0.01)
+# create objects representing topic scores & correlation matrix
+theta <- topic_model$theta
+cor_theta <- cor(theta)
+
+```
+
+# Network analysis : Graphical display of topic correlations.
+
+```{r fig.height=7, fig.width=10, warning=FALSE}
+set.seed(123) # for reproducibility 
+
+plot(mod.out.coor, vlabels = c("DEMOGRAPHY AND ECONOMY", "EDUCATION", 
+      "VOTING & CITIZENSHIP", "SECURITY & RESTRICTION",
+      "REFUGEE & ASYLUM SETTLMENT", 
+      "RELIGION & DIVERSITY", "BUDGET", 
+      "VISIBLE MINORITY & DISCRIMINATION", 
+      "LAW ENFORCEMENT",  "LOCAL COMMUNITY", 
+      "HELATH & WELFARE", "MULTICULTURALISM", "ETHNIC COMMUNITIES",
+      "FAMILY", "HUMANITARIANISM ", "QUEBEC & LANGUAGE ", 
+      "INVESTMENT IN JOBS", "RACIAL DISCRIMINATION", "LABOR MIGRATION", # Les labels sont faits en ordre des topics (1, 2, 3, 4, 5, ..., 31, 32, 33, 34, 35)
+      "CULTURAL IDENTITY"), vertex.label.cex = 1.5)
+```
+
+
+# Autres network analysis (Igraph)
+
+# Topic Correlation Graph (Tie strength > 0.05). Node size reflects corpus-level topic proportion. Ties indicate greater likelihood that topics are discussed within common documents. Coloring emphasizes topic clusters.
+
+Topics near each other, and with a tie, indicate that they are more likely to be discussed within a document. Node sizes correspond to the topic proportions and are graphed using the Fruchterman–Reingold algorithm.
+
+```{r}
+# create object to represent nodesize proportional to topic prevalence
+nodesize <- colMeans(topic_model$theta)   #since topic proportions are all < 1, have to scale nodesize when plotting to get it to show up
+
+# create igraph object
+g2 <- graph.adjacency(cor_theta, weighted=TRUE, mode="lower")
+g2 <- delete.edges(g2, E(g2)[weight < 0.05 ])  ## adjust this threshold as needed
+g2 <- simplify(g2, remove.multiple = T, remove.loops = T,
+              edge.attr.comb=c(weight="sum", type="ignore") )
+l2 <- layout_with_fr(g2) #Fruchterman-Reingold
+V(g2)$color <- "lightgrey"
+```
+
+                
+```{r fig.height=4.5, fig.width=4.9}
+set.seed(123) # for reproducibility 
+
+par(mar = c(0,0,0,0))
+# igraph plot; adjust topic labels as needed, as well as optional 'mark.groups' and 'mark.col' arguments (below was used to render Figure 5)
+plot(g2, layout=l2, #main="Graphical Display of 25 Topic Correlations (Tie Strength > .05)",
+     vertex.label = c("DEMOGRAPHY AND ECONOMY", "EDUCATION", 
+      "VOTING & CITIZENSHIP", "SECURITY & RESTRICTION",
+      "REFUGEE & ASYLUM SETTLMENT", 
+      "RELIGION & DIVERSITY", "BUDGET", 
+      "VISIBLE MINORITY & DISCRIMINATION", 
+      "LAW ENFORCEMENT",  "LOCAL COMMUNITY", 
+      "HELATH & WELFARE", "MULTICULTURALISM", "ETHNIC COMMUNITIES",
+      "FAMILY ", "HUMANITARIANISM ", "QUEBEC & LANGUAGE ", 
+      "INVESTMENT IN JOBS", "RACIAL DISCRIMINATION", "LABOR MIGRATION", 
+      "CULTURAL IDENTITY"),# Les labels sont faits en ordre des topics (1, 2, 3, 4, 5, ..., 31, 32, 33, 34, 35)
+     vertex.color = V(g2)$color, vertex.label.cex = 1, vertex.size=nodesize*300, 
+     vertex.label.color="black",edge.color="gray60", edge.lty="solid",
+     mark.groups=list(c(8, 9, 18),
+                      c(6, 12, 20),
+                      c(1, 10, 17, 19)),# draws polygon around nodes
+     mark.col=c("darkseagreen1","skyblue","pink"), mark.border="black") #main="Graphical Display of 25 Topic Correlations (Tie Strength > .05)",
+```

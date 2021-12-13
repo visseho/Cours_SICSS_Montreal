@@ -153,6 +153,74 @@ Analyse des termes (Topic modelling)
     >- il ne veut pas utiliser beaucoup de mots dans un sujet.
 
 
+## Écahntillonnage de Gibbs (exemple)
+
+- La salle non rangée représente les mots dans le corpus
+- Et on voulait ranger cela selon le nombre de sujets
+
+![](../Figs/gibbs1.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+- Voici à nouveau la chambre non rangée. 
+- Où allons nous placer le cintre, assumant que toutes les autres choses sont au bon endroit?
+
+![](../Figs/gibbs2.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+![](../Figs/gibbs3.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+![](../Figs/gibbs4.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs5.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs6.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs7.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs8.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs9.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs10.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs11.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs12.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs13.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs14.png)
+
+<!--
+
 ## Échantillonnage de Gibbs: formule
 
 - Soit :
