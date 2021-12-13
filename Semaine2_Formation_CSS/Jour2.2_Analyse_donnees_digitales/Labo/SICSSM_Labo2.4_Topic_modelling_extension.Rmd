@@ -138,11 +138,15 @@ Ensuite, on va charger les données
 
 library(qss)
 
-data(package="qss")
+#data(package="qss")
 
 DIR_SOURCE <- system.file("extdata/federalist", package = "qss")
 corpus_raw <- VCorpus(DirSource(directory = DIR_SOURCE, pattern = "fp"))
 corpus_raw
+
+corpus_raw[[1]][1]
+
+
 
 ?VCorpus
 
@@ -168,7 +172,7 @@ corpus_tidy <- corpus_tidy %>%
 
 class(corpus_tidy$id_num)
 
-
+str
 ```
 
 
@@ -230,8 +234,8 @@ graph_doc <- function(donnee){
   ggplot(donnee) +
     geom_col(aes(x = reorder(word, desc(n)), y = n, fill = word), show.legend = FALSE) +
     labs(x = "Word") +
-    coord_flip() +
-    guides(color = FALSE)
+    coord_flip() #+
+    #guides(color = FALSE)
 }
 
 #show.legend = FALSE
@@ -269,6 +273,7 @@ doc12_idf <-
   corpus_tidy_text_tfidf %>% 
   filter(id_num == 12) %>% 
   arrange(desc(tf_idf))
+
 
 
 doc12_idf_10 <- doc12_idf[1:10, ]      
@@ -345,7 +350,7 @@ Hamilton_dtm <- Hamilton %>%
   cast_dtm(id_num, word, tf_idf)
 
 class(Hamilton_dtm)
-inspect(Hamilton_dtm[1:5, 2:7])
+inspect(Hamilton_dtm[7:10, 2:7])
 
 CLUSTERS <- 4
 
@@ -381,7 +386,7 @@ top_word <-
   group_by(cluster) %>% 
   top_n(10, value)
 
-ggplot(top_word %>% filter(cluster == 1)) +
+ggplot(top_word %>% filter(cluster == 2)) +
   geom_col(aes(x = reorder(word, desc(value)), y = value)) +
   coord_flip() 
   #facet_wrap(~cluster)
@@ -441,6 +446,7 @@ library(topicmodels)
 Hamilton_dtm_tf <- Hamilton %>% 
   cast_dtm(id_num, word, n)
 
+inspect(Hamilton_dtm[1:5, 2:6])
 
 topic_hamilton_lda <- LDA(Hamilton_dtm_tf, k = 4, control = list(seed = 2342)) 
 
@@ -465,6 +471,7 @@ tt_top_term
 ```{r}
 
 tt_top_term %>%  
+  filter(term != "corpus") %>% 
   mutate(term = reorder_within(term, beta, topic)) %>% 
   ggplot(aes(x = term, y = beta, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
