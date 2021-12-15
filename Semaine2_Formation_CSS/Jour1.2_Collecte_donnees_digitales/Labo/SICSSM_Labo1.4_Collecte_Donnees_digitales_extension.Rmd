@@ -1,0 +1,140 @@
+---
+title: 'Labo 1.4: Collecte données digitales : extension'
+subtitle: 'web scraping'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+# Question 1
+
+L'utilisation généralisée d'Internet a conduit à une quantité astronomique de données textuelles numérisées qui s'accumulent chaque seconde via les e-mails, les sites Web et les médias sociaux. L'analyse des sites de blog et des publications sur les réseaux sociaux peut donner de nouvelles perspectives sur le comportement et les opinions humains. Dans le même temps, des efforts à grande échelle pour numériser des articles publiés, des livres et des documents gouvernementaux ont été en cours, offrant des opportunités intéressantes de revoir des questions déjà étudiées, en analysant de nouvelles données.
+
+Cet exemple est basé sur le papier de F. Mosteller and D.L. Wallace (1963) “Inference in an authorship problem.” Journal of the American Statistical Association, vol. 58, no. 302, pp. 275–309.
+
+Vous allez analyser le texte **The Federalist**, plus communément appelé **The Federalist Papers**. Les *Federalist*, dont la page de titre est affichée ci dessous se compose de 85 essais attribués à [Alexander Hamilton](https://www.penguinrandomhouse.com/authors/11693/alexander-hamilton/), [John Jay](https://www.penguinrandomhouse.com/authors/45268/john-jay/) et [James Madison](https://www.penguinrandomhouse.com/authors/18636/james-madison/) de 1787 à 1788 afin d'encourager les habitants de New York à ratifier la nouvelle constitution américaine. Parce que Hamilton et Madison ont contribué à la rédaction de la Constitution, les chercheurs considèrent les *Federalist Papers* comme un document principal reflétant les intentions des auteurs de la Constitution.
+
+Les *Federalist Papers* ont été initialement publiés dans divers journaux de l'État de New York sous le pseudonyme de «Publius». Pour cette raison, la paternité de chaque article a fait l'objet de recherches savantes. Selon la *Library of Congress*, deux experts estiment que Hamilton a écrit 51 essais tandis que Madison en a rédigé 15. De plus, Hamilton et Madison ont rédigé conjointement 3 articles tandis que John Jay a écrit 5. Les 11 essais restants ont été écrits soit par Hamilton soit par Madison, bien que les chercheurs contestent lequel. L'objectif de cet exercice esr d'analyser le texte des *Federalist Papers pour prédire les auteurs des 11 essais.* 
+
+Voici les documents connus pour être écrits par chaque auteur:
+
+  - Hamilton: les numéros 1, 6–9, 11–13, 15–17, 21–36, 59–61 et 65–85. 
+  - Madison: les numéros 10, 14, 37–48 et 58. 
+  - Hamilton et Madison: les numéros 18–20. 
+  - John Jay: les numéros  2–5 et 64.
+
+Le texte des 85 essais est extrait du site Web de la Bibliothèque du Congrès et stocké sous le nom **fpXX.txt**, où XX représente le numéro d'essai allant de 01 à 85. Chaque fichier de données contient les données textuelles de son essai correspondant. Voir le tableau 5.1, qui affiche la première et la dernière page de **The Federalist Paper no. 1** à titre d'exemple.
+
+![Table 1. The Federalist Papers Data](fed1.png)
+
+![Table 2. The Federalist Papers Data](fed2.png)
+
+
+1. Utiliser l'une des techniques de grattage apprises en classe pour gratter ce site https://guides.loc.gov/federalist-papers/full-text pour collecter les données et transformer le tableau en base de données. Vous pouvez remarquer que ces textes sont présentés par dizaine comme dans le lien ici: https://guides.loc.gov/federalist-papers/text-1-10
+
+
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+library(rvest)
+
+webpage <- read_html("https://guides.loc.gov/federalist-papers/text-1-10") 
+webpage
+# .s-lib-box-std
+# Only one page
+doc1 <- 
+  webpage %>% 
+  html_node(css = '.s-lg-box-wrapper-25493264 .s-lib-box-std') %>% 
+  html_text() %>% 
+  str_squish()
+doc1
+
+file <- tibble(texte = doc1)
+
+## select the paper
+
+papers <- 
+  webpage %>% 
+  html_nodes(css = '.s-lib-floating-box-content a') %>% 
+  html_text() %>% 
+  str_squish()
+papers
+
+#.s-lib-floating-box-content a
+
+# Take the url
+
+pages_url <- 
+  webpage %>% 
+  html_nodes(css = '.s-lib-floating-box-content a') %>% 
+  html_attr("href") 
+pages_url
+
+# Put it in a dataframe
+
+data_papers <- tibble(papers = papers, url = pages_url)
+data_papers
+
+data_papers <-
+  data_papers %>% 
+  mutate(web = str_c("https://guides.loc.gov/federalist-papers/text-1-10", url, collapse = ""))
+
+```
+
+
+```{r}
+
+#'//*[@id="s-lg-box-wrapper-25493264"]'
+
+file <- html_text(page_section)
+file
+
+data1 <- data_frame(text = file)
+data1$text
+data1 <-
+  data1 %>% 
+  separate(text, into = c("text1", "text2", "text3", "text4", "text5", 
+                          "text6", "text7", "text8", "text9", "text10"), sep = "Back to text")
+
+## cs selector
+
+page_section1 <- html_node(webpage, css = ".s-lg-box-wrapper-25493264 .s-lib-box-std")
+file1 <- html_text(page_section1)
+file1
+
+# Approche 1
+
+page <- c("1-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-85")
+length(page)
+
+for(i in seq_along(page)) {
+  data <- read_html(webpage) %>%
+    html_nodes("table") %>%
+    //*[@id="s-lg-box-wrapper-25493264"] %>% 
+    html_table()
+
+  webpage <- html_session(webpage) %>% follow_link(css = ".pager-next a") %>% .[["url"]]
+}
+
+?follow_link
+
+
+# Approche 2
+
+for(i in 0:1) {
+  webpage <- read_html(paste0("https://bra.areacodebase.com/number_type/M?page=", i))
+  data <- webpage %>%
+    html_nodes("table") %>%
+    .[[1]] %>% 
+    html_table()
+}
+
+
+webpage_section <- html_node(webpage, css = '.views-field')
+web_table <- html_text(webpage_section)
+web_table
+#//*[@id="block-system-main"]/div/div/div[1]/table/tbody
+
+
+```
