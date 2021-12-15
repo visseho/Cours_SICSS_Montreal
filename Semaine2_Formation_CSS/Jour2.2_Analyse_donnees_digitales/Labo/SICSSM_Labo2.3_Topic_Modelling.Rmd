@@ -21,6 +21,7 @@ library(topicmodels)
 
 ```
 
+## Processing
 
 ```{r}
 
@@ -52,6 +53,8 @@ tidy_trump_tweets %>%
 ```
 
 
+La lda fonctionne avec la matrice document-terme. On va donc transformer le fichier.
+
 ```{r}
 
 trump_tweets_dtm <- 
@@ -59,11 +62,14 @@ trump_tweets_dtm <-
   count(created_at, word) %>% 
   cast_dtm(created_at, word, n)
 
-inspect(trump_tweets_dtm[1:5,1:8])
+inspect(trump_tweets_dtm[1:5,1:6])
 
 ```
 
-# trois sujets /topics
+# Trois sujets /topics
+
+Le but est de deefinir un certain nombre de sujets et essayer de voir celui qui permet une meilleure interprétation des données.
+
 
 ```{r}
 
@@ -71,6 +77,8 @@ trump_tweet_lda <- LDA(trump_tweets_dtm, k = 5, control = list(seed = 3425))
 trump_tweet_lda
 
 ```
+
+Regardons ce qu'il y a dans chaque sujet
 
 ```{r}
 
@@ -88,6 +96,8 @@ tt_top_term
 
 ```
 
+On peut finalement représenter les trois sujets sous formes de graphiques.
+
 ```{r}
 
 
@@ -101,6 +111,8 @@ tt_top_term %>%
 
 
 ```
+
+D'autres exemples avec d'autres corpus
 
 ```{r}
 

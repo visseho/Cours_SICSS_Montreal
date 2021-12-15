@@ -39,7 +39,7 @@ Analyse de sentiments (sentiments analysis)
 
 ## Introduction
 
-- Technique qui permet d'extraire une information d'une document à partir d'une requête précise.
+- Technique qui permet d'extraire une information d'un document à partir d'une requête précise.
 - Se base sur l'utilisation d'un dictionnaire qui décrit les éléments de la requête
 
 ## Labo
@@ -69,6 +69,8 @@ Analyse des termes (Topic modelling)
 
 >- Les mots fortement associés aux sujets dominants du document ont plus de chances d'être sélectionnés et placés dans le sac de documents (c'est-à-dire plus de chances d'apparaître dans le document).
 
+## Comment ça fonctionne
+
 >- Utilise l'analyse Bayesienne notamment le "Latent Dirichet Allocation"
 
 >- Il s'agit d'un cas d'**apprentissage automatique non supervisé** (unsupervised machine learning)
@@ -76,13 +78,13 @@ Analyse des termes (Topic modelling)
 
 ## Apprentissage automatique (machine learning)
 
--1. Apprentissage supervisé
+1. Apprentissage supervisé
 
->- Classification
->- Prédiction
->- Régression
+- Classification
+- Prédiction
+- Régression
   
->-2. Apprentissage non supervisé
+>2. Apprentissage non supervisé
 
 >- Clustering
 >- Analyse en composantes principales
@@ -107,7 +109,11 @@ Analyse des termes (Topic modelling)
 ## Latent Dirichet Allocation (LDA)
 
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/lda2.png)
+
+## Latent Dirichet Allocation (LDA)
+
 >- L'ensemble des sujets utilisées par un document est appelé allocation du document (Figure 7.2). 
+
 >- Cette terminologie explique le nom d'allocation de Dirichlet latente: chaque document a une allocation sur des sujets latents régie par une distribution de Dirichlet.-->
 
 
@@ -143,9 +149,77 @@ Analyse des termes (Topic modelling)
 
 - Un modèle de sujet veut faire deux choses: 
 
-  >- il ne veut pas utiliser beaucoup de sujets dans un document et 
-  >- il ne veut pas utiliser beaucoup de mots dans un sujet.
+    >- il ne veut pas utiliser beaucoup de sujets dans un document et 
+    >- il ne veut pas utiliser beaucoup de mots dans un sujet.
 
+
+## Écahntillonnage de Gibbs (exemple)
+
+- La salle non rangée représente les mots dans le corpus
+- Et on voulait ranger cela selon le nombre de sujets
+
+![](../Figs/gibbs1.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+- Voici à nouveau la chambre non rangée. 
+- Où allons nous placer le cintre, assumant que toutes les autres choses sont au bon endroit?
+
+![](../Figs/gibbs2.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+![](../Figs/gibbs3.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+![](../Figs/gibbs4.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs5.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs6.png)
+
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs7.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs8.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs9.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs10.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs11.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs12.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs13.png)
+
+## Écahntillonnage de Gibbs (exemple)
+
+![Tiré de Serrano](../Figs/gibbs14.png)
+
+<!--
 
 ## Échantillonnage de Gibbs: formule
 
@@ -192,7 +266,7 @@ $$p(z_{d,n = k}) {\displaystyle \propto }[\underset{\text{combien le doc aime le
 
 >-**Entrée principale**: texte et nombre de sujets à découvrir.
 
->-**Processus simplifié**: choisissez à plusieurs reprises un sujet, puis un mot dans ce sujet, et placez-les dans le sac de mots représentant le document jusqu'à ce qu'un document soit complet .
+>-**Processus simplifié**: choisissez à plusieurs reprises un sujet, puis un mot dans ce sujet, et placez-les dans le sac de mots représentant le document jusqu'à ce qu'un document soit complet.
 
 >-**Sortie**: distributions de mots pour chaque sujet, distributions de sujets pour le corpus.
 
@@ -228,6 +302,7 @@ Analyse de réseaux et analyse des réseaux de texte
 - Bien que l'analyse de réseau soit le plus souvent utilisée pour décrire les relations entre les personnes, certains des premiers pionniers de l'analyse de réseau se sont rendu compte qu'elle pouvait également être appliquée pour représenter les relations entre les mots. 
 
 >- Par exemple, on peut représenter un corpus de documents comme un réseau où chaque nœud est un document, et l'épaisseur ou la force des liens entre eux décrit les similitudes entre les mots utilisés dans deux documents. 
+
 >- Ou, on peut créer un réseau de textes où les mots individuels sont les nœuds, et les liens entre eux décrivent la régularité avec laquelle ils coexistent dans les documents.
 
 ## Introduction
@@ -236,7 +311,7 @@ Analyse de réseaux et analyse des réseaux de texte
 
 >- Tout comme les groupes de connexions sociales peuvent aider à expliquer une gamme de résultats, la compréhension des modèles de connexions entre les mots aide à identifier leur signification de manière plus précise que les approches du «sac de mots» discutées précédemment. 
 
->-Deuxièmement, les réseaux de texte peuvent être construits à partir de documents de n'importe quelle longueur, alors que les modèles thématiques fonctionnent mal sur des textes courts tels que les messages des médias sociaux. 
+>- Deuxièmement, les réseaux de texte peuvent être construits à partir de documents de n'importe quelle longueur, alors que les modèles thématiques fonctionnent mal sur des textes courts tels que les messages des médias sociaux. 
 
 <!--
 >-Enfin, il existe sans doute un ensemble de techniques d'identification des clusters au sein des réseaux sociaux plus sophistiquées que celles utilisées dans d'autres techniques d'analyse de texte automatisée décrites dans mes précédents tutoriels.
