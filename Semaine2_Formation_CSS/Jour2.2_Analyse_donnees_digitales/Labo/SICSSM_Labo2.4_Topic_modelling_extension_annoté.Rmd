@@ -6,6 +6,34 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 output: html_document
 ---
 
+<!--
+## Code for the tokenization
+
+```{r}
+samples <- c("The cat sat on the mat.", "The dog ate my homework.") 
+
+token_index <- list()                                                     
+for (sample in samples)
+  for (word in strsplit(sample, " ")[[1]])                                
+    if (!word %in% names(token_index))
+      token_index[[word]] <- length(token_index) + 2                      
+
+max_length <- 10                                                          
+results <- array(0, dim = c(length(samples),
+                            max_length,
+                            max(as.integer(token_index))))                
+for (i in 1:length(samples)) {
+  sample <- samples[[i]]
+  words <- head(strsplit(sample, " ")[[1]], n = max_length)
+  for (j in 1:length(words)) {
+    index <- token_index[[words[[j]]]]
+    results[[i, j, index]] <- 1
+  }
+}
+```
+
+-->
+
 # Question 1
 
 L'utilisation généralisée d'Internet a conduit à une quantité astronomique de données textuelles numérisées qui s'accumulent chaque seconde via les e-mails, les sites Web et les médias sociaux. L'analyse des sites de blog et des publications sur les réseaux sociaux peut donner de nouvelles perspectives sur le comportement et les opinions humains. Dans le même temps, des efforts à grande échelle pour numériser des articles publiés, des livres et des documents gouvernementaux ont été en cours, offrant des opportunités intéressantes de revoir des questions déjà étudiées, en analysant de nouvelles données.
@@ -32,21 +60,51 @@ Le texte des 85 essais est extrait du site Web de la Bibliothèque du Congrès e
 
 1. Utiliser l'une des techniques de grattage apprises en classe pour gratter ce site https://guides.loc.gov/federalist-papers/full-text pour collecter les données et transformer le tableau en base de données. Vous pouvez remarquer que ces textes sont présentés par dizaine comme dans le lien ici: https://guides.loc.gov/federalist-papers/text-1-10
 
-<!--
+
+
 ```{r}
 
 library(tidyverse)
 library(magrittr)
 library(rvest)
 
-webpage <- "https://bra.areacodebase.com/number_type/M?page=0"
+webpage <- read_html("https://guides.loc.gov/federalist-papers/text-1-10") 
+
+#webpage_text <- webpage %>% 
+#  html_nodes("p") %>% 
+#  html_text()
+#webpage_text
+#https://www.youtube.com/watch?v=smriIBG08ok
+
+page_section <- html_node(webpage, xpath = '//*[@id="s-lg-col-1"]/div')
+
+#'//*[@id="s-lg-box-wrapper-25493264"]'
+
+file <- html_text(page_section)
+file
+
+data1 <- data_frame(text = file)
+data1$text
+data1 <-
+  data1 %>% 
+  separate(text, into = c("text1", "text2", "text3", "text4", "text5", 
+                          "text6", "text7", "text8", "text9", "text10"), sep = "Back to text")
+
+## cs selector
+
+page_section1 <- html_node(webpage, css = ".s-lg-box-wrapper-25493264 .s-lib-box-std")
+file1 <- html_text(page_section1)
+file1
 
 # Approche 1
 
-for(i in 1:2) {
+page <- c("1-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-85")
+length(page)
+
+for(i in seq_along(page)) {
   data <- read_html(webpage) %>%
     html_nodes("table") %>%
-    .[[1]] %>% 
+    //*[@id="s-lg-box-wrapper-25493264"] %>% 
     html_table()
 
   webpage <- html_session(webpage) %>% follow_link(css = ".pager-next a") %>% .[["url"]]
