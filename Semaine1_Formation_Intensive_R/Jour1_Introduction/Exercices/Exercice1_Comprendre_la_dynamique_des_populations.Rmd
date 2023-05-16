@@ -8,7 +8,7 @@ output:
   word_document: default
 ---
 
-Cet exercice est tiré du livre de Imai Kosuke.
+Cet exercice est tiré du livre de **Imai Kosuke**.
 
 Comprendre la dynamique des populations est important pour de nombreux domaines des sciences sociales. Nous allons calculer certaines quantités démographiques à base des naissances et des décès pour deux pays et la population mondiale pour deux périodes: 1950 à 1955 et 2005 à 2010. Nous analyserons les fichiers de données CSV suivants: `Kenya.csv`, `Sweden.csv` et `World.csv`. Chaque fichier contient des données démographiques pour le Kenya, la Suède (Sweden) et le monde (World), respectivement. Le tableau ci-dessous présente les noms et les descriptions des variables dans chaque ensemble de données.
 
