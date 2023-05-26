@@ -26,13 +26,12 @@ https://search1.odesi.ca/#/
 
 rm(list = ls())
 
-
 #library(qss)
 library(tidyverse)
 library(summarytools)
 #library(tinytex)
 
-cis_2015 <- read_csv("CIS-72M0003-E-2015_F1.csv")
+cis_2015 <- read.csv("../Données/cis_short_5percent_2015.csv")
 
 
 summary(cis_2015$CFATINC) 

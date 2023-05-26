@@ -187,7 +187,7 @@ Il faut regarder dans les hypothèses, celles qui peut avoir causer cela.
 
 
 ```{r}
-knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/hypotheses_regression.png")
+knitr::include_graphics("../Données/hypotheses_regression.png")
 ```
 
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/hypotheses_regression.png)

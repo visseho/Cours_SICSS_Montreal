@@ -1,7 +1,7 @@
 ---
 title: 'Labo 1 : Indexation et fichier de données'
 author: "Visseho Adjiwanou, PhD."
-date: "26/05/2021"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   beamer_presentation: default
   ioslides_presentation: default
