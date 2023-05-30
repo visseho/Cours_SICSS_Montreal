@@ -210,7 +210,7 @@ table_wiki1
 
 ```{r}
 
-lego <- read_html("https://www.imdb.com/title/tt1490017/")
+lego <- read_html("https://www.imdb.com/title/tt1490017/") # ce chunk ne marche pas et je n'arrive pas à l'arranger (trouvé le xpath) 
 
 acteurs <- html_nodes(lego, xpath = '.primary_photo+ td a')
 
