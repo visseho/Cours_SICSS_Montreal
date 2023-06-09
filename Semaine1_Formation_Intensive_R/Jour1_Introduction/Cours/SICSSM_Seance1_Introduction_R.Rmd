@@ -4,11 +4,11 @@ author: "Visseho Adjiwanou, PhD."
 institute: "SICSS-Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  slidy_presentation: default
   beamer_presentation:
     colortheme: beaver
     fonttheme: structurebold
     theme: Antibes
+  slidy_presentation: default
   ioslides_presentation: default
 header-includes:
   - \usepackage{color}
@@ -16,11 +16,14 @@ header-includes:
 
 ## Remerciements
 
-Robert Djogbénou, Georges Tchango et Nima Zahedinameghi ont contribué à développer les cours de cette école d'été.
+Aoudou Mounchingam a aidé à développer les cours de cette année.
 
 ## Cette ère est finie ...
 
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/joke2.png)
+<!--![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/joke2.png)-->
+
+
+![](/Users/visseho/Library/CloudStorage/OneDrive-UQAM/Cours/Images_cours/joke2.png)
 
 ## Au programme
 
@@ -136,8 +139,8 @@ RStudio offre aux utilisateurs :
 
 La figure 1.1 montre une capture d'écran de RStudio.
 
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/Screenshot_RStudio.jpg)
 
+![](/Users/visseho/Library/CloudStorage/OneDrive-UQAM/Cours/Images_cours/Screenshot_RStudio.jpg)
 
 
 ## RStudio
@@ -323,7 +326,8 @@ Autres objets:
 
 ## Mode des objets
 
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/Objet_mode.jpg)
+
+![](/Users/visseho/Library/CloudStorage/OneDrive-UQAM/Cours/Images_cours/Objet_mode.jpg)
 
 <!--
 ```{r Objet, echo=FALSE, fig.cap="A caption", out.width = '100%'}
@@ -346,7 +350,9 @@ Vecteurs
 
 ## Vecteurs
 
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/Population_mondiale.jpg)
+
+![](/Users/visseho/Library/CloudStorage/OneDrive-UQAM/Cours/Images_cours/Population_mondiale.jpg)
+
 
 - Le tableau contient des estimations de la population mondiale (en milliers) au cours des dernières décennies. 
 
@@ -444,6 +450,7 @@ rate
 ```{r}
 round(rate, 2)
 ```
+
 - Qu'est-ce que la commande **round** permet de faire?
 
 Matrice
@@ -768,7 +775,9 @@ Fonctions
 
 ## Fonctions - Définitions
 
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/Fonction_diagramme.jpg)
+
+![](/Users/visseho/Library/CloudStorage/OneDrive-UQAM/Cours/Images_cours/Fonction_diagramme.jpg)
+
 
 <!--
 ```{r diagramme, echo=FALSE, fig.cap="A caption", out.width = '90%'}
@@ -849,6 +858,7 @@ gl(2, 6, label=c("Male", "Female"))
 
 
 ```
+
 - gl pour `generate levels`
 
 ## Fonctions - Autres fonctions intéressantes
@@ -945,4 +955,4 @@ Les packages
 
 - https://cran.r-project.org/web/views/
 
-
+- https://codehorizons.com/resources/r-tutorials/
