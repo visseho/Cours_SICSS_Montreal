@@ -16,7 +16,7 @@ header-includes:
 
 ## Remerciements
 
-Aoudou Mounchingam a aidé à développer les cours de cette année.
+Aoudou Mounchingam, Robert Djogbenou, Georges Ngalé, Nima Zahedinameghi ont aidé à développer les labos de cette école.
 
 ## Cette ère est finie ...
 
