@@ -1,0 +1,246 @@
+---
+title: 'Labo 10.2: Collete de données digitales par API'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+
+## Reddit
+
+
+```{r}
+
+#install.packages("RedditExtractoR")
+
+library(RedditExtractoR)
+
+# Extraire quelques données
+
+urls <- 
+  find_thread_urls(keywords = "africa")
+View(urls)
+
+# Données sur les utilisateurs
+
+user <- "Poem_for_your_sprog"
+
+sprog <- get_user_content(user)
+
+sprog[[1]][[1]][3]
+
+
+# Transformer en base de données
+library(tidyverse)
+
+sprod_df <- enframe(sprog)
+sprod_df_tibble <- as_tibble(sprog)
+  
+sprog_df1 <- data.frame(t(sapply(sprog,c)))
+sprog_df1
+
+
+# nested list
+
+sprog_df2 <- as.data.frame(do.call(cbind, sprog))
+sprog_df2
+
+# Using data.table
+library(data.table)
+
+sprog_df3 <- rbindlist(sprog)
+
+
+
+```
+
+
+## Twitter
+
+![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api9.png)
+
+
+```{r}
+#library(devtools)
+#install_github("mkearney/rtweet")
+
+# rtweet est sur CRAN, vous n'avez plus besoin de l'installer à partir du Github
+
+#install.packages("rtweet")
+```
+ 
+
+
+```{r}
+#install.packages("rtweet")
+library(rtweet)
+library(httpuv)
+library(maps)
+
+app_name <- ""
+consumer_key <- ""
+consumer_secret <- ""
+
+#access_token <-
+#access_token_secret <-
+  
+create_token(app = app_name, consumer_key = consumer_key, consumer_secret = consumer_secret, set_renv = TRUE)  
+
+#create_token(app = app_name, consumer_key = consumer_key, consumer_secret = consumer_secret, access_token = access_token, access_token_secret = access_token_secret, set_renv = TRUE)  
+
+
+# Collecter des tweets sur un thème donné
+
+canada_tweet <- search_tweets("#Canada", n = 3000, include_rts = FALSE)
+
+
+head(canada_tweet$text)
+
+
+names(canada_tweet)
+
+
+library(tidyverse)
+ts_plot(canada_tweet, "3 hours") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Frequence des Tweets sur le Canada",
+    subtitle = "Nombre de tweet agrégés en utilisant des intervalles de trois heures",
+    caption = "Source: Données collectées à partir de l'API REST de Twitter via rtweet")
+
+
+
+
+cd_tweets <- search_tweets("canada",
+                           "lang:en", geocode = lookup_coords("usa"),
+                           n = 1000, type="recent", include_rts=FALSE)
+head(cd_tweets$text)
+
+
+geocode <- lat_lng(cd_tweets)
+
+library(maps)
+par(mar = c(0, 0, 0, 0))
+maps::map("state", lwd = .25)
+with(geocode, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
+
+usa_map <- map_data("word", region = "USA")
+ggplot() +
+  geom_point(geocode, aes(x = lng, y = lat, group = group))
+
+
+
+sanders_tweets <- get_timelines(c("sensanders"), n = 5)
+head(sanders_tweets$text)
+
+trudeau_tweets <- get_timeline("JustinTrudeau", n = 5)
+head(trudeau_tweets$text)
+
+
+
+sanders_twitter_profile <- lookup_users("sensanders")
+
+
+sanders_twitter_profile$description
+sanders_twitter_profile$location
+sanders_twitter_profile$followers_count
+
+sanders_favorites<-get_favorites("sensanders", n=5)
+sanders_favorites$text
+
+sanders_follows <- get_followers("sensanders")
+head(sanders_follows)
+
+
+rate_limits <- rate_limit()
+
+head(rate_limits[,1:4])
+
+get_trends("Montreal")
+
+post_tweet("I love APIs")
+
+elected_officials <- read.csv("https://cbail.github.io/Senators_Twitter_Data.csv", stringsAsFactors = FALSE)
+
+head(elected_officials)
+
+
+#créer un conteneur vide pour stocker les tweets de chaque élu
+elected_official_tweets <- as.data.frame(NULL)
+
+for(i in 1:nrow(elected_officials)){
+
+  #Télécharger les tweets
+tweets <- get_timeline(elected_officials$twitter_id[i], n=100)
+  
+#  tweets <-
+#    elected_officials %>% 
+#    get_timeline(twitter_id[i], n = 100)
+  
+  # Mettre le tweet dans le conteneur
+elected_official_tweets <- rbind(elected_official_tweets, tweets)
+
+#elected_official_tweets <- binds_row(elected_official_tweets, tweets)
+
+
+    
+  #faire une pause de cinq secondes pour éviter de dépasser le taux (rate limiting)
+  Sys.sleep(1)
+  
+  #imprimer le nombre/itération pour le débogage/suivi de la progression
+  print(i)
+}
+
+
+
+load(url("https://cbail.github.io/Elected_Official_Tweets.Rdata"))
+
+
+
+#renommer la variable twitter_id dans le jeu de données d'origine afin de le fusionner avec le jeu de données tweet
+
+View(elected_official_tweets) 
+View(elected_officials)
+
+elected_officials <-
+  elected_officials %>% 
+  mutate(screen_name = twitter_id)
+
+#colnames(elected_officials)[colnames(elected_officials)=="twitter_id"]<-"screen_name"
+
+#for_analysis <- left_join(elected_official_tweets, elected_officials, by = "screen_name")
+
+
+
+tweet_analyse <- left_join(elected_official_tweets, elected_officials, by = "screen_name")
+
+# Graphique
+
+ggplot(tweet_analyse) +
+  geom_histogram(aes(x = retweet_count))
+
+
+
+#install.packages("MASS")
+library(MASS)
+
+retweet_pred <- glm.nb(retweet_count ~ party + followers_count + statuses_count + gender, data=tweet_analyse)
+
+summary(retweet_pred)
+## horodateur
+
+head(tweet_analyse$created_at)
+
+
+tweet_analyse$date <- as.Date(tweet_analyse$created_at, format="%Y-%m-%d")
+head(tweet_analyse$date)
+
+
+august_tweets <- 
+  tweet_analyse %>% 
+  filter(date > "2018-07-31" &  date<"2018-09-01")
+
+```
+

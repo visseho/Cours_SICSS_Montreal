@@ -135,6 +135,7 @@ nombre_age4 <-
   crsc96_small %>% 
   count(age = age4)
 
+nombre_age4
 ```
 
 
@@ -164,11 +165,14 @@ proportion2
 ## Avec le package Summarytools
 
 ```{r}
+
 freq(crsc96$sexq)
+
 freq(crsc96$q1)
 freq(crsc96$region)
 freq(crsc96$q44)
 freq(crsc96$q95)
+
 ```
 
 
@@ -184,6 +188,8 @@ Il faut préter attention aux variables manquantes.
 
 summary(crsc96_small)
 
+summary(crsc96_small$age)
+
 ```
 
 
@@ -195,6 +201,7 @@ L’inconvénient, c'est que c'est mal présenté, et ce ne sont pas l'ensemble 
 ```{r}
 
 age_moyen <- mean(crsc96_small$age)
+
 age_moyen
 
 age_mediane <- median(crsc96_small$age)
@@ -310,7 +317,9 @@ position_q <-
   summarise_each(funs(mean, median))
 position_q
 
+
 ```
+
 Le problème, c'est la longueur du fichier.
 
 ## EXERCICE
@@ -377,6 +386,7 @@ poids_moyen_reporte <-
 poids_moyen_reporte
 
 ```
+
 Quel est le problème qui se pose quand des informations sont manquantes. Peut-on faire confiance aux résultats?
 
 
@@ -420,12 +430,20 @@ Une jeune fille non mariée de 18 ans ne devrait pas avoir de relations sexuelle
 
 ```{r}
 
+freq(crsc96_small$q2)
+
 qlabel <- c("totally agree", "agree somewhat", "DK/NA", "disagree somewhat", "totally disagree")
 
 crsc96_small <-
   crsc96_small %>% 
   mutate(q2_new = factor(q2, labels = qlabel),
          q3_new = factor(q3, labels = qlabel))
+
+freq(crsc96_small$q2_new)
+
+# relation entre sexe et affirmation q2
+
+ctabl
 
 ctable(crsc96_small$sexe, crsc96_small$q2_new)
 

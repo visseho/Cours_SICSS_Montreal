@@ -26,6 +26,7 @@ Ce code permet d'effacer l'environnement.
 
 ```{r}
 
+ls()
 rm(list = ls())
 
 ```
@@ -33,9 +34,10 @@ rm(list = ls())
 ## Entrons les données pour créer la base de données 
 
 - la section de code est obtenue par ce raccourci:
-    - command + Option + i (mac)
+    - Command + Option + i (mac)
 - Pour exécuter une ligne de code, il faut se placer sur la ligne et faire 
     - command + Entree (mac)
+    
 ```{r}
 
 nom_classe <- c("guillaume", "amy", "andree", "john", "natacha")
@@ -238,6 +240,7 @@ crsc96_small <-
 
 crsc96_small 
 
+
 ```
 
 Signification du code:
@@ -352,6 +355,16 @@ crsc96_small <-
   mutate(age_double =  age*2,
          age_écart = age - mean(age))
 
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age_double = age*2)
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age_ecart = age - mean(age))
+
+
 ```
 
 L'une des modification les plus importantes pour une variable continue est le calcul du score z (z-score en anglais), ou score standardisé. Il désigne le nombre d'écarts-types par rapport à la moyenne d'un point de données. Par exemple, un individu qui a une valeur de z-score de 2, signifie qu'il se trouve à deux écarts-types de la moyenne. Le calcul des z-scores permet de comparer les populations entre elle, en enlevant l'unité de mesure spécifique dans laquelle les mesures ont été faites. Les tests standardisés, les poids et taille standardisés sont des z-scores. Il se calcule de la manière suivante:
@@ -360,7 +373,7 @@ L'une des modification les plus importantes pour une variable continue est le ca
 
 crsc96_small <-
   crsc96_small %>% 
-  mutate(age_standardise = (age - mean(age))/sqrt(age))
+  mutate(age_standardise = (age - mean(age))/sd(age))
 
 ```
 
@@ -379,10 +392,12 @@ crsc96_small <-
 class(crsc96_small$q1_new)
 
 head(crsc96_small)
+
 ```
+
 On voit que q1_new est exactement comme q1. Mais ce n'est pas ce que nous voulons. Nous voulons que ce soit une variable factorielle.
 
-## Recodage et création de variables facorielles
+## Recodage et création de variables factorielles
 
 ```{r}
 crsc96_small <-
@@ -390,6 +405,8 @@ crsc96_small <-
   mutate(q1_new = as.factor(q1))
 
 class(crsc96_small$q1_new)
+class(crsc96_small$q1)
+
 head(crsc96_small)
 
 ```
@@ -445,6 +462,7 @@ crsc96_small <-
          q3_new = factor(q3, labels = qlabel))
 
 freq(crsc96_small$q2)
+freq(crsc96_small$q2_new)
 
 ```
 
@@ -468,6 +486,8 @@ crsc96_small <-
   crsc96_small %>% 
   mutate(age2bis = as.factor(if_else(age >= 35, "adulte", "jeune")))
 
+class(crsc96_small$age2bis)
+
 # utiliser factor
 
 crsc96_small <-
@@ -490,14 +510,26 @@ crsc96_small <-
   crsc96_small %>% 
   mutate(age4 = case_when(
     age < 20 ~ "adolescent",
+    age >= 20 & age < 35 ~ "jeune",
+    age >= 35 & age < 59 ~ "adulte",
+    age >= 60 ~ "ainé"
+  ))
+
+
+crsc96_small <-
+  crsc96_small %>% 
+  mutate(age4 = case_when(
+    age < 20 ~ "adolescent",
     age >= 20 & age < 34 ~ "jeune",
-    age >= 35 & age <59 ~ "adulte",
+    age >= 35 & age < 59 ~ "adulte",
     age >=60 ~ "ainé"
   ))
 
+  
 class(crsc96_small$age4)
 
 head(crsc96_small)
+  
 ```
 
 Si je veux que ce soit une variable factorielle, que dois-je faire?
@@ -544,6 +576,8 @@ crsc96_small <-
   mutate(age6 = factor(ntile(age, 5), labels = c("g1", "g2", "g3", "g4", "g5")))
 
 class(crsc96_small$age6)
+freq(crsc96_small$age6)
+
 
 head(crsc96_small)
 

@@ -1,0 +1,171 @@
+---
+title: 'Séance 5.2: Travailler avec les chaines de caractères'
+subtitle: 'exemple du livre r4ds'
+author: "Visseho Adjiwanou, PhD."
+#institute: "SICSS-Montréal"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+institute: SICSS - Montréal
+---
+
+
+Ce chapitre vous présente la manipulation des chaînes de caractères dans R. Vous apprendrez les bases du fonctionnement des chaînes de caractères et comment les créer à la main, mais ce chapitre se concentrera sur les expressions régulières, ou regexps en abrégé. Les expressions régulières sont utiles car les chaînes contiennent généralement des données non structurées ou semi-structurées, et les regexps constituent un langage concis pour décrire des motifs dans les chaînes. Lorsque vous regardez une regexp pour la première fois, vous pensez qu'un chat a traversé votre clavier, mais au fur et à mesure que vous la comprendrez, elle prendra tout son sens.
+
+
+
+```{r}
+
+library(tidyverse)
+
+string1 <- "This is a \\ string"
+string1
+writeLines(string1)
+string2 <- 'If I want to include a "quote" inside a string, I use single quotes'
+
+double_quote <- "\"" # or '"'
+double_quote
+single_quote <- '\'' # or "'"
+
+# Caractères spéciaux
+x <- "\u00b5"
+
+x
+
+```
+
+1. combiner les chaînes
+
+```{r}
+
+str_c("x", "y")
+str_c("x", "y", sep = ", ")
+
+x <- c("abc", NA)
+x
+
+str_c("|-", x, "-|")
+
+str_c("|-", str_replace_na(x), "-|")
+
+
+str_c("prefix-", c("a", "b", "c"), "-suffix")
+
+
+# length 0 object drops
+
+name <- "Hadley"
+time_of_day <- "morning"
+birthday <- FALSE
+class(birthday)
+
+str_c(
+  "Good ", time_of_day, " ", name,
+  if (birthday) " and HAPPY BIRTHDAY",
+  "."
+)
+
+# collapse
+
+str_c(c("x", "y", "z"), collapse = ", ")
+
+```
+
+2. subsetting string
+
+```{r}
+
+x <- c("Apple", "Banana", "Pear")
+x
+str_sub(x, 1, 3)
+
+str_sub(x, -3, -1)
+
+str_sub(x, 1, 1) <- str_to_lower(str_sub(x, 1, 1))
+str_sub(x, 1, 1)
+
+```
+
+3. locate
+
+```{r}
+
+# Turkish has two i's: with and without a dot, and it
+# has a different rule for capitalising them:
+str_to_upper(c("i", "ı"))
+
+str_to_upper(c("i", "ı"), locale = "tr")
+
+
+x <- c("apple", "eggplant", "banana")
+
+str_sort(x, locale = "en")  # English
+
+str_sort(x, locale = "haw") # Hawaiian
+
+```
+
+- tr is the code for Turkish: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+
+
+# Matching pattern
+
+Les regexps sont un langage très laconique qui permet de décrire des motifs dans des chaînes de caractères. Il faut un peu de temps pour les assimiler, mais une fois que vous les aurez comprises, vous les trouverez extrêmement utiles.
+
+Pour apprendre les expressions régulières, nous utiliserons str_view() et str_view_all(). Ces fonctions prennent un vecteur de caractères et une expression régulière, et vous montrent comment ils correspondent. Nous commencerons par des expressions régulières très simples, puis nous les compliquerons progressivement. Une fois que vous aurez maîtrisé la recherche de motifs, vous apprendrez à appliquer ces idées à diverses fonctions de stringr.
+
+
+```{r}
+
+
+x <- c("apple", "banana", "pear")
+
+str_view(x, "an")
+
+# except new line
+str_view(x, ".a.")
+
+# To create the regular expression, we need \\
+dot <- "\\."
+dot
+# But the expression itself only contains one:
+writeLines(dot)
+
+# And this tells R to look for an explicit .
+str_view(c("abc", "a.c", "bef"), "a\\.c")
+
+
+x <- "a\\b"
+x
+writeLines(x)
+
+str_view(x, "\\\\")
+
+```
+
+## 14.3.2 Anchors
+
+Par défaut, les expressions régulières correspondent à n'importe quelle partie d'une chaîne. Il est souvent utile d'ancrer l'expression régulière de manière à ce qu'elle corresponde au début ou à la fin de la chaîne. Vous pouvez utiliser :
+
+
+^ pour trouver le début de la chaîne.
+$ pour trouver la fin de la chaîne.
+
+```{r}
+
+
+
+```
+
+14.3.5 Groupement et références arrière
+
+Plus tôt, vous avez appris que les parenthèses permettaient de désambiguïser des expressions complexes. Les parenthèses créent également un groupe de capture numéroté (numéro 1, 2, etc.). Un groupe de capture stocke la partie de la chaîne de caractères correspondant à la partie de l'expression régulière à l'intérieur des parenthèses. Vous pouvez faire référence au même texte que celui qui a été précédemment trouvé par un groupe de capture avec des références arrière, comme \N1, \N2, etc. Par exemple, l'expression régulière suivante trouve tous les fruits qui ont une paire de lettres répétée.
+
+```{r}
+
+str_view(fruit, "(.)\\1", match = TRUE)
+str_view(fruit, "(..)\\1", match = TRUE)
+
+```
+

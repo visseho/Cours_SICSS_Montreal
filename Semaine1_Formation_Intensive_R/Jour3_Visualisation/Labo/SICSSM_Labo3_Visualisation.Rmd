@@ -88,7 +88,7 @@ FWEIGHT : Final weight
 mean_income <-
   cis_short %>% 
   group_by(Province) %>% 
-  summarise(mean(CFATINC))
+  summarise(revenu_moyen = mean(CFATINC))
 
 mean_income
 
@@ -116,7 +116,8 @@ Ce que cette distribution ne nous dit pas, c'est le niveau d'inégalité au sein
 variation_income <-
   cis_short %>% 
   group_by(Province) %>% 
-  summarise(var(CFATINC, na.rm = TRUE))
+  summarise(variance_revenu = var(CFATINC, na.rm = TRUE),
+            écart_type = sd(CFATINC, na.rm = TRUE))
 
 variation_income
 
@@ -170,6 +171,10 @@ knitr::include_graphics("/Users/visseho/OneDrive - UQAM/Cours/Images_cours/boxpl
 ggplot(cis_short) +
   geom_boxplot(aes(y = CFATINC))
 
+
+ggplot(cis_short %>% filter(Province == "Québec")) +
+  geom_boxplot(aes(y = CFATINC))
+
 ```
 
 Ce graphique permet de visualiser les données abbérantes ou les outliers. Un **outlier**, ou **donnée aberrante** est “une valeur ou une observation qui est « distante » des autres observations effectuées sur le même phénomène, c’est-à-dire qu’elle contraste grandement avec les valeurs « normalement » mesurées. Une donnée aberrante peut être due à la variabilité inhérente au phénomène observé ou bien elle peut aussi indiquer une erreur expérimentale. Les dernières sont parfois exclues de la série de données”. Mais avant cela, voyons comment se présentent les distributions selon les régions du Canada.
@@ -184,11 +189,12 @@ ggplot(cis_short) +
 ```
 
 ```{r}
+
 ggplot(cis_short) +
   geom_boxplot(aes(x = Province, y = CFATINC, color = Province))
 
 ggplot(cis_short) +
-  geom_boxplot(aes(x = Province, y = CFATINC), color = "green")
+  geom_boxplot(aes(x = Province, y = CFATINC), color = "blue")
 
 ```
 

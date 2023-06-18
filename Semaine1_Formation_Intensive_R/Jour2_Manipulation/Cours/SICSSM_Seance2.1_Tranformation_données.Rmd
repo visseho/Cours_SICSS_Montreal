@@ -49,7 +49,13 @@ UNpop <- read.csv(UNpop_URL)
 ## Opération sur les fichiers de données
 
 ```{r}
+
 head(UNpop)
+head(UNpop, 4)
+
+help(head)
+?(head)
+
 ```
 
 
@@ -109,6 +115,9 @@ UNpop[c(1, 2, 3), ]
 UNpop[, "world.pop"]
 UNpop$world.pop
 UNpop[["world.pop"]]
+
+
+UNpop$year
 
 ```
 - select(UNpop, world.pop) marche aussi mais. select vient d'un autre package

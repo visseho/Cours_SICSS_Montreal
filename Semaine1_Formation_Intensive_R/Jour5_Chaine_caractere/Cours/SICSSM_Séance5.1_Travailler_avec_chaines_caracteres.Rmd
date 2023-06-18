@@ -56,7 +56,7 @@ Un terme de programmation général pour une unité de données de caractères e
 
 -
 
-Dans d'autres langages, "chaîne" fait souvent référence à une *séquence * d'informations numériques, comme chaînes binaires (par exemple "01110000 01101111 01101111 01110000"). Nous les utilisons rarement dans R.
+Dans d'autres langages, "chaîne" fait souvent référence à une *séquence* d'informations numériques, comme chaînes binaires (par exemple "01110000 01101111 01101111 01110000"). Nous les utilisons rarement dans R.
 
 -
 
@@ -87,14 +87,17 @@ freq(restaurants$ZIP_length)
 
 ## `substr()`
 
-Nous pouvons utiliser `substr ()` pour extraire uniquement les 5 premiers chiffres du code postal.
+Nous pouvons utiliser `substr()` pour extraire uniquement les 5 premiers chiffres du code postal.
 
 ```{r substr}
 
 restaurants <- 
   restaurants %>%
   mutate(ZIP_5 = substr(Zip_Code, 1, 5),
-         ZIP_3 = substr(Zip_Code, 2, 4))
+         ZIP_3 = substr(Zip_Code, 2, 4),
+         count_zip5 = nchar(ZIP_5))
+
+freq(restaurants$count_zip5)
 
 ?substr
 restaurants %>% distinct(ZIP_5) %>% head()
@@ -128,6 +131,8 @@ restaurants %>% distinct(mailing_address) %>% head()
 
 ```{r paste0}
 
+1:5
+letters[1:5]
 
 paste(1:5, letters[1:5]) # sep met un espace par défaut
 paste(1:5, letters[1:5], sep ="")
@@ -146,15 +151,21 @@ Voici quelques exemples; assurez-vous de comprendre comment chaque ensemble d'ar
 
 ```{r paste_practice, eval=TRUE, results="hold"}
 
+letters[1:5]
+
 paste(letters[1:5], sep = "+")
 paste(1:5, letters[1:5], sep = "+")
 
 paste(letters[1:5], collapse = "!")
 paste0(1:5, letters[1:5], collapse = "???")
+
 paste(1:5, "Z", sep = "*")
+paste(1:5, "Z", collapse = "*", sep = "")
+
 paste(1:5, "Z", sep = "*", collapse = " ~ ")
 
-?paste
+
+
 ```
 
 
@@ -188,9 +199,11 @@ De façon pratique, **la plupart** des fonctions `stringr` commence par "`str_`"
 
 ```{r str_sub_example}
 
-str
 
 str_sub("Washington", 3, 8)
+
+shingt
+
 str_sub("Washington", 8, 3) # Pourquoi ceci ne marche pas?
 
 str_sub("Washington", -5, -3)
@@ -201,7 +214,7 @@ str_sub("Washington", -3, -5) # Pourquoi ceci ne marche pas?
 ```
 
 
-- `str_c ()` ("string combine") est exactement comme `paste()` mais où la valeur par défaut est `sep =""` (comme `paste0()`)
+- `str_c()` ("string combine") est exactement comme `paste()` mais où la valeur par défaut est `sep =""` (comme `paste0()`)
 
 ```{r str_c_example}
 letters
@@ -209,6 +222,8 @@ letters[1:5]
 1:5
 
 str_c(letters[1:5], 1:5)
+
+str_c(letters[1:5], 1:5, collapse = "*")
 
 ```
 
@@ -243,7 +258,9 @@ restaurants <-
          Address = str_to_upper(Address),
          City = str_to_upper(City))
 
+
 # Plus simplement avec mutate_at
+
 
 restaurants <- 
   restaurants %>%
@@ -288,11 +305,12 @@ Remarque: `mutate_if(x, y)` applique la fonction `y` à chaque colonne pour laqu
 
 
 
+
 # Expressions régulières 
 
 # Que sont les expressions régulières?
 
-**Les expressions régulières** ou **regex** sont la façon dont nous décrivons les modèles que nous recherchons dans le texte d'une manière qu'un ordinateur peut comprendre. Nous écrivons une **expression**, l'appliquons à une entrée de chaîne, puis on peut faire des choses avec **correspond** que nous trouvons.
+**Les expressions régulières** ou **regex** sont la façon dont nous décrivons les modèles que nous recherchons dans le texte d'une manière qu'un ordinateur peut le comprendre. Nous écrivons une **expression**, l'appliquons à une entrée de chaîne, puis on peut faire les **correspondances** que nous trouvons.
 
 Page 2 de ceci: https://github.com/rstudio/cheatsheets/blob/main/strings.pdf
 
@@ -372,6 +390,8 @@ Mais PAS pour correspondre à "206" se trouvant ailleurs:
 
 ```{r look_for_206}
 
+head(unique(restaurants$Phone))
+
 code_206_pattern <- "^\\(?206|^\\(?306"
 
 exemple_test <- c("2061234567", "(206)1234567",
@@ -379,11 +399,14 @@ exemple_test <- c("2061234567", "(206)1234567",
 
 exemple_test
 
+str_detect(exemple_test, "206")
+
 str_detect(exemple_test, "^\\(?206")
 
 str_detect(exemple_test, "206")  # Voyez la différence
 
 str_detect(exemple_test, code_206_pattern)
+
 
 
 
@@ -442,7 +465,7 @@ direction_exemples <- c("2812 THORNDYKE AVE W", "512 NW 65TH ST",
 
 direction_exemples
 
-str_extract(direction_exemples, "N")
+str_view(str_extract(direction_exemples, " N "))
 
 str_extract(direction_exemples, direction_pattern1)
 
@@ -476,7 +499,7 @@ Peut-être que nous voulons faire une analyse des inspections au niveau de la ru
 
 ```{r test_address_numbers}
 
-address_number_pattern <- "^[0-9]*-?[A-Z]? (1/2 )?"
+address_number_pattern <- "^[0-9]*-?[A-Z]*? (1/2 )?"
 
 address_number_test_examples <- 
   c("2812 THORNDYKE AVE W", "1ST AVE", "10AA 1ST AVE", 
@@ -595,6 +618,7 @@ head(unique(restaurants$Violation_Description))
 
 head(str_split_fixed(restaurants$Violation_Description, " - ", n = 2))
 
+str_
 ```
 
 
@@ -617,6 +641,8 @@ http://edrub.in/CheatSheets/cheatSheetStringr.pdf
 - https://regexr.com/
 
 - https://regenerativetoday.com/a-complete-beginners-guide-to-regular-expressions-in-r/
+
+- Présentation youtube très génial : https://www.youtube.com/watch?v=sa-TUpSx1JA
 
 **Remarques**
 

@@ -1,4 +1,9 @@
 ---
+output:
+  beamer_presentation: default
+  html_document: default
+---
+  ---
 title: 'Session3: Visualisation avec ggplot'
 author: "Visseho Adjiwanou, PhD."
 institute: "SICSS - Montréal"
@@ -129,6 +134,7 @@ Exemples: Visualiser la distribution univariée
 - Nous allons utiliser les données dhs_ipv
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
+
 library(tidyverse)
 
 dhs_ipv <- read_csv("../données/dhs_ipv.csv")
@@ -287,6 +293,10 @@ Exemples: Visualiser la distribution bivariée
 ggplot(crsc96_small) +
   geom_bar(aes(x = sexe, fill = q2_new))
 
+
+ggplot(crsc96_small) +
+  geom_bar(aes(x = sexe, y = ..prop.., fill = q2_new))
+
 ```
 
 - Ce graphique nous donne pour chaque sexe, le nombre de personnes qui sont dans chaque catégorie de la variable dépendante.
@@ -360,8 +370,12 @@ a +
 ```{r, out.width = '60%', message = FALSE, warning=FALSE, fig.align='center'}
 
 b <- ggplot(dhs_ipv) + 
-  geom_boxplot(aes(x = region, y = beat_burnfood))
+  geom_boxplot(aes(x = region, y = beat_burnfood)) +
+  ylim(0, 80)
+
 b
+
+?ylim
 ```
 - Note : x doit être une variable qualitative, et y une variable quantitative.
 
@@ -370,7 +384,8 @@ b
 
 ```{r, out.width = '60%', message = FALSE, warning=FALSE, fig.align='center'}
 c <- ggplot(dhs_ipv) + 
-  geom_boxplot(aes(x = region, y = sec_school))
+  geom_boxplot(aes(x = region, y = sec_school)) #+
+  #ylim(0, 80)
 c
 
 ```
@@ -383,9 +398,12 @@ c
 ## Exemple: Diagramme de quartile 
 
 ```{r, out.width = '70%', message = FALSE, warning=FALSE, fig.align='center'}
+
 #install.packages("ggpubr")
 library(ggpubr)
 ggarrange(b, c, ncol = 2)
+
+ggarr
 
 ```
 
@@ -450,16 +468,16 @@ https://ggplot2.tidyverse.org/reference/theme.html
 
 ```{r, out.width = '75%', message = FALSE, warning=FALSE}
 
-d <- ggplot(dhs_ipv) +
-  geom_point(aes(x = no_media, y = beat_burnfood, 
-                 color = region)) +
-  geom_smooth(aes(x = no_media, y = beat_burnfood, 
-                  color = region), 
+ggplot(dhs_ipv) +
+  geom_point(aes(x = no_media, y = beat_burnfood, color = region)) +
+  geom_smooth(aes(x = no_media, y = beat_burnfood, color = region), 
               method = lm, se = FALSE,  formula = y ~ x) + 
   labs(title = "Association entre accès aux médias et attitudes face à la violence",
        x = "Non accès aux médias (%)",
        y = "Battre si brûle la nourriture (%)") +
-  theme(legend.position = "bottom", legend.direction = "horizontal")
+  theme_bw() +
+  theme(legend.position = "bottom", legend.direction = "horizontal") 
+ 
 
 ```
 

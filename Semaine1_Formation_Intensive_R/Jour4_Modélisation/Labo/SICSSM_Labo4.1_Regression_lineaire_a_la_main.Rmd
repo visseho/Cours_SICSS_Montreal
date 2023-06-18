@@ -32,6 +32,7 @@ longueur
 louve <- data_frame(poids, longueur)
 
 louve
+
 ```
 
 2. Présenter un graphique montrant la relation entre le poids (variable dépendante) et la taille (variable indépendante)
@@ -50,13 +51,16 @@ Une relation positive. C'est à dire, qu'une plus grande taille est associée à
 
 4. En estimant que cette relation est linéaire, calculer les paramêtres $\alpha$ et $\beta$.
 
+$$\hat{\beta} = \frac{\sum_{i=1}^n(Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n(X_i - \bar{X})^2}$$
 
 ```{r}
+
+mean(louve$longueur)
 
 louve <-
   louve %>% 
   mutate(dec_longueur = longueur - mean(longueur),
-         dec_longueur_sq = dec_longueur ^ 2,
+         dec_longueur_sq = dec_longueur^2,
          dec_poids = poids - mean(poids),
          prod_croise = dec_poids*dec_longueur)
   
@@ -71,10 +75,15 @@ coef_reg <-
 
 coef_reg
 coef_reg[[1]]
+
+coef_reg$beta
+
+
 coef_reg[[2]]
 
 class(coef_reg[1])
 class(coef_reg[[1]])
+
 ```
 
 ```{r}
@@ -85,7 +94,10 @@ ggplot(louve) +
   geom_smooth(aes(x = longueur, y = poids), method = "lm", se = FALSE)
 
 ```
+
+
 ```{r}
+
 coef_reg
 
 ggplot(louve) +
@@ -99,6 +111,7 @@ ggplot(louve) +
 5. Calculé le poids prédit
 
 ```{r}
+
 a <- coef_reg[[2]]
 a
 b <- coef_reg[[1]]
@@ -141,10 +154,13 @@ https://www.rdocumentation.org/packages/broom/versions/0.7.6
 
 ```{r}
 #install.packages("broom")
+
 library(broom)
 ?broom
+
 reg1 <- lm(formula =  poids ~ longueur, data = louve)
 reg1
+
 reg <- 
   louve %>% 
   lm(formula =  poids ~ longueur)
@@ -153,6 +169,7 @@ reg <-
 reg1
 summary(reg1)
 summary(reg1)[2]
+
 
 tableau_reg <- tidy(reg1)
 tableau_reg

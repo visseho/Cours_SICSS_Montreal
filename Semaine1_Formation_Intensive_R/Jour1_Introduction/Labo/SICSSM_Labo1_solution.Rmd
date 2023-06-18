@@ -1,0 +1,45 @@
+---
+title: 'Labo 1 : Indexation et fichier de données'
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  beamer_presentation: default
+  ioslides_presentation: default
+---
+
+Ce Labo utilise le fichier de données classdata2021 fourni sous format .csv.
+
+## Exercice 1
+
+1. Importer le fichier classdata2021.csv dans RStudio.
+
+```{r}
+
+classdata2021 <- read.csv("../Données/classdata2021.csv")
+
+#class <- read.csv("classdata2021.csv")
+
+```
+
+
+2. Quelles sont les dimensions de ce fichier de données ?
+
+162 observations et 6 variables
+
+```{r}
+
+dim(classdata2021)
+
+```
+
+3. Obtenir un sous-ensemble du fichier contenant la 1ère et la 3ème colonne et de la 2ème à la 4ème ligne.
+
+## Exercice 2
+
+1. Calculer la moyenne des variables "height" et "shoe.size". (Astuce : possible d'utiliser la fonction colMeans())
+2. Créer un nouveau fichier de données "gender_height" contenant les observations de 4 à 10 et les variables "gender" et "height".
+3. Déterminer la taille des femmes à partir de ce fichier.
+
+## Exercice 3
+
+Déterminer la couleur des cheveux ("hair.color") des 25% personnes les plus grandes en taille ("height").

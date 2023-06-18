@@ -188,6 +188,7 @@ bmk %>%
 
 
 ```
+
 On dira qu'être jumeau accroît la probabilité de décès de 6,7% (0.0677*100).
 
 ### 5.2  Modèle de probabilité linéaire - multivarié

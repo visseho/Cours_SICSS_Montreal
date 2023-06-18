@@ -387,7 +387,9 @@ population
 ```{r Vecteurs 2}
 
 pop1 <- c(2525779, 3026003, 3691173)
+pop1
 pop2 <- c(4449049, 5320817, 6127700, 6916183)
+pop2
 
 pop_totale <- c(pop1, pop2)
 
@@ -408,6 +410,7 @@ pop_totale
 ```{r}
 population
 population[2]
+
 
 ```
 
@@ -437,7 +440,9 @@ population[-2]
 ```{r, out.width='60%'}
 
 pop_million <- population / 1000
+
 pop_million
+
 rate <- population / population[1]
 rate 
 
@@ -462,6 +467,7 @@ Matrice
 - Deux dimensions 
   - Nombre de colonnes
   - Nombre de lignes
+
 
 
 ## Matrices
@@ -630,7 +636,9 @@ data("UNpop", package = "qss")
 ## Fichier/base de données - Opération sur les fichiers de données
 
 ```{r}
+
 head(UNpop)
+
 ```
 
 ## Fichier/base de données - Opération sur les fichiers de données
@@ -644,6 +652,8 @@ head(UNpop)
 
 age <- c(24, 25, 37)
 nom <- c("Jules", "Olivia", "John")
+
+base_mat <- cbind(age, nom)
 
 base <- data.frame(age, nom)
 
@@ -664,6 +674,7 @@ age1
 age2 <- rep(c(12, 25, 18), each = 4)
 age2
 ```
+
 - Quelle est la différence?
 
 ## Fichier/base de données - Opération sur les fichiers de données

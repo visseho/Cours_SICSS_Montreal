@@ -110,7 +110,7 @@ reg3 <- lm(beat_burnfood ~  region, data = dhs_ipv)
 reg3
 summary(reg3)
 
-
+freq(dhs_ipv$region)
 ```
 
 
@@ -176,6 +176,20 @@ cor(dhs_ipv$sec_school, dhs_ipv$no_media, use = "pairwise.complete.obs")
 
 
 ```
+
+
+Y = a + b1 education (1)
+
+Y = a + b2 education + c no_media
+
+
+- media corélé avec education
+- media corrélé avec Y
+
+
+
+
+
 
 **Interprétation**
 

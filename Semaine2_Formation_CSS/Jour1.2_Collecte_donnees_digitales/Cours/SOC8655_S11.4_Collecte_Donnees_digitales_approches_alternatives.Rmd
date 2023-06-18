@@ -1,0 +1,213 @@
+---
+title: 'Séance : Collecter les données digitales'
+subtitle: "Approches alternatives"
+author: "Visseho Adjiwanou, PhD., Georges Ngalé"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+# Objectifs
+Décrire en détails l'ensemble de ses procédures
+
+# Données de Twitter
+
+Quatre moyens existent pour collecter les données de Twitter: https://gwu-libraries.github.io/sfm-ui/posts/2017-09-14-twitter-data
+
+1. Retrieve from the Twitter public API
+2. Find an existing Twitter dataset
+3. Purchase from Twitter
+4. Access or purchase from a Twitter service provider
+
+# Twitter API
+
+REST APIs (https://dev.twitter.com/rest/public) :
+User timeline : Docs: https://dev.twitter.com/rest/reference/get/statuses/user_timeline
+Gets most recent tweets for a user.
+- Creating, getting, and updating users, tweets, followers, lists, and more.
+- User is specified by a screen name or user id.
+- Getting tweets by tweet ids.
+- Limited to last 3,200 tweets.
+- Returns 200 at a time, so must make multiple calls (“paging”) to get full timeline.
+Example: GET https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=socialfeedmgr&max_id=829886156334571524
+Limits: 900 tweets per 15 minutes
+
+Search API (https://dev.twitter.com/rest/public/search)
+Search : Docs: https://dev.twitter.com/rest/reference/get/search/tweets
+Search recent tweets.
+- Sampling of tweets from last 7 days.
+- Query by keyword, phrases, hashtags, author, date, sentiment and more.
+- Returns up to 100 at a time, so must use paging to get full results.
+- Not the same as search on Twitter website.
+Example: GET https://api.twitter.com/1.1/search/tweets.json?q=%23onlyatgw
+Limits: 180 tweets per 15 minutes
+
+Streaming API (https://dev.twitter.com/streaming/public)
+
+Sample Stream : Docs: https://dev.twitter.com/streaming/reference/get/statuses/sample
+Sample of all (public) tweets.
+- Estimated to be 0.5-1% of tweets.
+- Continue to receive additional tweets over a single call to API. (No paging.)
+- Around 3GB per day (compressed).
+Example: GET https://stream.twitter.com/1.1/statuses/sample.json
+(Notice there are no parameters.)
+Limits: Only one stream at a time.
+
+Filter Stream : Docs: https://dev.twitter.com/streaming/reference/post/statuses/filter
+Filtering of all (public) tweets.
+- Filter by keyword, user, or location.
+- Continue to receive additional tweets over a single call to API. (No paging.)
+Example: POST https://stream.twitter.com/1.1/statuses/filter.json?track=gwu
+Limits: Only one stream at a time ; Number of tweets at a time.
+
+# API Summary
+
+Get tweets from the past:
+- By user: User timeline
+- By query: Search
+
+Get tweets from the present:
+- A sample: Sample stream
+- By query: Filter stream
+
+## 1. Retrieve from the Twitter public API
+
+- Software libraries (e.g., Tweepy for Python and rtweet for R)
+- Command line tools (e.g., Twarc)
+- Web applications (e.g., DMI-TCAT and our very own Social Feed Manager)
+- Plugins for popular analytic packages (e.g., NVIVO, NodeXL for Excel, and TAGS for Google Sheets)
+
+### 1. Web applications
+
+#### 1.1 Social Feed Manager
+
+https://gwu-libraries.github.io/sfm-ui/
+https://gwu-libraries.github.io/sfm-ui/posts/2017-09-14-twitter-data
+
+##### a. But
+
+Social Feed Manager (SFM) recueille des messages individuels - tweets, photos, blogs - à partir de sites de médias sociaux. 
+Ces publications sont collectées dans leur format de données brutes natif appelé JSON et peuvent être exportées dans de nombreux 
+formats, y compris des feuilles de calcul. Les utilisateurs peuvent ensuite utiliser ces données collectées à des fins de recherche, 
+d'analyse ou d'archivage.
+
+##### b. Etapes
+
+Pour lancer votre première collection:
+
+1. Inscription : 
+
+- sur la page d'accueil de SFM, cliquez sur «S'inscrire». 
+- Remplissez le formulaire, y compris un e-mail unique. 
+- Une fois inscrit, vous serez automatiquement connecté.
+
+Configuration des informations d'identification : 
+
+- Accédez à https://apps.twitter.com/ .
+- Connectez-vous à Twitter et sélectionnez "Créer une application".
+- Entrez un nom pour l'application comme Social Feed Manager ou le nom d'un nouvel ensemble de collections.
+- Entrez une description. Vous pouvez copier et coller: Il s'agit d'un outil de recherche et d'archivage des 
+médias sociaux, qui recueille des données pour les chercheurs universitaires via une interface utilisateur accessible.
+- Entrez un site Web tel que l'URL SFM. Tout site Web fonctionnera.
+- Lisez et acceptez le contrat de développeur Twitter et cliquez sur Créer votre application Twitter.
+
+Conseillé:
+- Cliquez sur votre nouvelle application.
+- Accédez à l' onglet Autorisations .
+- Sélectionnez Lecture seule puis Mettre à jour les paramètres .
+
+- Accédez à la page Informations d'identification de SFM, puis cliquez sur Ajouter des informations d'identification Twitter .
+
+Remplissez tous les champs:
+- Sur la page des applications Twitter ( https://apps.twitter.com/ ), cliquez sur votre nouvelle application.
+- Accédez à l' onglet Clés et jetons d'accès .
+- Dans la moitié supérieure de la page, copiez et collez dans les champs correspondants dans SFM: Consumer Key et Consumer Secret .
+- Dans la moitié inférieure de la page, copiez et collez dans la correspondance
+- champs dans SFM: jeton d' accès et secret de jeton d'accès .
+- Cliquez sur Enregistrer
+
+2. Création de collections :
+
+Les collections sont les conteneurs SFM de base pour les données des médias sociaux. Chaque collection rassemble les publications 
+de comptes individuels ou rassemble les publications en fonction de critères de recherche. Les collections sont contenues dans des 
+ensembles de collections.
+
+Type de collections
+- twitter user timeline : collectez les tweets de comptes Twitter spécifiques
+- twitter search : collecte les tweets par une requête de recherche fournie par l'utilisateur à partir de tweets récents
+- twitter sample : collecte un flux fourni par Twitter d'un sous-ensemble de tous les tweets en temps réel.
+- twitter filter : collecte les tweets en fonction de critères fournis par l'utilisateur à partir d'un flux de tweets en temps réel.
+
+Création des ensembles de collections
+- Accédez à la page Ensembles de collections dans le menu supérieur, puis cliquez sur le bouton Ajouter un ensemble de collections .
+- Donnez à l'ensemble de collection un nom et une description uniques. Un ensemble de collections est comme un dossier pour toutes 
+les collections d'un projet.
+
+Création de collections
+- Une fois que vous êtes dans un ensemble de collections, cliquez sur le menu déroulant «Ajouter une collection» et sélectionnez 
+le type de collection que vous souhaitez ajouter.
+- Saisissez un nom de collection unique et une brève description. La description est un excellent emplacement pour décrire comment 
+vous avez choisi ce que vous voulez mettre dans votre collection.
+- Sélectionnez les informations d'identification que vous souhaitez utiliser. 
+
+3. Ajout des graines :
+
+Les semences sont les critères utilisés par SFM pour collecter les publications sur les réseaux sociaux. Les semences peuvent être 
+des comptes de médias sociaux individuels ou des termes de recherche utilisés pour filtrer les publications.
+
+Le processus de base pour ajouter des graines est le même pour chaque type de collection, à l'exception de Twitter Sample.
+
+- Désactivez la collection.
+- Cliquez sur Ajouter une graine pour ajouter une graine ou Ajouter des graines en vrac pour plusieurs.
+- Saisissez les identifiants utilisateur ou les critères de recherche et enregistrez.
+- Lorsque vous avez ajouté toutes les graines souhaitées, cliquez sur Activer.
+
+Pour plus de détails en fonction des types de collection :
+twitter user timeline : https://sfm.readthedocs.io/en/latest/collections.html#guide-twitter-user-timelines
+twitter search : https://sfm.readthedocs.io/en/latest/collections.html#guide-twitter-search
+twitter sample : https://sfm.readthedocs.io/en/latest/collections.html#guide-twitter-sample
+twitter filter : https://sfm.readthedocs.io/en/latest/collections.html#guide-twitter-filter
+
+4. Exportation
+
+Pour accéder aux données d'une collection, vous devrez l'exporter. Vous pouvez télécharger vos données dans plusieurs formats, y 
+compris Excel (.xlsx) et des valeurs séparées par des virgules (.csv), qui peuvent être chargées dans une feuille de calcul ou un 
+logiciel d'analyse de données.
+
+- En haut de la collection individuelle, cliquez sur Exporter .
+- Sélectionnez le type de fichier souhaité (.csv est recommandé; les types .xlsx seront également facilement accessibles).
+Sélectionnez la taille de fichier d'exportation souhaitée, en fonction du nombre de publications par fichier. Vous voudrez 
+peut-être sélectionner un certain nombre de publications qui fonctionneront avec le programme dans lequel vous allez charger 
+les données, par exemple Excel.
+- Sélectionnez Dédupliquer si vous ne voulez qu'une seule instance de chaque publication. Cela nettoiera vos données, 
+mais rendra l'exportation plus longue.
+- L'item date de début / date de fin vous permet de limiter l'exportation en fonction de la date de création de chaque publication. 
+Notez que la date que vous entrez sera dans le fuseau horaire local. La date dans les messages peut être dans un fuseau horaire différent, 
+par exemple, UTC. Des ajustements appropriés seront faits pour en tenir compte.
+- La date de début / date de fin de récolte vous permet de limiter l'exportation en fonction des dates de récolte.
+- Lorsque vous disposez des paramètres souhaités, cliquez sur Exporter . Vous serez redirigé vers l'écran d'exportation. 
+
+Lorsque l'exportation est terminée, les fichiers, ainsi qu'un fichier README décrivant ce qui a été inclus dans l'exportation 
+et la collection, apparaîtront pour que vous puissiez cliquer et télécharger. Vous recevrez un e-mail lorsque votre exportation 
+sera terminée.Pour vous aider à comprendre chaque champ de métadonnées dans l'exportation, consultez Dictionnaires de données 
+pour les exportations CSV / Excel : https://sfm.readthedocs.io/en/latest/data_dictionary.html#twitter-dictionary
+
+
+
+## Docker
+
+https://sfm.readthedocs.io/en/latest/docker.html
+
+From example.env
+
+#TWITTER_CONSUMER_KEY=mBbq9ruffgEcfsktgQztTHUir8Kn0
+#TWITTER_CONSUMER_SECRET=Pf28yReB9Xgz0fpLVO4b46r5idZnKCKQ6xlOomBAjD5npFEQ6Rm
+
+https://sfm.readthedocs.io/en/latest/install.html
+
+## Georges Mason University Library
+
+https://infoguides.gmu.edu/text-mining/social
+
+Pour s'enregistrer
+
+https://infoguides.gmu.edu/textanalysistools/socialfeedmanager

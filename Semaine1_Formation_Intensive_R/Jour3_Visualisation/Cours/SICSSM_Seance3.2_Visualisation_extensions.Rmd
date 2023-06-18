@@ -156,6 +156,9 @@ Exemple: Facets
 ```{r, out.width= '50%', message = FALSE}
 
 ggplot(dhs_ipv) +
+  geom_histogram(aes(x = beat_burnfood))
+
+ggplot(dhs_ipv) +
   geom_histogram(aes(x = beat_burnfood, color = region))
 
 ```
@@ -165,7 +168,7 @@ ggplot(dhs_ipv) +
 ```{r, out.width= '50%', message = FALSE}
 
 ggplot(dhs_ipv) +
-  geom_histogram(aes(x = beat_burnfood), color = "blue") +
+  geom_histogram(aes(x = beat_burnfood), fill = "blue", color = "white") +
   facet_wrap(~region)
 
 ```
@@ -198,6 +201,8 @@ ggplot(dhs_ipv) +
 # Que faire si vous voulez mettre sur ce graphique la médiane de l'ensemble de l'échantillon?
 
 ```
+
+
 ```{r}
 
 ggplot(dhs_ipv, aes(x = region, y = beat_burnfood, color = region)) + 

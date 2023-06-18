@@ -1,5 +1,5 @@
 ---
-title: 'Labo 10.1: Collete de données digitales par screen-scraping'
+title: 'Labo 10.1: Collecte de données digitales par screen-scraping'
 author: "Visseho Adjiwanou, PhD."
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: html_document
@@ -9,7 +9,6 @@ Remarque: Cours basé sur les notes de cours de Chris Bail (Duke University)
 
 ![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c10api11.png)
  
-# Présentation
 - Avec xpath
 - Avec SelectorGadget
 - Avec Selenium
