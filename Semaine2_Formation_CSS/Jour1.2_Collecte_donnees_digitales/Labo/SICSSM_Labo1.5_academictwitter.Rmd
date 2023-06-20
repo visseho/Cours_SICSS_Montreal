@@ -1,0 +1,160 @@
+---
+title: 'Labo: Collecte de données digitales par API'
+subtitle: "Academictwitter.R"
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+## Ressources
+
+https://cran.r-project.org/web/packages/academictwitteR/vignettes/academictwitteR-intro.html
+
+https://github.com/cjbarrie/academictwitteR
+
+https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/twitter-research-track/
+
+## Setting
+
+Nous pouvons utiliser academictwitter pour collecter les données sur Twitter
+
+```{r}
+
+rm(list = ls())
+
+#install.packages("academictwitteR")
+library(tidyverse)
+library(academictwitteR)
+
+academictwitteR::set_bearer()
+
+```
+
+## Interroger l'API Twitter avec academictwitteR
+
+- Collecte de données sur Black Lives Matter
+
+```{r}
+
+tweets_blm <-
+  get_all_tweets(
+    query = "#BlackLivesMatter",
+    start_tweets = "2020-01-01T00:00:00Z",
+    end_tweets = "2020-01-05T00:00:00Z",
+    file = "blmtweets"
+  )
+
+```
+
+- Collecte de données sur un autre hashtag
+
+```{r}
+
+tweets_jt <-
+  get_all_tweets(
+    query = "#Juneteenth",
+    start_tweets = "2023-06-01T00:00:00Z",
+    end_tweets = "2023-06-19T00:00:00Z",
+    file = "jttweets"
+  )
+
+```
+
+## quelques chose sur le Québec
+
+```{r}
+
+tweets_qb <-
+  get_all_tweets(
+    query = "#SICSS",
+    start_tweets = "2023-06-01T00:00:00Z",
+    end_tweets = "2023-06-19T00:00:00Z",
+    file = "qbtweets"
+  )
+
+```
+
+
+## Collecter les données sur un utilisateurs
+
+```{r}
+
+legault_trudeau <-
+get_all_tweets(
+  query = "Français",
+  users = c("francoislegault", "JustinTrudeau"),
+  start_tweets = "2022-06-01T00:00:00Z",
+  end_tweets = "2023-06-19T00:00:00Z",
+  n = 100
+)
+
+```
+
+14260960 => @JustinTrudeau
+260846506 => @francoislegault
+
+
+## Collecter en boucle
+
+
+```{r}
+
+
+elected_officials <- read.csv("https://cbail.github.io/Senators_Twitter_Data.csv", stringsAsFactors = FALSE)
+
+write_rds(elected_officials, file ="../Data/elected_officials.csv")
+
+elected_officials1 <- read_rds("../Data/elected_officials.csv")
+
+
+get_tweets_from_user <- function(twitter_id) {
+  # Another option is to add "query" parameter
+  academictwitteR::get_all_tweets(
+    users = twitter_id,
+    start_tweets = "2021-01-01T00:00:00Z",
+    end_tweets = "2021-09-30T00:00:00Z",
+    data_path = "data/raw/",
+    n = 3)
+}
+
+purrr::walk(elected_officials[["twitter_id"]], get_tweets_from_user)
+
+
+```
+
+## Mettre les données dans une base de données
+
+
+
+```{r}
+
+
+
+
+users <- academictwitteR::bind_tweets(data_path = "data/", user = TRUE)  
+
+tweets <- academictwitteR::bind_tweets(data_path = "data/")
+
+```
+
+## Sauvegarder les données
+
+```{r}
+
+write_rds(tweets, file = "../Données/tweet_senator_sicss_2023.csv")
+
+data <- read_rds("../Données/tweet_senator_sicss_2023.csv")
+
+
+tweet <- read_rds("/Users/visseho/Library/CloudStorage/OneDrive-UQAM/SICSS_2021_Montreal/Cours/Semaine2/Jour1.2_Collecte_donnees_digitales/Données/tweet_senator_sicss_2023.csv")
+
+```
+
+
+
+## Pour trouver l'auteur du Tweet
+
+- Entrer le "author_id" sur le site https://tweeterid.com/
+- Retourne le nom de l'auteur
+
+

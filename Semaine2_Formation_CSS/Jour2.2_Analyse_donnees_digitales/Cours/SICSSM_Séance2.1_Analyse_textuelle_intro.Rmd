@@ -1,8 +1,6 @@
-  ---
+---
 title: 'Séance 2.1: Analyse données digitales'
-subtitle: 'Analyse de texte'
 author: "Visseho Adjiwanou, PhD."
-institute: "SICSS - Montréal"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   beamer_presentation:
@@ -11,6 +9,9 @@ output:
     theme: Antibes
   slidy_presentation: default
   ioslides_presentation: default
+  #pdf_document: default
+subtitle: Analyse de texte
+institute: "SICSS - Montréal"
 ---
 
 ## Plan de présentation
@@ -239,7 +240,8 @@ Années 1940: les chercheurs en sciences sociales utilisent des méthodes simila
 
 >- Nous pouvons également inverser les lignes et les colonnes et convertir une matrice documents-termes en une matrice termes-documents où les lignes et les colonnes représentent respectivement les termes et les documents.
 
-![](/Users/visseho/OneDrive - UQAM/Cours/Images_cours/c11term_matrix.png)
+
+![](/Users/visseho/Library/CloudStorage/OneDrive-UQAM/Cours/Images_cours/c11term_matrix.png)
 
 
 ## 2. Tokénisation

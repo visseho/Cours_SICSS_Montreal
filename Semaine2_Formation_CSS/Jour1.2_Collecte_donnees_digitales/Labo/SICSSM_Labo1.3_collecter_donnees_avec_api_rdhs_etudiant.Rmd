@@ -1,9 +1,16 @@
 ---
-title: 'Labo 1.3: Collete de données avec API - rdhs'
+title: 'Labo 1.3: Collecte de données avec API - rdhs'
 author: "Visseho Adjiwanou, PhD."
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: html_document
 ---
+
+## Ressources
+
+https://cran.r-project.org/web/packages/rdhs/vignettes/introduction.html
+
+
+## Dresser la table
 
 ```{r, warning=FALSE}
 rm(list = ls())         # Clear your environment
@@ -26,6 +33,10 @@ library(survey)
 library(plotrix)
 library(foreign)        # To read Stata, SPSS and other files in R
 ```
+
+
+## Set up the 
+
 
 ```{r}
 library(rdhs)
@@ -56,8 +67,8 @@ datasets <- dhs_datasets(
   ungroup()
   
 #DHS credentials:
-set_rdhs_config(email = "",
-                project = "",
+set_rdhs_config(email = "visseho09@yahoo.fr",
+                project = "Reproductive health behavior and ch...",
                 config_path = "~/.rdhs.json",
                global = TRUE,
                verbose_download = TRUE)
@@ -66,3 +77,13 @@ set_rdhs_config(email = "",
 downloads <- get_datasets(datasets$FileName)
 
 ```
+
+
+# Regardons ce que nous avons télécharger
+
+```{r}
+
+zwir <- readRDS(downloads$ZWIR72DT)
+
+```
+

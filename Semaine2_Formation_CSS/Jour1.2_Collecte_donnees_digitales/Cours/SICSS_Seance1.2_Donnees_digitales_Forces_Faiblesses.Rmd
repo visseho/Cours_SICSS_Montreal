@@ -38,9 +38,6 @@ knitr::include_graphics("../Images/science_policy.jpg")
 
 ```
 
-
-
-
 Données digitales
 ======================================================
 
@@ -80,41 +77,114 @@ knitr::include_graphics("../Images/Matthews.png")
 
 ## Qu'est-ce que les données de traces numériques ou digitales?
 
+"... Les chercheurs peuvent maintenant observer le comportement, poser des questions, mener des expériences et collaborer de manière tout à fait impossible dans un passé récent. Ces nouvelles opportunités s'accompagnent de nouveaux risques: les chercheurs peuvent maintenant nuire aux gens d'une manière qui était impossible dans un passé récent."
+
+- (Salganik, 2017)
+
+
+## Qu'est-ce que les données de traces numériques ou digitales?
+
+1. Données en ligne créées et collectées par les entreprises
+
 - Sites de média sociaux
 - Données de recherche Web
 - Blogs / Autres forums Internet
-- Données administratives sur les sites Web
 - Internet Archive
-- Numérisation de textes historiques / archives
 - Données audio-visuelles
-- Données de téléphonie mobile
 
-## Exemples
+## Qu'est-ce que les données de traces numériques ou digitales?
+
+2. Données des appareils numériques dans le monde physique
+    - données de caisse de supermarché ((Mas and Moretti 2009) )
+    - Données de téléphonie mobile (Blumenstock, Cadamuro and On, 2015)
+    
+## Qu'est-ce que les données de traces numériques ou digitales?
+
+3. Données créées par les gouvernements    
+    - Données administratives sur les sites Web: dossiers fiscaux, les dossiers scolaires et les dossiers de l'état civil
+    - Numérisation de textes historiques / archives
+    
+    - Exemple: 
+        - données des compteurs de taxis numériques du gouvernement de la ville de New York (Farber 2015)
+        - dossiers de vote recueillis par le gouvernement ont été utilisés dans une enquête (Ansolabehere and Hersh 2012) et d'une expérience (Bond et al. 2012)
+
+
+## Quelques chiffres
 
 ```{r, warning=FALSE, message=FALSE, out.width='80%', echo=FALSE}
 
-knitr::include_graphics("../Images/c10facebook.png")
+knitr::include_graphics("../Images/chiffre_internet1.jpg")
 
 ```
 
+## Quelques chiffres
+
+- 171 millions de nouveaux internautes sur les 12 derniers mois (+3,5 %)
+- 190 millions de nouveaux utilisateurs des réseaux sociaux au cours des 12 derniers mois (+4,2 %)
+- 96,1 % des internautes utilisent leur mobile pour surfer sur le web (+0,3 %),
+- 6h37 passées en moyenne sur Internet par jour (en recul de 20 minutes),
+- 2h28 passées en moyenne sur les réseaux sociaux par jour (+1 minute),
+- 7,2 plateformes utilisées en moyenne par les socionautes chaque mois.
+
+(Source: https://www.blogdumoderateur.com/chiffres-cles-internet-reseaux-sociaux-monde-octobre-2022/)
 
 
 Caractéristiques des données digitales
 ======================================================
 
+## Caractéristiques
+
+1. Bon pour la recherche: 
+
+- Volumineuse
+- Toujours active
+- Non réactive
+- Capture les relations sociales
+
+## Caractéristiques
+
+2. Probématique pour la recherche
+
+- Incomplète
+- Inaccessible
+- Non représentative
+- Dérivante
+- Algorithmiquement confondue
+- Sale
+- Sensible
+
 ## 1. Volumineuses
 
 - Elles sont volumineuses
+
+"[Notre] corpus contient plus de 500 milliards de mots, en anglais (361 milliards), français (45 milliards), espagnol (45 milliards), allemand (37 milliards), chinois (13 milliards), russe (35 milliards) et hébreu (2 milliards). Les œuvres les plus anciennes ont été publiées dans les années 1500. Les premières décennies ne sont représentées que par quelques livres par an, comprenant plusieurs centaines de milliers de mots. En 1800, le corpus atteint 98 millions de mots par an; en 1900, 1,8 milliard; et en 2000, 11 milliards. Le corpus ne peut pas être lu par un humain. Si vous avez essayé de lire seulement les entrées en anglais de l'an 2000 seulement, au rythme raisonnable de 200 mots / min, sans interruptions pour la nourriture ou le sommeil, cela prendrait 80 ans. La séquence de lettres est 1000 fois plus longue que le génome humain: si vous l'écrivez en ligne droite, elle atteindrait la Lune 10 fois plus vite. " (Michel et al. 2011)
+
+<!--L'ampleur de ces données est sans aucun doute impressionnante, et nous sommes tous chanceux que l'équipe de Google Livres ait diffusé ces données au public (en fait, certaines des activités à la fin de ce chapitre utilisent ces données). Mais, chaque fois que vous voyez quelque chose comme ça, vous devriez demander: est-ce que toutes ces données font vraiment quelque chose? Auraient-ils pu faire la même recherche si les données pouvaient atteindre la Lune et revenir une seule fois? Et si les données pouvaient seulement atteindre le sommet du Mont Everest ou le sommet de la Tour Eiffel?
+-->
+
+
+## 1. Volumineuses
+
 - Pourquoi est-ce important?
+
   - Étude des phénomènes rares
-  - Hétérogénéité: études de Raj Chetty et ses collègues sur la mobilité sociale (que j'ai présenté en introduction de mon cours)
-  - Détecter des petites différences
+  
+  >- Hétérogénéité: études de Raj Chetty et ses collègues sur la mobilité sociale.            - Utilisation des données fiscales de 40 millions de personnes pour estimer l'hétérogénéité de la mobilité intergénérationnelle entre les régions des États-Unis 
+
+<!--Si Chetty et ses collègues avaient utilisé les dossiers fiscaux de 40 mille personnes plutôt que 40 millions, ils n'auraient pas été en mesure d'estimer l'hétérogénéité régionale et ils n'auraient jamais pu faire des recherches ultérieures pour essayer d'identifier les mécanismes qui créent cette variation.-->
+  
+  >- Détecter des petites différences: Par exemple, s'il y a deux interventions de santé publique et que l'une est légèrement plus efficace que l'autre, choisir une intervention plus efficace pourrait permettre de sauver des milliers de vies supplémentaires.
+  
+  >- Faire de la randomisation (expérience dans les magasins en ligne par exemple)
+
 
 ##  2. Continues
 
 - L'une des caractéristiques les plus attrayantes des données de traces numériques est leur collecte continue, contrairement aux enquêtes qui ne fournissent généralement qu'un bref instantané du monde social.
 - Permet d'étudier des évènements inattendus
-- Exemple: Ceren Budak et Duncan Watts (2015) dans l'étude sur les manifestations en Turquie
+- Exemple: Ceren Budak et Duncan Watts (2015) dans l'étude sur les manifestations en Turquie: ils ont été en mesure d'estimer quels types de personnes étaient plus susceptibles de participer aux manifestations de Gezi et d'estimer les changements d'attitudes de participants et non-participants, à la fois à court terme (comparant les pré-Gezi à Gezi) et à long terme (comparant les pré-Gezi aux post-Gezi).
+
+
 
 ##  2. Continues
 
@@ -149,9 +219,14 @@ En plus d'étudier des événements inattendus, les systèmes de données volumi
 ## 3. Non réactives
 
 - Un autre avantage important des données de traces numériques est qu'elles sont non réactives ou ne sont pas produites via une interaction entre les chercheurs et ceux qu'ils étudient. 
+
 - Dans certains cas, cela peut entraîner une réduction significative du biais de désirabilité sociale ou d'autres formes d'effet de l'intervieweur. 
+
+- Exemple : Stephens-Davidowitz (2014) utilisé la prévalence des termes racistes dans les requêtes des moteurs de recherche pour mesurer l'animosité raciale dans différentes régions des États-Unis
+
 - Considérons, par exemple, l’utilisation des données de recherche Google pour étudier l’avortement volontaire (voir la figure ci-dessous).
 
+<!-- Un aspect des données volumineuses que de nombreux chercheurs trouvent prometteur est que les participants ne sont généralement pas conscients que leurs données sont capturées ou qu'ils se sont tellement habitués à cette collecte de données qu'il ne change plus leur comportement. -->
 
 ## 3. Non réactives
 
@@ -161,12 +236,21 @@ knitr::include_graphics("../Images/c10reactive.png")
 
 ```
 
+## 3. Non réactives
 
+- Ne reflète pas d'une manière ou d'une autre le comportement ou les attitudes des gens : «ce n'est pas que je n'ai pas de problèmes, je ne les mets tout simplement pas sur Facebook» (Newman et al. 2011). 
+
+- Les gens ont tendance à se présenter de la meilleure manière possible. 
+
+- Affecté par les objectifs des objectifs des propriétaires de plate-forme
+
+- Enfin, bien que la non-réactivité soit avantageuse pour la recherche, le suivi du comportement des personnes sans leur consentement et leur sensibilisation soulève des préoccupations éthiques.
 
 
 ## 4. Capture les relations sociales
 
 - Les données de traces numériques sont également quelque peu inhabituelles dans la mesure où elles décrivent souvent des relations sociales. 
+
 - Alors que les techniques d'enquête classiques ne mesurent généralement que les caractéristiques de sujets individuels, par exemple, les données de trace numériques peuvent souvent être utilisées pour mesurer des relations sociales telles que le réseau de politiciens européens illustré ci-dessous.
 
 ## 4. Capture les relations sociales
@@ -180,20 +264,48 @@ knitr::include_graphics("../Images/c10relation.png")
 
 ## 5. Incomplètes
 
-- Bien que la taille et l’échelle des données de traçage numériques pouvant être collectées soient souvent considérées comme un gage, les nouveaux arrivants sur le terrain sont souvent surpris par la quantité de données qui manque souvent ou est incomplète. 
-- Prenons, par exemple, une étude sur les comportements d'intimidation sur les réseaux sociaux: bon nombre des publications les plus abusives susceptibles d'intéresser un chercheur sont souvent supprimées par Facebook avant que l'on puisse tenter de les étudier.
+- Bien que la taille et l’échelle des données de traces numériques pouvant être collectées soient souvent considérées comme un gage, les nouveaux arrivants sur le terrain sont souvent surpris par la quantité de données qui manque souvent ou est incomplète. 
+
+- **Incomplète naturellement**: La plupart des grandes sources de données sont incomplètes, dans le sens où elles ne disposent pas de l'information que vous voulez pour votre recherche. Elles manquent trois types d'information:
+
+    - les informations démographiques sur les participants, 
+    - le comportement sur d'autres plateformes et 
+    - les données permettant d'opérationnaliser les concepts théoriques: comment mesurer par exemple l'intéligence à partir de ces données? 
+
+<!-- De nombreux chercheurs en sciences sociales ont déjà eu l'expérience de traiter l'incomplétude, comme une enquête existante qui ne posait pas la question qui était nécessaire. Malheureusement, les problèmes d'incomplétude ont tendance à être plus extrêmes dans les grandes données. 
+
+Lorsque vous évaluez un résultat de recherche, un moyen rapide et utile d'évaluer la validité du construit est de prendre le résultat, qui est généralement exprimé en termes de constructions, et de le ré-exprimer en termes de données utilisées. Par exemple, considérons deux études hypothétiques qui prétendent montrer que les gens qui sont plus intelligents gagnent plus d'argent. Dans la première étude, le chercheur a constaté que les personnes qui obtiennent de bons résultats au Raven Progressive Matrices Test - un test d'intelligence analytique bien étudié (Carpenter, Just, and Shell 1990) - ont des revenus déclarés plus élevés dans leurs déclarations de revenus. Dans la deuxième étude, le chercheur a constaté que les personnes sur Twitter qui utilisent des mots plus longs sont plus susceptibles de mentionner les marques de luxe. Dans les deux cas, ces chercheurs pourraient prétendre avoir démontré que les personnes plus intelligentes gagnent plus d'argent. Cependant, dans la première étude, les constructions théoriques sont bien opérationnalisées par les données, alors que dans la seconde, elles ne le sont pas. En outre, comme cet exemple l'illustre, plus de données ne résolvent pas automatiquement les problèmes de validité de construction. Vous devriez douter des résultats de la deuxième étude, qu'il s'agisse d'un million de tweets, d'un milliard de tweets ou d'un billion de tweets.
+-->
+
+
+>- **Incomplète par suppression**: prenons, par exemple, une étude sur les comportements d'intimidation sur les réseaux sociaux: bon nombre des publications les plus abusives susceptibles d'intéresser un chercheur sont souvent supprimées par Facebook avant que l'on puisse tenter de les étudier.
 
 ## 6. Inaccessibles
 
 - Un défi encore plus redoutable est que les données sont souvent inaccessibles. Bien que Twitter fournisse une quantité énorme de données accessibles au public, la grande majorité des données générées sur Facebook sont privées. 
+
 - Bien que certaines pages Facebook telles que les "pages de fans" aient des paramètres publics par défaut, la grande majorité des utilisateurs de Facebook définissent leurs paramètres de confidentialité par défaut de manière à ce que les utilisateurs ne puissent accéder à leurs données que s'ils sont affiliés les uns aux autres en tant qu' "amis".
 
+<!-- Selon mon expérience, de nombreux chercheurs basés dans les universités comprennent mal la source de cette inaccessibilité. Ces données sont inaccessibles non pas parce que les gens dans les entreprises et les gouvernements sont stupides, paresseux ou indifférents. Il existe plutôt de sérieux obstacles juridiques, commerciaux et éthiques qui empêchent l'accès aux données. Par exemple, certains accords sur les conditions d'utilisation des sites Web autorisent uniquement l'utilisation de données par les employés ou l'amélioration du service. Ainsi, certaines formes de partage de données pourraient exposer les entreprises à des poursuites légitimes des clients. Il existe également des risques commerciaux importants pour les entreprises impliquées dans le partage de données. Essayez d'imaginer comment le public réagirait si des données de recherche personnelles étaient divulguées accidentellement par Google dans le cadre d'un projet de recherche universitaire. Une telle violation de données, si extrême, pourrait même être un risque existentiel pour l'entreprise. Donc Google - et la plupart des grandes entreprises - sont très réticents au risque de partager des données avec les chercheurs.-->
 
 ## 7. Non-représentatives
 
 - Ceux qui souhaitent utiliser des données de traces numériques doivent également faire face à un autre défi majeur: un échantillon aléatoire d'utilisateurs de Facebook ou de Twitter n'est pas représentatif de la population plus large des États-Unis ou de la plupart des autres pays. 
-- La figure ci-dessous présente des données du Wall Street Journal sur les données démographiques des utilisateurs de plusieurs sites de médias sociaux, démontrant des différences significatives entre plates-formes en fonction de la race. 
+- Les données du Wall Street Journal sur les données démographiques des utilisateurs de plusieurs sites de médias sociaux démontrent des différences significatives entre plates-formes en fonction de la race. 
 - D'autre part, l'utilisation de Facebook est devenue tellement répandue que certains lecteurs pourraient être surpris de voir à quel point il est devenu plus représentatif du public américain au cours des dernières années.
+
+## 7. Non-représentatives
+
+- Faire la différence entre transportabilité (comparaison intra-échantillon) 
+
+    - Étude de John Snow sur l'épidémie de choléra de 1853-54 à Londres
+    - Étude de Richard Doll et A. Bradford Hill (1954) qui ont suivi environ 25 000 hommes médecins pendant plusieurs années et ont comparé leurs taux de mortalité en fonction du nombre de cigarettes fumé. Ce résultat est transportable sur d'autres populations, pas à cause de la représentativité, mais du mécanisme liant tabac et cancer
+    
+- Et représentativité (généralisation -- problème statistique)
+
+
+
+<!-- En conclusion, de nombreuses sources de données importantes ne sont pas des échantillons représentatifs d'une population bien définie. Pour les questions qui nécessitent de généraliser les résultats de l'échantillon à la population à partir de laquelle il a été tiré, c'est un problème sérieux. Mais pour des questions sur les comparaisons intra-échantillon, les données non représentatives peuvent être puissantes, à condition que les chercheurs soient clairs sur les caractéristiques de leur échantillon et soutiennent les affirmations sur la transportabilité avec des preuves théoriques ou empiriques. En fait, j'espère que les sources de données volumineuses permettront aux chercheurs d'effectuer davantage de comparaisons intra-échantillon dans de nombreux groupes non représentatifs, et je suppose que les estimations de plusieurs groupes feront davantage avancer la recherche sociale qu'une simple estimation aléatoire aléatoire. échantillon.-->
 
 ## 8. Dérive (Drift)
 
@@ -201,9 +313,23 @@ knitr::include_graphics("../Images/c10relation.png")
 - Les plateformes numériques ne changent pas seulement de popularité (ce qui a bien sûr des implications importantes pour leur représentativité), mais aussi selon qui les utilise et pourquoi. 
 - Bien que Facebook fût autrefois la plateforme la plus populaire pour les étudiants américains de premier cycle, beaucoup d’entre eux se sont tournés vers Instagram ou Snapchat, peut-être en réaction à la hausse de l’utilisation de Facebook par la génération de leurs parents :)
 
+
+## 8. Dérive (Drift)
+
+- Trois types de dérive:
+
+    1. dérivée-est causée par des changements dans l'utilisation du système
+    2. changements dans la façon dont le système est utilisé
+    3. dérive est la dérive du système
+    
+<!--En conclusion, de nombreuses sources de données volumineuses sont en train de dériver en raison des changements dans la façon de les utiliser, dans la façon dont elles sont utilisées et dans le fonctionnement des systèmes. Ces sources de changement sont parfois des questions de recherche intéressantes, mais ces changements compliquent la capacité des grandes sources de données à suivre les changements à long terme au fil du temps.-->
+
 ## 9. Algorithmiquement confondant
 
 - Parfois, les données de traces numériques qui semblent décrire le comportement humain reflètent en réalité des changements dans la façon dont les humains interagissent avec des algorithmes. 
+
+- Un exemple relativement simple de confusion algorithmique est le fait que sur Facebook, il y a un nombre anormalement élevé d'utilisateurs avec environ 20 amis, comme l'ont découvert Johan Ugander et ses collègues (2011)
+
 - La «parabole de Google Flu» en est un exemple populaire. À l'origine, Google Flu était un outil populaire permettant aux utilisateurs d'estimer la prévalence de la grippe à l'aide des données de recherche Google. 
 - L'outil était si précis que certains ont suggéré de déplacer les enquêtes officielles des Centers for Disease Control (CDC). 
 
@@ -212,12 +338,28 @@ knitr::include_graphics("../Images/c10relation.png")
 - Au début de 2013, les estimations de Google étaient bien supérieures à celles de la CDC. 
 - Des chercheurs ont par la suite découvert que les liens hypertextes liés à la grippe sur laquelle les internautes avaient cliqué apparaissaient dans leur navigateur Web après avoir recherché des informations sur les symptômes du rhume. 
 
+- Contrairement à d'autres problèmes avec les traces numériques, la confusion algorithmique est largement invisible
+
+## 9. Algorithmiquement confondant
+
+"Plutôt que de penser aux grandes sources de données comme observant les gens dans un cadre naturel, une métaphore plus appropriée est d'observer les gens dans un casino. Les casinos sont des environnements hautement conçus conçus pour induire certains comportements, et un chercheur ne s'attendrait jamais à ce que le comportement dans un casino fournisse une fenêtre ouverte sur le comportement humain. Bien sûr, vous pourriez apprendre quelque chose sur le comportement humain en étudiant les gens dans les casinos, mais si vous ignorez le fait que les données ont été créées dans un casino, vous pourriez tirer de mauvaises conclusions." (Salganik, 2017)
+
+<!--Malheureusement, il est particulièrement difficile de traiter la confusion algorithmique car de nombreuses fonctionnalités des systèmes en ligne sont propriétaires, mal documentées et en constante évolution. Par exemple, comme je l'expliquerai plus loin dans ce chapitre, la confusion algorithmique était une explication possible de la dégradation progressive de Google Flu Trends (section 2.4.2), mais cette affirmation était difficile à évaluer car les mécanismes internes de l'algorithme de recherche de Google propriétaire. La nature dynamique de la confusion algorithmique est une forme de dérive du système. La confusion algorithmique signifie que nous devons être prudents quant à toute affirmation concernant le comportement humain provenant d'un système numérique unique, quelle que soit sa taille.-->
+
+
 ## 10. Non-structurées
 
 - Les données de traces numériques sont également souvent très désordonnées. 
 - Les nouveaux venus sur le terrain pensent souvent que les données générées sous forme numérique sont bien structurées, faciles à rechercher et rapidement transposables dans différents formats. 
 - Comme nous le verrons dans les prochains tutoriels, ce n'est généralement pas vrai. 
 - Un article récent du New York Times indiquait que les scientifiques du traitement des données consacraient plus de 80% de leur temps à nettoyer les données!
+
+<!-- Je pense que la source ultime de cette difficulté est que bon nombre de ces sources de données volumineuses n'ont jamais été utilisées à des fins de recherche et qu'elles ne sont donc pas collectées, stockées et documentées de manière à faciliter le nettoyage des données.
+
+Comme l'illustre cet exemple, une analyse relativement simple de données relativement complexes et en désordre risque d'être sérieusement faussée.
+
+Il n'y a pas de technique ou d'approche statistique unique qui puisse garantir que vous avez suffisamment nettoyé vos données sales. En fin de compte, je pense que la meilleure façon d'éviter d'être berné par des données sales est de comprendre autant que possible la façon dont vos données ont été créées.
+-->
 
 ## 11. Sensibles
 
@@ -230,6 +372,55 @@ knitr::include_graphics("../Images/c10relation.png")
 - Enfin, les données de traces numériques ont souvent des dimensions performatives. 
 - De nombreuses personnes ne signalent pas d'informations négatives à leur sujet en ligne précisément parce qu'elles savent que leurs amis, leurs collègues ou d'autres personnes qu'elles ne connaissent pas peuvent les surveiller. 
 - Cela crée une autre forme commune de biais dans la recherche sur les médias sociaux.
+
+
+Les stratégies de recherche
+=======================================
+
+## Les stratégies de recherche:
+
+1. Compter les choses 
+2. Prédirer les choses et 
+3. Approximer les expériences
+
+## Compter les choses
+
+"Souvent, les étudiants motivent leur recherche en disant: Je vais compter quelque chose que personne n'a jamais compté auparavant. Par exemple, un étudiant pourrait dire que beaucoup de gens ont étudié des migrants et beaucoup de gens ont étudié des jumeaux, mais personne n'a étudié les jumeaux migrants. D'après mon expérience, cette stratégie, que j'appelle la motivation par l'absence , ne mène généralement pas à de bonnes recherches. La motivation par l'absence est un peu comme dire qu'il y a un trou là-bas, et je vais travailler très dur pour le remplir. Mais pas tous les trous doivent être remplis." (Salganik, 2017)
+
+- Rechercher plutôt des questions de recherche qui sont :
+    - Importantes: a un impact mesurable ou qu'elle alimente une décision importante des décideurs
+    - ou Intéressantes: Étude de Henry Farber (2015) sur le comportement des chauffeurs de taxis de New York
+
+## Compter les choses
+
+Intéressantes: Étude de Henry Farber (2015) sur le comportement des chauffeurs de taxis de New York
+
+- Les modèles néoclassiques en économie prédisent que les chauffeurs de taxi travailleront davantage les jours où ils ont des salaires horaires plus élevés.
+
+- Alternativement, les modèles de l'économie comportementale prédisent exactement le contraire. 
+
+- Données utilisées: chaque trajet en taxi effectué par les taxis de New York de 2009 à 2013 
+
+    - Informations sur chaque voyage: heure de départ, lieu de départ, heure de fin, lieu de fin, tarif et pourboire (si le pourboire a été payé avec une carte de crédit)
+    
+<!-- L'étude de Farber était proche d'un scénario optimiste pour une recherche utilisant une grande source de données car les données collectées par la ville étaient assez proches des données que Farber aurait recueillies (une différence est que Farber aurait voulu des données sur le total les salaires et les pourboires, mais les données sur la ville ne comprennent que les pourboires payés par carte de crédit). Cependant, les données seules n'étaient pas suffisantes. La clé de la recherche de Farber était d'apporter une question intéressante aux données, une question qui a des implications plus larges au-delà de ce cadre spécifique.-->
+
+
+## Prédire les choses 
+
+- Nowcasting: Étude de Ginsberg et ses collègues sur la grippe (2009)
+
+## Approximer les expériences
+
+- Quel est l'effet d'un programme de formation professionnelle sur les salaires?
+
+- Expérimentation naturelle: augmentation du salaire minimum
+- Ajustement statistique
+
+
+## Les stratégies de recherche: conclusion
+
+"Les données volumineuses sont créées et collectées par les entreprises et les gouvernements à des fins autres que la recherche. L'utilisation de ces données pour la recherche nécessite donc une réutilisation."
 
 Sociologie (sciences sociales), qualité des données, données massives
 ===========================================================================

@@ -1,0 +1,30 @@
+---
+title: 'Séance 1.2: Données digitales'
+subtitle: "Conclusion"
+author: "Visseho Adjiwanou, PhD."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Antibes
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+
+# Conclusion
+
+- Solution aux défis d'aujourd'hui: un autre R package est disponible pour faire le travail. Il s'agit de academictwitter:
+
+    - https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/twitter-research-track/
+
+- Pour interagir directement avec le API, vous pouvez utiliser l'interface Postman
+
+  - https://www.postman.com/
+
+  - https://developer.twitter.com/en/docs/tutorials/postman-getting-started
+
+- Vous avez d'autres applications pour collecter les données pour vous comme Facepager 
+
+    - https://github.com/strohne/Facepager

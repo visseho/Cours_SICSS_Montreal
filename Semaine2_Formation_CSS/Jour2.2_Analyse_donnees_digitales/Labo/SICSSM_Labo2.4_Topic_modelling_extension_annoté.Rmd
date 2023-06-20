@@ -260,6 +260,7 @@ La découverte de sujets est un exemple d'**apprentissage non supervisé** parce
 - Présenter le nuage des mots (wordcloud) qui utilise la fréquence des mots (tf) pour les documents 12 et 24. Commenter les résultats en essayant d'établir le/les sujets couverts par ces documents. Retenez les 20 mots les plus importants. N'oubliez pas que le package wordcloud utilise la matrice document-termes. Vous devez donc transformer votre donnée tidy au 3 en matrice document-termes que vous nommez **dtm**
 
 ```{r}
+
 graph_doc <- function(donnee){
   ggplot(donnee) +
     geom_col(aes(x = reorder(word, desc(n)), y = n, fill = word), show.legend = FALSE) +

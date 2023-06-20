@@ -101,6 +101,10 @@ Section_wikipedia <- html_node(wikipedia_page, xpath = '//*[@id="mw-content-text
 
 Section_wikipedia
 
+#section_wiki_f <- html_node(wikipedia_page, xpath = #'/html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/table')
+
+                            /html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/table
+                            
 #//*[@id="mw-content-text"]/div[1]/table
 
 #//*[@id="mw-content-text"]/div[1]/table
@@ -177,21 +181,12 @@ Une fois que nous avons identifié le sélecteur CSS que nous pensons attaché �
 
 wikipedia_page <- read_html("https://en.wikipedia.org/wiki/World_Health_Organization_ranking_of_health_systems_in_2000")
 
-#.jquery-tablesorter td , .headerSort
-
 
 Section_wikipedia1 <- html_node(wikipedia_page, css = '#mw-content-text > div.mw-parser-output > table')
 
 
-# .headerSort , .jquery-tablesorter td
-
-Section_wikipedia1
 
 table_wiki1 <- html_table(Section_wikipedia1)
-
-table_wiki1
-
-
 
 
 #Section_wikipedia2 <- html_node(wikipedia_page, css = '.headerSort , .jquery-tablesorter td')
@@ -210,6 +205,7 @@ table_wiki1
 ```{r}
 
 lego <- read_html("https://www.imdb.com/title/tt1490017/") # ce chunk ne marche pas et je n'arrive pas à l'arranger (trouvé le xpath) 
+
 
 acteurs <- html_nodes(lego, xpath = '.primary_photo+ td a')
 
