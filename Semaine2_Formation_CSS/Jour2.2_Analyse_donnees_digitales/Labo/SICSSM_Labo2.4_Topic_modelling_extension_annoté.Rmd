@@ -64,12 +64,19 @@ Le texte des 85 essais est extrait du site Web de la Bibliothèque du Congrès e
 
 ```{r}
 
+rm(list = ls())
+
 library(tidyverse)
 library(magrittr)
 library(rvest)
 
 webpage <- read_html("https://guides.loc.gov/federalist-papers/text-1-10") 
 
+section <- html_nodes(webpage, css = ".s-lib-box-std")
+section[[1]][[2]]
+
+file <- html_text(section)
+file
 #webpage_text <- webpage %>% 
 #  html_nodes("p") %>% 
 #  html_text()

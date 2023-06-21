@@ -1,0 +1,71 @@
+---
+title: "Labo2.4_Scraping_Federalist_Papers"
+author: "Leonard"
+date: "20/06/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(rvest)
+library(dplyr)
+
+links <- c("https://guides.loc.gov/federalist-papers/text-1-10",
+           "https://guides.loc.gov/federalist-papers/text-11-20",
+              "https://guides.loc.gov/federalist-papers/text-21-30",
+              "https://guides.loc.gov/federalist-papers/text-31-40",
+              "https://guides.loc.gov/federalist-papers/text-41-50",
+              "https://guides.loc.gov/federalist-papers/text-51-60",
+              "https://guides.loc.gov/federalist-papers/text-61-70",
+              "https://guides.loc.gov/federalist-papers/text-71-80",
+              "https://guides.loc.gov/federalist-papers/text-81-85")
+
+
+output <- list()
+
+
+for (link in links) {
+  url_papers <- link
+  parsed_html <- read_html(url_papers)
+
+  papers_text <- parsed_html %>%
+    html_nodes(".s-lib-box-std") %>%
+    html_text()
+  papers_text <- papers_text[-1] %>%
+    substring(60)
+
+  title <- parsed_html %>%
+    html_nodes(".s-lib-box-title") %>%
+    html_text()
+
+  author <- parsed_html %>%
+    html_nodes("p+ p strong") %>%
+    html_text()
+  
+  max_length <- max(length(papers_text), length(title), length(author))
+  papers_text <- rep(papers_text, length.out = max_length)
+  title <- rep(title, length.out = max_length)
+  author <- rep(author, length.out = max_length)
+
+  papers_results <- tibble(
+    Text = papers_text,
+    Title = title,
+    Author = author)
+
+  output <- c(output, list(papers_results))
+}
+
+
+combined_tibble <- bind_rows(output)
+
+
+filtered_tibble <- combined_tibble %>%
+  filter(Title != "Table of Contents\n                                ") %>%
+  distinct(Title, .keep_all = TRUE)
+
+
+```
+

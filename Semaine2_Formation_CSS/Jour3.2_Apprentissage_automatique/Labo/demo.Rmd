@@ -1,0 +1,737 @@
+---
+title: "Démonstration"
+author: "Aoudou"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(summarytools) 
+library(haven) 
+```
+
+
+# chargement de la base de données et selection des variables necessaire pour l'étude
+```{r}
+rm(list=ls())
+data<-read_dta("CMKR71FL.dta")
+data2 <- data %>% select(caseid,v000,v001,v002,v005,v131,v157,v158,v159,v106,v743a,v743b,v743d,v744a,v744b,v744c,v744d,v744e,v717,v012, m19,b11,b4,m15, bord,v150,v151,v190,v136,v025,v130,v445,b5,s928a,s925a,v170,v169a, v701,v024,v367,v426,v113,v115,v116,v445,m14,m70,v313)
+
+```
+
+v367 : enfant était voulu (1: voulu à l'époque, 2: voulu pour plus tard, 3: ne plus vouloir du tout)
+v426 : quand l'enfant a été mis au sein?
+v113 : Source d'eau de boisson 
+v115 : temps jusqu'à la source d'eau de boisson
+v116: type de toilette
+v445 : indice de masse corporel
+m14: nombre de visite prénatale durant la grossesse
+m70: visites postnatales dans les 2 mois mois après l'accouchement (oui/non)
+v313: Utilisation de contraceptive (à coder oui/non)
+
+## Création de nos différentes variables et leur labelisation
+
+- variable dépendante
+
+```{r}
+data2=data2 %>% 
+  mutate(dead=if_else(b5==0,1,0)) %>% 
+  mutate(dead=factor(dead,levels=c(0,1),labels = c("a live","dead")),
+         ponderation=v005/1000000)
+```
+
+
+- Variable indépendante
+
+education de la femme (v106): 0:Superieur,
+                              1:secondaire
+                              2:Primaire, 
+                              3:Sans instruction
+                              
+```{r}
+data2=data2 %>% mutate(educ=case_when(v106==0~3,
+                                      v106==1~2,
+                                      v106==2~1,
+                                      v106==3~0),
+                       educ=factor(educ, levels=c(3,2,1,0), labels=c("Supérieur","Secondaire","Primaire","Sans instruction")))
+freq(data2$educ)
+```
+
+statut d'emploi (v717) [recoder comme suit : 0:Entrepreneures agricoles,
+                                             1:Travailleurs qualifiés ou non qualifiés
+                                             
+                                             2:Sans emploi
+```{r}
+data2=data2 %>% mutate(activite=case_when(v717==4~0,
+                                          v717==1 | v717==2 | v717==3 | v717==7 | v717==8 |v717==9~1,
+                                         
+                                        v717==0~2),
+                       activite=factor(activite, levels=c(0:2),labels=c("Entrepreneures agricoles","Travailleuses qualifiées ou non qualifiées","Sans emploi")))
+
+
+freq(data2$activite)
+```
+
+<!-- etat nutritionnel de la femme (v445) (à voir si je vais le garder ici où pas)-->
+attitude face à la violence (v744a,v744b,v744c,v744d,v744e)
+ - justifié de battre si la femme sort sans averti son mari (V744a) : 0 : Non
+                                                                      1 : Oui
+                                                                      8 : missing
+ - justifié de battre si la femme si elle néglige les enfants (v744b) : 0 : Non
+                                                                        1 : Oui
+                                                                        8 : missing
+ - Justifié de battre si la femme se dispute avec son mari(v744c) :     0 : Non
+                                                                        1 : Oui
+                                                                        8 : missing
+ - Justifié de battre si la femme refuse le sexe à son mari(v744d) :    0 : Non
+                                                                        1 : Oui
+                                                                        8 : missing
+ - Justifié de battre si la femme brule la nourriture (v744e) :         0 : Non
+                                                                        1 : Oui
+                                                                        8 : missing
+
+```{r}
+data2$v744a[data2$v744a == 8] <- NA
+data2$v744b[data2$v744b == 8] <- NA
+data2$v744c[data2$v744c == 8] <- NA
+data2$v744d[data2$v744d == 8] <- NA
+data2$v744e[data2$v744e == 8] <- NA
+
+data2=data2 %>% mutate(attitude_violence=v744a+v744b+v744c+v744d+v744e,
+                       attitude_violence=case_when(attitude_violence==0~1,
+                                                   attitude_violence %in% c(1:5)~2),
+                       attitude_violence=factor(attitude_violence, levels = c(1,2),labels=c("Non favorable","Favorable")))
+
+
+data2 %>% filter(is.na(attitude_violence)) %>% select(v744a,v744b,v744c,v744d,v744e,attitude_violence)
+
+freq(data2$attitude_violence)
+```
+                                                                        
+pouvoir decisionnel de la femme au sein du ménage (v743a,v743b,v743d)
+ - Prise de décision  concernant les soins de santé (v743a) :   0 : femme seule 
+                                                                1 : femme et mari/partenaire
+                                                                2 : mari/partenaire seul
+                                                                3:  [5,6] Autres personnes
+                                                                NA: missing
+  - Prise de décision  concernant les achats du ménages (v743b) : 0 : femme seule 
+                                                                  1 : femme et mari/partenaire
+                                                                  2 : mari/partenaire seul
+                                                                  3 :  [5,6] Autres personnes
+                                                                  NA: missing
+                                                                
+  - Prise de décision  concernant la visite en famille (v743d) :  0 : femme seule 
+                                                                  1 : femme et mari/partenaire
+                                                                  2 : mari/partenaire seul
+                                                                  3 : Autre personnes                                                                                                                    NA: missing
+```{r}
+data2=data2 %>% mutate(decision_sante=case_when(v743a==1~0,
+                                               v743a==2~1,
+                                               v743a==4~2,
+                                               v743a==5 | v743a==6 ~3),
+                       decision_achat=case_when(v743b==1~0,
+                                               v743b==2~1,
+                                               v743b==4~2,
+                                               v743b==5 | v743b==6 ~3),
+                       decision_visite=case_when(v743d==1~0,
+                                               v743d==2~1,
+                                               v743d==4~2,
+                                               v743d==5 | v743d==6 ~3),
+                       pouvoir_decision=decision_sante+decision_achat+decision_visite,
+                       pouvoir_decision=case_when(pouvoir_decision<2~1,
+                                                  pouvoir_decision==2 |pouvoir_decision==3~2,
+                                                  pouvoir_decision >=4~3),
+                       pouvoir_decision=factor(pouvoir_decision,levels=c(1:3),labels=c("Elévé","Moyen","Faible")))
+                       
+freq(data2$pouvoir_decision)
+data2 %>% filter(pouvoir_decision=="Elévé") %>% select(decision_sante,decision_achat,decision_visite,pouvoir_decision)
+```
+                                                          
+                                                                  
+- Religion de la mère (v130)
+ - Age de la mère (v012)
+ - Sexe de l’enfant (b4)
+ - Poids de l’enfant à la naissance (m19)
+ - Rang de l’enfant à la naissance (bord)
+ - Intervalle entre l’enfant et la naissance précédente (b11)
+ - Lieu d’accouchement (m15)
+ - Niveau d'instruction du conjoint (v701)
+
+```{r}
+
+data2 = data2 %>% mutate(religion=case_when(v130==1~1,
+                                            v130==2~2,
+                                            v130==4~3,<<
+                                            v130==3~4,
+                                            v130==5 | v130==7 | v130==96~5
+                                            ),
+                         religion=factor(religion, levels = c(1:5),labels = c("Catholique","Protestant","Musulman","Autres chrétiens","Animistes et autres")),
+                         age_mere=case_when(v012<20~1, 
+                                          v012 >=20 & v012<30~2,
+                                          v012 >=30 & v012<40~3,
+                                          v012 >=40~4),
+                       age_mere=factor(age_mere,levels = c(1:4),labels = c("Moins de 20 ans","Entre 20 et 29 ans ","Entre 30 ans et 39 ans","40 ans et plus")),
+                       sex_enfant=factor(if_else(b4==1,1,2),levels = c(1,2), labels = c("Masculin","Feminin")),
+                       
+                       poids_nais=case_when(m19<2500~1,
+                                            m19 >=2500 & m19<4000~2,
+                                            m19 >=4000 & m19<7500~3,
+                                            m19==9996 | m19==9998~ NA_real_),
+                       poids_nais=factor(poids_nais,levels = c(1:3), labels = c("Faible","Normal","Elevé")),
+                       rang_naiss=case_when(bord==1~1,
+                                            bord==2 | bord==3~2,
+                                            bord >=4~3),
+                                            
+                       rang_naiss=factor(rang_naiss,levels = c(1:3),labels = c("Premier né","Rang 2 ou 3","Rang 4 ou plus")),
+                       
+                       interval_precedent=case_when(b11<24~1,
+                                                    b11 >=24~2,
+                                                    
+                                                    is.na(b11)~3),
+                       interval_precedent=factor(interval_precedent,levels = c(1:3),labels = c("Moins de 24 mois","Plus de 24 mois","Non concerné")),
+                       
+                       lieu_accouch=factor(if_else(m15==10 | m15==11 | m15==12,1,2), levels = c(1,2),labels = c("Domicile","Formation sanitaire")))
+
+data2=data2 %>% mutate(ins_conj=factor(v701,levels=c(0:3),labels=c("Sans instruction","Primaire","Secondaire","Supérieur")))
+
+```
+
+- v367 : enfant était voulu (1: voulu à l'époque, 2: voulu pour plus tard, 3: ne plus vouloir du tout)
+- v426 : quand l'enfant a été mis au sein? (rearranger comme suit :mis au sein dans les une heures suivant sa naissance ?)
+- v113 : Source d'eau de boisson 
+- v116: type de toilette
+- v445 : indice de masse corporel
+- m14: nombre de visite prénatale durant la grossesse
+- m70: visites postnatales dans les 2 mois mois après l'accouchement (oui/non)
+- v313: Utilisation de contraceptive (à coder oui/non)
+
+```{r}
+data2=data2 %>% mutate(naissance_voulu=factor(v367,levels=c(1:3),labels=c("avait voulu","voulu pour plutard","indésirée")),
+                       allaiter_heure=case_when(v426==0 | v426==100~1,
+                                                v426==101 | v426==102 |v426==102 | v426==103 |v426==103 | v426==104 | v426==105 | v426==106 | v426==107 | v426==108 | v426==109 | v426==110 | v426==111 | v426==112 | v426==113 | v426==114 | v426==115 | v426==116 | v426==120 | v426==121 | v426==123 | v426==201 | v426==202 | v426==203 | v426==204 | v426==205 | v426==206 | v426==207 | v426==210 | v426==212 | v426==214 | v426==215 | v426==218 | v426==221 | v426==223~2),
+                       allaiter_heure=factor(allaiter_heure,levels =c(1,2),labels=c("Oui","Non")),
+                       source_eau=if_else(v113==10 |v113==11 |v113==12 |v113==13 |v113==14 |v113==41 |v113==61 |v113==71,1,2),
+                   source_eau=factor(source_eau,levels = c(1,2),labels=c("Amelioree","Non amelioree")),
+                   type_toilet=if_else(v116==10 |v116==11| v116==12 |v116==13 |v116==14 |v116==15 |v116==20 |v116==21      |v116==22,1,2),
+                   type_toilet=factor(type_toilet,levels = c(1,2),labels=c("Amelioree","Non amelioree")),
+                  
+                   contraception=if_else(v313==0,1,2),
+                   contraception=factor(contraception,levels=c(1,2),labels=c("Non","Oui")))
+
+
+```
+
+- Degré d’exposition de la femme aux médias  (à partir de v157,v158,v159)
+```{r}
+data2=data2 %>% mutate(degmedia=v157+v158+v159, 
+                       degmedia=case_when(degmedia==0~0,
+                                          degmedia==1 | degmedia==2 ~1,
+                                          degmedia==3 | degmedia==4~2,
+                                          degmedia==5 | degmedia==6~3),
+                       degmedia=factor(degmedia, levels =c(0:3),labels =c("Nul","Faible","moyenne","Elevé")))
+freq(data2$degmedia)
+```
+ 
+
+## Caractéristiques des ménages
+
+Taille du menage (v136)
+Sexe du chef de ménage (v151)
+Niveau de vie du ménage (v190)
+
+```{r}
+data2=data2 %>% mutate(taille_menage=case_when(v136<=3~1,
+                                               v136 >=4 & v136<=6~2,
+                                               v136 >=7~3),
+                       taille_menage=factor(taille_menage,levels = c(1:3),labels = c("2-3","4-6","7 et plus")),
+                       sex_chef=factor(if_else(v151==1,1,2),levels = c(1,2), labels = c("Masculin","Feminin")),
+                       niveau_vie=case_when(v190==1 | v190==2~1,
+                                        v190==3~2,
+                                        v190==4 |v190==5~3),
+                   niveau_vie=factor(niveau_vie,levels=c(1:3),labels = c("Pauvre","Moyen","Riche"))
+                       )
+
+freq(data2$niveau_vie)
+```
+
+
+## Caractéristiques Communautaires
+Region (v024)
+Milieu de résidence (v025)
+proportion des ménages pauvres dans la communauté (à partir de niveau_vie)
+
+
+```{r}
+data2=data2 %>% mutate(milieu_residence=factor(v025,levels = c(1,2),labels = c("Urbain","Rural")),
+                       region=case_when(v024==1 | v024==4 | v024==5 | v024==7~1,
+                                        v024==8 | v024==9 | v024==11 ~2,
+                                        v024==2 | v024==6 | v024==10~3,
+                                        v024==12 | v024==3 ~4),
+                       region=factor(region,levels=c(1:4),labels=c("Grand nord","Grand ouest","Grand sud","Yaounde ou Douala")))
+freq(data2$milieu_residence)
+```
+
+
+```{r}
+data2=data2 %>% mutate(ind_vie=if_else(niveau_vie=="Pauvre",1,0))
+
+prop_Pauvre=data2 %>% group_by(v001) %>% 
+  summarise(prop_Pauvre=mean(ind_vie)) %>% 
+  mutate(prop_Pauvre=factor(case_when(prop_Pauvre<0.5~1,
+                                    prop_Pauvre >=0.5 ~2),levels = c(1,2),labels = c("Faible","Elevé")))
+data2=left_join(data2,prop_Pauvre,by="v001")
+
+```
+ 
+## Traitement des données manquantes
+
+```{r}
+base=data2 %>% select(dead,educ,activite,attitude_violence,pouvoir_decision,religion,age_mere,degmedia,ins_conj,sex_enfant,poids_nais,rang_naiss,interval_precedent,lieu_accouch,naissance_voulu,allaiter_heure,source_eau,type_toilet,contraception,taille_menage,sex_chef,niveau_vie,region,milieu_residence,prop_Pauvre)
+
+```
+
+- Traitement des données manquantes à l'aide des techinques d'imputations multiples par équation chainées.
+
+*regardons le nombre de valeur manquantes*
+
+```{r}
+apply(is.na(base), 2, sum)
+```
+
+
+<!-- - Maintenant, nous pouvons créer l'objet mice qui contient les informations sur les méthodes d'imputation pour chaque variable : -->
+```{r}
+# Installation et chargement du package MICE
+#install.packages("mice")
+library(mice)
+```
+
+
+```{r}
+imputation <- mice(base,method = "rf", maxit = 50, seed = 123)
+```
+
+<!-- Dans ce cas, nous utilisons la méthode "rf" pour imputer les valeurs manquantes. Cela signifie que nous utilisons les forêts aléatoire pour prédire les valeurs manquantes en se basant sur les autres variables. Nous avons également défini le nombre maximum d'itérations à 50 et une graine aléatoire pour la reproductibilité.-->
+
+
+Maintenant, nous pouvons effectuer l'imputation en utilisant la fonction complete :
+
+```{r}
+base_final <- complete(imputation)
+```
+
+<!-- Cette fonction renvoie un nouveau jeu de données avec les valeurs manquantes imputées à l'aide de l'imputation multiple. -->
+
+Enfin, nous pouvons vérifier à nouveau le nombre de valeurs manquantes pour chaque variable :
+
+```{r}
+apply(is.na(base_final), 2, sum)
+```
+
+
+# 
+```{r}
+base_final=read_csv2("../Données/base.csv")
+```
+
+## Analyse bivariée
+
+```{r}
+for (i in 2:25) {
+ tab=ctable(base_final$dead,base_final[,i],chisq = TRUE)
+ print(tab)
+}
+```
+
+
+```{r}
+for (i in 2:25) {
+  plot <- ggplot(base_final) +
+    geom_bar(aes(x = base_final[[i]], fill = dead),position = "fill")+
+    labs(title = paste("Diagramme en barres - Colonne", i - 1), x = "Catégorie", y = "Pourcentage")
+  print(plot)
+}
+```
+
+
+## Construction des modèles 
+
+- Division de la base de donnée train et test
+```{r}
+library(caret)
+```
+
+
+```{r}
+set.seed(123)
+training_samples <- base_final$dead %>% 
+  createDataPartition(p = 0.8, list = FALSE)
+
+data_train <- base_final[training_samples, ]
+data_test<- base_final[-training_samples, ]
+
+
+
+freq(data_train$dead)
+freq(data_test$dead)
+```
+
+Dans le data train, on va suréchantillonner la classe minoritaire avant d'entrainer le model (par réplication aléatoire)
+
+```{r}
+majoritaire <- filter(data_train, dead == "a live")
+minoritaire <- filter(data_train, dead == "dead")
+
+difference_taille <- nrow(majoritaire) - nrow(minoritaire)
+```
+
+On va dupliquer de façon aléatoire des échantillons de la classe minoritaire jusqu'à atteindre un équilibre avec la classe majoritaire.
+
+```{r}
+echantillon_duplique <- sample_n(minoritaire, difference_taille, replace = TRUE)
+```
+
+Combinaision des données dupliquées avec la classe majoritaire pour former le nouvel ensemble de données équilibré
+
+```{r}
+data_train_bal2 <- rbind(majoritaire, echantillon_duplique)
+freq(data_train_bal2$dead)
+```
+
+remarque : Il convient de noter que la duplication aléatoire peut introduire un certain degré de surapprentissage (overfitting), car les exemples dupliqués sont essentiellement des répétitions des exemples existants. Il est recommandé de tester différentes techniques de gestion du déséquilibre des données et de choisir celle qui convient le mieux à votre jeu de données spécifique.
+
+## Régression logistique classique 
+
+- construction du modèle
+
+```{r} 
+data_train_bal2=lapply(data_train_bal2, as.factor)
+data_train_bal2=as.data.frame(data_train_bal2)
+
+model_logit=glm(dead~.,data=data_train_bal2, family = binomial(link = "logit"))
+```
+
+- prediction sur le train et le test set 
+
+```{r}
+# sur le data train
+prediction_train=predict(model_logit,newdata = data_train_bal2,type="response")
+predicted_class_train <- if_else(prediction_train > 0.5, "dead", "a live")
+
+# sur le test set 
+y=lapply(data_test,as.factor)
+y=as.data.frame(y)
+data_test=y
+
+predicted_test=predict(model_logit,newdata = data_test,type="response")
+predicted_class_test=if_else(predicted_test > 0.5, "dead", "a live")
+```
+
+- Evaluation des performances
+
+```{r}
+evaluation_prediction <- function(yobs, ypred, posLabel = 1) {
+  # Matrice de confusion
+  mc <- table(yobs, ypred)
+  # Taux de bon classement
+  tbc <- round(sum(diag(mc)) / sum(mc), 4)
+  
+  # Rappel
+  recall <- mc[posLabel, posLabel] / sum(mc[posLabel, ])
+  
+  # Précision
+  precision <- mc[posLabel, posLabel] / sum(mc[, posLabel])
+  
+  # F1-Measure
+  f1 <- 2.0 * (precision * recall) / (precision + recall)
+  
+  # Créer le tableau des métriques
+  metrics <- data.frame(
+    Taux_de_bon_classement = tbc,
+    Rappel = round(recall, 3),
+    Précision = round(precision, 3),
+    F1_Score = round(f1, 3)
+  )
+  
+  # Retourner le tableau des métriques
+  return(metrics)
+}
+```
+
+
+```{r}
+evaluation_prediction(data_train_bal2$dead,predicted_class_train)
+```
+
+```{r}
+evaluation_prediction(data_test$dead,predicted_class_test)
+```
+## Régression régularisée
+
+### Regression logistique pénalisé LASSO
+
+
+- création de la matrice des prédicteurs (sous forme exploitable par l'algorithme)
+
+```{r}
+#install.packages("glmnet")
+library(glmnet)
+
+x_train <- model.matrix(dead~., data_train_bal2)[,-1]
+y_train <- data_train_bal2$dead
+```
+Rappel : 
+x : matrice des variables prédicteurs (chaque variable dichotomisée)
+y : la variable de réponse ou de résultat, qui est une variable binaire.
+family : le type de réponse. Utilisez "binomial" pour une variable de résultat binaire.
+alpha : le paramètre de mélange elasticnet. Les valeurs autorisées comprennent :
+"1" : pour la régression lasso
+"0" : pour la régression ridge
+une valeur comprise entre 0 et 1 (disons 0,5) pour la régression elasticnet.
+lamba : une valeur numérique définissant la quantité de rétrécissement(pénalité). (à spécifier).
+
+Dans la régression pénalisée,on doit spécifier un lambda constant pour ajuster la quantité de rétrécissement du coefficient. Le meilleur lambda pour les données, peut être défini comme le lambda qui minimise le taux d'erreur de prédiction par cross validation. Ceci peut être déterminé automatiquement à l'aide de la fonction cv.glmnet().
+
+**cherchons le meilleur lambda par  cross-validation à 10 plis**
+
+```{r}
+cv_lasso <- cv.glmnet(x_train, y_train, alpha =1, nfolds =10 , intercept= TRUE, family = "binomial", standardize = TRUE)
+```
+ 
+Visualisation des résultats de la validation croisée avec régularisation Lasso (la valeur optimale de lambda qui minimise l'erreur de validation croisée est en pointillé)
+
+```{r}
+plot(cv_lasso)
+```
+Le graphique affiche l'erreur de validation croisée en fonction du logarithme de lambda. La ligne verticale pointillée de gauche indique que le logarithme de la valeur optimale de lambda est d'environ exp(-4.5), ce qui est celui qui minimise l'erreur de prédiction. Cette valeur de lambda donnera le modèle le plus précis. La valeur exacte de lambda peut être visualisée comme suit :
+
+```{r}
+cv_lasso$lambda.min
+```
+*Entrainement du modèle LASSO, puis recherche du LASSO optimal*
+```{r}
+model_lasso <- glmnet(x_train,y_train, alpha = 1, family = "binomial")
+
+#Visualisation de l'évolution des coefficients selon valeur de lambda avec régularisation LASSO + ligne rouge indiquant le lambda optimal
+
+plot(model_lasso, xvar = "lambda", label = FALSE, xlab = ~ log(lambda))
+abline( v = log(cv_lasso$lambda.min), col = "red", lty = 2)
+```
+
+
+- Modèle Lasso optimal
+
+```{r}
+model_lasso <- glmnet(x_train, y_train, alpha = 1, lambda=cv_lasso$lambda.min, family = "binomial")
+```
+
+- Prédiction
+
+```{r}
+pred_lasso_train=predict(model_lasso,newx = x_train,type = "response")
+pred_lasso_train_class=if_else(pred_lasso_train >0.5,"dead","alive")
+
+
+x_test <- model.matrix(dead~., data_test)[,-1]
+pred_lasso=predict(model_lasso,newx = x_test,type = "response")
+
+pred_lasso_class=if_else(pred_lasso >0.5,"dead","alive")
+
+```
+
+- Evaluation des performances
+
+```{r}
+evaluation_prediction(data_train_bal2$dead,pred_lasso_train_class)
+```
+
+
+```{r}
+perfor_lasso=evaluation_prediction(data_test$dead,pred_lasso_class)
+perfor_lasso
+```
+
+
+## Regression logistique Ridge
+
+**cherchons le meilleur lambda par  cross-validation à 10 plis**
+
+```{r}
+cv_ridge<- cv.glmnet(x_train, y_train, alpha =0, nfolds =10 , intercept= TRUE, family = "binomial", standardize = TRUE)
+```
+ 
+```{r}
+plot(cv_ridge)
+```
+
+
+```{r}
+cv_ridge$lambda.min
+```
+
+- Modèle Ridge optimal
+
+```{r}
+model_ridge <- glmnet(x_train, y_train, alpha = 0, lambda=cv_ridge$lambda.min, family = "binomial")
+```
+
+- Prédiction
+
+```{r}
+pred_ridge_train=predict(model_ridge,newx = x_train,type = "response")
+pred_ridge_train_class=if_else(pred_ridge_train >0.5,"dead","alive")
+
+
+pred_ridge=predict(model_lasso,newx = x_test,type = "response")
+
+pred_ridge_class=if_else(pred_ridge >0.5,"dead","alive")
+
+```
+
+- Evaluation des performances
+
+```{r}
+evaluation_prediction(data_train_bal2$dead,pred_ridge_train_class)
+```
+
+
+```{r}
+perfor_ridge=evaluation_prediction(data_test$dead,pred_ridge_class)
+perfor_ridge
+```
+
+## Elasticnet
+
+```{r}
+cv_elastic<- cv.glmnet(x_train, y_train, alpha =0.5, nfolds =10 , intercept= TRUE, family = "binomial", standardize = TRUE)
+```
+
+- Modèle elasticnet optimal
+
+```{r}
+model_elastic <- glmnet(x_train, y_train, alpha = 0.5, lambda=cv_elastic$lambda.min, family = "binomial")
+```
+
+- Prédiction
+
+```{r}
+pred_elastic_train=predict(model_elastic,newx = x_train,type = "response")
+pred_elastic_train_class=if_else(pred_elastic_train >0.5,"dead","alive")
+
+
+pred_elastic=predict(model_elastic,newx = x_test,type = "response")
+
+pred_elastic_class=if_else(pred_elastic >0.5,"dead","alive")
+
+```
+
+- Evaluation des performances
+
+```{r}
+evaluation_prediction(data_train_bal2$dead,pred_elastic_train_class)
+```
+
+
+```{r}
+evaluation_prediction(data_test$dead,pred_elastic_class)
+```
+
+
+## Random forest
+
+- Construction du modèle 
+
+```{r}
+library(randomForest)
+
+model_rf=randomForest(x_train,y_train)
+```
+
+```{r}
+plot(model_rf$err.rate[, 1], type = "l", xlab = "nombre d'arbres", ylab = "erreur OOB", col="red")
+```
+
+```{r}
+set.seed(123)
+model_rf_optimal<- randomForest(x_train,y_train, ntree=1000, mtry=4) #mtry nombre de variables testées à chaque division par defaut vaut sqrt(p) dans le cas d'une classification 
+print(model_rf_optimal)
+```
+```{r}
+plot(model_rf_optimal$err.rate[, 1], type = "l", xlab = "nombre d'arbres", ylab = "erreur OOB")
+```
+
+- predictions avec le modèle optimal
+
+```{r}
+# sur le data train
+predicted_train_rf=predict(model_rf_optimal,newdata = x_train)
+
+# sur le test set 
+
+predicted_test_rf=predict(model_rf_optimal,newdata = x_test)
+```
+
+- Evaluation des performances
+
+```{r}
+evaluation_prediction(data_train_bal2$dead,predicted_train_rf)
+
+```
+
+```{r}
+evaluation_prediction(data_test$dead,predicted_test_rf)
+```
+
+
+## Resumé des performances
+
+```{r}
+glm=evaluation_prediction(data_test$dead,predicted_class_test)
+ridge=evaluation_prediction(data_test$dead,pred_ridge_class)
+lasso=evaluation_prediction(data_test$dead,pred_lasso_class)
+elasticnet=evaluation_prediction(data_test$dead,pred_elastic_class)
+Randonforest=evaluation_prediction(data_test$dead,predicted_test_rf)
+
+
+metrics=rbind(glm,ridge,lasso,elasticnet,Randonforest)
+metrics
+
+model=c("Regression classique","Ridge","Lasso","Elasticnet","Randonforest")
+
+cbind(model,metrics)
+```
+- Visualisation de l'importance des variables
+
+```{r}
+varImpPlot(model_rf_optimal, type =2, main = "Importance des variables")
+```
+
+```{r}
+# Extraire les mesures d'importance
+importance <- importance(model_rf_optimal)
+importance <- as.data.frame(importance)
+importance$variable<- rownames(importance)
+```
+
+
+
+```{r}
+ggplot(importance %>% arrange(desc(MeanDecreaseGini)) %>% head(10)) +
+  geom_bar(aes(x = MeanDecreaseGini, y=variable),stat = "identity", fill = "blue") +
+  labs(x = "Mean Decrease Gini", y = "Variable") +
+  ggtitle("Les 10 variables les plus importantes avec Random Forest") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+
+
+
+
+
+
+
+
+

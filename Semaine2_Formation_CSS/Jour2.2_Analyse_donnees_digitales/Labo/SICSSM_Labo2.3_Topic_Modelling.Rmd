@@ -73,7 +73,8 @@ Le but est de deefinir un certain nombre de sujets et essayer de voir celui qui 
 
 ```{r}
 
-trump_tweet_lda <- LDA(trump_tweets_dtm, k = 5, control = list(seed = 3425))
+trump_tweet_lda <- LDA(trump_tweets_dtm, k = 3, control = list(seed = 123))
+
 trump_tweet_lda
 
 ```
@@ -108,7 +109,7 @@ tt_top_term %>%
   coord_flip() +
   facet_wrap(~ topic, scales = "free") 
 
-
+tt_top_term
 
 ```
 
