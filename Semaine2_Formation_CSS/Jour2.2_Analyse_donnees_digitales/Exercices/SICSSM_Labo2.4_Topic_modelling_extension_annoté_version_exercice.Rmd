@@ -252,6 +252,11 @@ https://drsimonj.svbtle.com/k-fold-cross-validation-with-modelr-and-broom
 ```
 
 
+## Utilisation de l'apprentissage automatique
+
+
+
+
 ## Références
 
 

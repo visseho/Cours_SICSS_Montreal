@@ -53,9 +53,9 @@ Voici les documents connus pour être écrits par chaque auteur:
 
 Le texte des 85 essais est extrait du site Web de la Bibliothèque du Congrès et stocké sous le nom **fpXX.txt**, où XX représente le numéro d'essai allant de 01 à 85. Chaque fichier de données contient les données textuelles de son essai correspondant. Voir le tableau 5.1, qui affiche la première et la dernière page de **The Federalist Paper no. 1** à titre d'exemple.
 
-![Table 1. The Federalist Papers Data](fed1.png)
+![Table 1. The Federalist Papers Data](../Figs/fed1.png)
 
-![Table 2. The Federalist Papers Data](fed2.png)
+![Table 2. The Federalist Papers Data](../Figs/fed2.png)
 
 
 1. Utiliser l'une des techniques de grattage apprises en classe pour gratter ce site https://guides.loc.gov/federalist-papers/full-text pour collecter les données et transformer le tableau en base de données. Vous pouvez remarquer que ces textes sont présentés par dizaine comme dans le lien ici: https://guides.loc.gov/federalist-papers/text-1-10
@@ -139,7 +139,7 @@ web_table
 
 ```
 
--->
+
 
 Maintenant, vous allez utiliser le package tidytext pour analyser les données.
 Voici les premiers codes qui vous permettent de télécharger ces données. Pour cet exemple, vous aurez besoin d'un ensemble de package que je vous charge aussi en même temps:
@@ -185,6 +185,7 @@ corpus_raw[[1]][1]
 
 
 
+
 ?VCorpus
 
 ```
@@ -209,7 +210,6 @@ corpus_tidy <- corpus_tidy %>%
 
 class(corpus_tidy$id_num)
 
-str
 ```
 
 
@@ -246,7 +246,9 @@ corpus_tidy_text <-
   mutate_at("word", funs(wordStem((.), language = "en")))
   #mutate(word_st = wordStem(word, language = "en"))
 
-
+corpus_tidy_text %>% 
+  group_by(word) %>% 
+  count(word, sort = TRUE)
 
 ```
 
@@ -254,7 +256,14 @@ corpus_tidy_text <-
 
 ```{r}
 
-corpus_dtm 
+corpus_dtm <- 
+  corpus_tidy_text %>% 
+  count(id_num, word) %>% 
+  cast_dtm(id_num, word, n)
+
+inspect(corpus_dtm[1:5,1:8])
+
+#data <- tidy(corpus_dtm)
 
 ```
 
@@ -292,7 +301,43 @@ doc12_10 <- doc12[1:10, ]
 graph_doc(doc12_10)
 
 # Nuage document 24
+
+doc24 <- corpus_tidy_text %>% 
+  filter(id_num == 24) %>% 
+  group_by(word) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+doc24_10 <- doc24[1:10, ]
+
 graph_doc(doc24_10)
+
+```
+
+- 
+
+Combinons les deux graphiques ensemble
+
+```{r}
+
+doc12_10 <-
+  doc12_10 %>% 
+  mutate(id = row_number())
+
+
+doc24_10 <-
+  doc24_10 %>% 
+  mutate(id = 2*row_number())
+
+doc12_24 <- bind_rows(doc12_10, doc24_10)
+
+ggplot(doc12_24) +
+    geom_col(aes(x = reorder(word, desc(n)), y = n, fill = id), show.legend = FALSE) +
+    labs(x = "Word") +
+    coord_flip() +
+    facet_grid(~ id, scales = "free") # +
+    #guides(color = FALSE)
+
 
 ```
 
@@ -307,16 +352,43 @@ corpus_tidy_text_tfidf <- corpus_tidy_text %>%
   count(word, id_num) %>% 
   bind_tf_idf(word, id_num, n)
 
-doc12_idf <- 
-  corpus_tidy_text_tfidf %>% 
-  filter(id_num == 12) %>% 
+
+# Function selection de variable
+
+data_select <- function(data, numero){
+  . <- 
+  data %>% 
+  filter(id_num == numero) %>% 
   arrange(desc(tf_idf))
+}
+
+# doc 12
+
+doc12_tfidf <- data_select(corpus_tidy_text_tfidf, 12)
+
+doc12_idf_10 <- doc12_tfidf[1:10, ]      
+
+g12 <- graph_doc(doc12_idf_10)
+
+g12
 
 
+```
 
-doc12_idf_10 <- doc12_idf[1:10, ]      
+- Avec le doc 24
 
-graph_doc(doc12_idf_10)
+```{r}
+
+doc24_tfidf <- data_select(corpus_tidy_text_tfidf, 24)
+
+doc24_idf_10 <- doc24_tfidf[1:10, ]      
+
+g24 <- graph_doc(doc24_idf_10)
+g24
+
+library(ggpubr)
+
+ggarrange(g12, g24)
 
 ```
 
@@ -346,7 +418,7 @@ Utilisons maintenant la statistique tf_idf
 ```{r}
 
 filter(corpus_tidy_text_tfidf, id_num == 12) %>% {
-  wordcloud(.$word, .$tf_idf, max.words = 20)
+  wordcloud(.$word, .$tf_idf, max.words = 10)
 }
 
 ```
@@ -359,6 +431,18 @@ Ces sujets découverts sont en effet cohérents avec le contenu réel des articl
 
 
 6. Maintenant, vous aller considérer une approche alternative pour découvrir les sujets, en identifiant des groupes d'essais similaires, sur la base de la mesure tf-idf. 
+
+# Question : Comment est-ce l'examen des titres des essais peut nous aider à classer les 11 autres essais?
+
+1. scrapper les titres
+
+```{r}
+
+
+```
+
+
+
 
 - Sélectionner les éssais écrits par Hamilton. 
 
@@ -376,7 +460,7 @@ Hamilton <- corpus_tidy_text_tfidf %>%
 
 ```
 
-- Appliquer l'algorithme des k-moyennes [k-means](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/kmeans) à la matrice document-terme pondérée. Retenez 4 comme nombre de clusters. Bien qu'arbitraire, ce choix produit des clusters qui semblent raisonnables. 
+- Appliquer l'algorithme des k-means (moyenne-k) [k-means](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/kmeans) à la matrice document-terme pondérée. Retenez 4 comme nombre de clusters. Bien qu'arbitraire, ce choix produit des clusters qui semblent raisonnables. 
 
 On peut utiliser un algorithme pour séparer les données. L'un de ses algorithmes est appelé le k-mean. L'algorithme k-means est un algorithme itératif dans lequel un ensemble d'opérations est effectué à plusieurs reprises jusqu'à ce qu'une différence notable dans les résultats ne soit plus produite. Le but de l'algorithme est de diviser les données en k groupes similaires où chaque groupe est associé à son centre de gravité, qui est égal à la moyenne intra-groupe. Pour cela, vous devez d'abord attribuer chaque observation à son cluster le plus proche, puis calculer le centroïde de chaque cluster en fonction de cette nouvelle affectation de cluster. Ces deux étapes sont répétées jusqu'à ce que l'affectation de cluster ne change plus. Notez que les chercheurs doivent choisir le nombre de grappes k et le centroïde initial de chaque grappe. Dans R, les emplacements initiaux des centroïdes sont sélectionnés au hasard, sauf indication contraire.
 
@@ -396,16 +480,18 @@ kmean_out <-
   Hamilton_dtm %>% 
   kmeans(centers = CLUSTERS, nstart = 10)
 
-kmean_out$iter
+#kmean_data <- tidy(kmean_out)          # pour transformer le résultat en dataframe
+#kmean_data_transpose <- t(kmean_data)
 
+kmean_out$iter    # Nombre d'itération avant la convergence
 
+  
 hamilton_words <-
   tibble(word = colnames(Hamilton_dtm))
 
 #dim(kmean.out$centers)
 
 hamilton_words <- bind_cols(hamilton_words, as_tibble(t(kmean_out$centers)))
-
 
 ```
 
@@ -418,9 +504,11 @@ hamilton_words <- bind_cols(hamilton_words, as_tibble(t(kmean_out$centers)))
 
 ```{r}
 
+pivot_longer()
+
 top_word <-
   hamilton_words %>% 
-  pivot_longer(cols = c("1":"4"), "cluster", "value") %>% 
+  pivot_longer(cols = c("1":"4"), names_to = "cluster", values_to = "value") %>% 
   group_by(cluster) %>% 
   top_n(10, value)
 
@@ -435,13 +523,28 @@ ggplot(top_word %>% filter(cluster == 2)) +
 
 ```{r}
 
+ggplot(top_word) +
+  geom_col(aes(x = reorder(word, desc(value)), y = value)) +
+  coord_flip() + 
+  facet_wrap(~cluster, scales = "free")
+
+
+for (i in 1:4){
+ plot[[i]] <- ggplot(top_word %>% filter(cluster == i)) +
+  geom_col(aes(x = reorder(word, desc(value)), y = value)) +
+  coord_flip() 
+ print(plot[[i]])
+}
+
+ggarrange(plot[[1]], plot[[2]], plot[[3]], plot[[4]], label.y = 1)
+
 
 ```
 
 
 L'examen des 10 termes les plus importants au centroïde de chaque groupe suggère que le groupe 2 se rapporte à la guerre et à la fiscalité, comme indiqué par des termes comme armi, taxat et guerre, tandis que le groupe 1 ne couvre qu'un seul document. Le groupe 3 traite de la conception institutionnelle et le groupe 4 semble concerner les systèmes judiciaires. La comparaison de ces sujets avec le contenu réel de The Federalist Papers montre un degré de validité décent pour les résultats de l'algorithme de clustering k-means.
 
-## Tableau avec les 
+## Tableau des mots les plus importants dans chaque cluster 
 
 
 ```{r}
@@ -460,11 +563,15 @@ top_word_summary
 
 ```{r}
 
-enframe(kmean_out$cluster, "id_num", "cluster") %>%
+enframe(kmean_out$cluster, name = "id_num", value = "cluster") %>%  ## Crée une base de données
   group_by(cluster) %>%
   summarise(documents = str_c(id_num, collapse = ", ")) 
 
+# TIdy ferait la même chose
 
+tidy(kmean_out$cluster) %>% 
+  group_by(x) %>%
+  summarise(documents = str_c(names, collapse = ", ")) 
 
 ```
 
@@ -597,7 +704,7 @@ corpus_tidy_short_t <-
 
 corpus_tidy_short_t <-
   corpus_tidy_short_t %>% 
-  left_join(known_essays, by = "id_num")
+  left_join(known_essays, by = c("id_num", "author"))
 
 
 #ctable(corpus_tidy_short_t$word, corpus_tidy_short_t$author, "c")
@@ -612,44 +719,11 @@ mots_auteurs <-
 
 mots_auteurs <-
   pivot_wider(mots_auteurs, names_from = word, values_from = moyenne)
+
 mots_auteurs
 t(mots_auteurs)
 
-
-hm_tfm <-
-  unnest_tokens(corpus_tidy, word, text) %>%
-  count(id, word) %>%
-  # term freq per 1000 words
-  group_by(id) %>%
-  mutate(count = n / sum(n) * 1000) %>%
-  select(-n) %>%
-  inner_join(STYLE_WORDS, by = "word") %>%
-  # merge known essays
-  left_join(known_essays, by = c("id", "document")) %>%
-  # make wide with each word a column
-  # fill empty values with 0
-  spread(word, count, fill = 0)
-
-```
-
-
-```{r}
-
-HAMILTON_ESSAYS <- c(1, 6:9, 11:13, 15:17, 21:36, 59:61, 65:85)
-MADISON_ESSAYS <- c(10, 14, 37:48, 58)
-JAY_ESSAYS <- c(2:5, 64)
-known_essays <- bind_rows(tibble(id_num = MADISON_ESSAYS,
-                                 author = "Madison"),
-                          tibble(id_num = HAMILTON_ESSAYS,
-                                 author = "Hamilton"),
-                          tibble(id_num = JAY_ESSAYS,
-                                 author = "Jay"))
-
-
-
-STYLE_WORDS <-
-  tibble(word = c("although", "always", "commonly", "consequently",
-                  "considerable", "enough", "there", "upon", "while", "whilst"))
+# un seul code pour tout cela
 
 hm_tfm <-
   unnest_tokens(corpus_tidy, word, text) %>%
@@ -658,12 +732,13 @@ hm_tfm <-
   group_by(id_num) %>%
   mutate(count = n / sum(n) * 1000) %>%
   select(-n) %>%
-  inner_join(STYLE_WORDS, by = "word") %>%
+  inner_join(Style_words, by = "word") %>%
   # merge known essays
   left_join(known_essays, by = "id_num") %>%
   # make wide with each word a column
   # fill empty values with 0
   spread(word, count, fill = 0)
+
 
 hm_tfm1 <-
 hm_tfm %>%
@@ -675,13 +750,16 @@ hm_tfm %>%
   group_by(author, word) %>%
   summarise(avg_count = mean(count)) %>%
   spread(author, avg_count) %>%
-  knitr::kable()
+  knitr::kable() 
+
 
 hm_tfm1
 
 ```
 
+
 Les résultats suggèrent que Hamilton préfère utiliser des termes tels que **there** et **upon**, que Madison utilise rarement, préférant plutôt utiliser **consequentlty** et **whilst**. Nous utiliserons la fréquence de ces 4 mots comme prédicteurs d'un modèle de régression linéaire, où la variable de résultat est la paternité d'un essai. Nous avons d'abord ajusté ce modèle de régression linéaire aux 66 essais dont la paternité est connue pour estimer les coefficients. Le modèle ajusté résultant peut ensuite être utilisé pour prédire la paternité inconnue des 11 essais sur la base des fréquences des 4 mots. Pour le modèle de régression linéaire, nous créons d'abord la variable de résultat en codant les essais rédigés par Hamilton comme 1 et ceux écrits par Madison comme -1. Nous construisons ensuite une base de données, qui contient cette variable de paternité ainsi que le terme matrice de fréquence tfm pour tous les essais dont la paternité est connue.
+
 
 ```{r}
 
@@ -697,18 +775,22 @@ hm_fit <- lm(author2 ~ upon + there + consequently + whilst,
              data = author_data)
 hm_fit
 
+summary(hm_fit)
 ```
 
 ```{r}
 
+library(summarytools)
 
 author_data <- author_data %>%
-  add_predictions(hm_fit) %>%
+  add_predictions(hm_fit) %>%     # Ajoute la valeur prédite de l'outcome, vient de modelr
   mutate(pred_author = if_else(pred >= 0, "Hamilton", "Madison"))
 
 ctable(author_data$pred_author, author_data$author, "c")
 
+
 ```
+
 
 ## Cross-validation
 
@@ -726,11 +808,21 @@ https://drsimonj.svbtle.com/k-fold-cross-validation-with-modelr-and-broom
 
 author_data %>%
   filter(!is.na(author)) %>%
-  group_by(author) %>%
+  group_by(author) %>% 
   summarise(`Proportion Correct` = mean(author == pred_author))
+
+## Voici la forme la plus longue du code avec le raccourci
+
+author_data %>%
+  filter(!is.na(author)) %>%
+  group_by(author) %>% 
+  mutate(pcorect = if_else(author == pred_author, 1, 0)) %>% 
+  summarise(`Proportion Correct` = mean(pcorect))
+
 
 
 ```
+
 
 
 ```{r}
@@ -740,30 +832,98 @@ crossv_loo <- function(data, id = ".id") {
   modelr::crossv_kfold(data, k = nrow(data), id = id)
 }
 
+
 # leave one out cross-validation object
+
 cv <- author_data %>%
   filter(!is.na(author)) %>%
   crossv_loo()
 
+as.integer(cv$train[[1]])
+as.integer(cv$test[[1]])
+
+# Je n'ai pas besoin de créer la fonction crossv_loo. 
+
+author_data_nona <- author_data %>% 
+  filter(!is.na(author))
+
+folds <- crossv_kfold(author_data_nona, k = 65, id = ".id")
+as.integer(folds$test[[1]])
+as.integer(folds$train[[1]])
 
 ```
+
+Une fois qu'on a retiré un essai, on estime le modèle sur le reste de l'échantillon. Il faut alors faire 65 régressions (sur les 65 folds). Voici ce que vous obtenez avec les deux premières régressions:
+
+```{r}
+
+lm(author2 ~ upon + there + consequently + whilst, data = cv$train[[1]], model = FALSE)
+lm(author2 ~ upon + there + consequently + whilst, data = cv$train[[2]], model = FALSE)
+
+```
+
+Vous pouvez alors utiliser le package purr pour faire l'ensemble des régressions pour vous. Si on veut suivre scrupuleusement comment map de purr fonctionne, on ferait:  
+
+```{r}
+
+## Créer une fonction
+mod_fun <- function(df){
+  lm(author2 ~ upon + there + consequently + whilst,
+                             data = df, model = FALSE)
+}
+
+## Appliquer cette fonction à toutes les bases de données de cv$train
+models1 <- purrr::map(cv$train, mod_fun)
+
+```
+
+Une manière plus compacte d'écrire la même chose est l'utilisation du premier ~ qui indique que ce qui suit est une fonction qui s'applique à data qui change chaque fois. Voici une explication détaillée : https://stackoverflow.com/questions/44834446/what-is-meaning-of-first-tilde-in-purrrmap ou https://www.rebeccabarter.com/blog/2019-08-19_purrr.
+
+Le package purr est un outil formidable à avoir.
 
 ```{r}
 
 models <- purrr::map(cv$train, ~ lm(author2 ~ upon + there + consequently + whilst,
                              data = ., model = FALSE))
 
+
 ```
+
+Maintenant que l'ensemble des régressions sont faites, on peut les évaluer sur la base de données qui sont laissée de côté. map2_df() va retourner une base de données
+
+En suivant la procédure de map2_df  de purr, je ferai:
 
 
 ```{r}
+
+## créer une fonction avec deux argument
+mod_fun2 <- function(mod, test){
+  add_predictions(as.data.frame(test), mod) %>% 
+    mutate(pred_author = if_else(pred >= 0, "Hamilton", "Madison"),
+                           correct = (pred_author == author))
+}
+  
+test2 <- map2_df(models, cv$test, mod_fun2)
+
+## la forme courte où la fonction est crée directement
+
 test <- map2_df(models, cv$test,
                 function(mod, test) {
                   add_predictions(as.data.frame(test), mod) %>%
-                    mutate(pred_author =
-                             if_else(pred >= 0, "Hamilton", "Madison"),
+                    mutate(pred_author = if_else(pred >= 0, "Hamilton", "Madison"),
                            correct = (pred_author == author))
                 })
+
+
+## Et si on veut se référer comme tantôt à l'utilisation du tilde, on écrirait
+
+test3 <- map2_df(models, cv$test,
+                 ~ add_predictions(as.data.frame(.y), .x) %>%
+                    mutate(pred_author = if_else(pred >= 0, "Hamilton", "Madison"),
+                           correct = (pred_author == author)))
+
+## Finalement, on peut voir combien de fois le modèle prédit correctement les authorship sur les 65 itérations
+
 test %>%
   group_by(author) %>%
   summarise(mean(correct))
@@ -771,8 +931,9 @@ test %>%
 
 ```
 
-The results below show that even when the cross validation procedure is used, the
-model continues to perfectly classify the authorship of each essay.
+Les résultats ci-dessous montrent que même lorsque la procédure de validation croisée est utilisée, le modèle continue à classer parfaitement l'auteur de chaque essai. Les essais de Madison ont 78% de chance d'être bien prédite.
+
+Le modèle étant bon, je peux alors prédire la paternité des autres essais, ce que nous avons déjà fait.
 
 
 ```{r}
@@ -792,7 +953,7 @@ author_data %>%
 disputed_essays <- filter(author_data, is.na(author))$id_num
 
 ggplot(mutate(author_data,
-              author = fct_explicit_na(factor(author), "Disputed")),
+              author = fct_na_value_to_level(author, "Disputed")),
        aes(y = id_num, x = pred, colour = author, shape = author)) +
   geom_ref_line(v = 0) +
   geom_point() +
@@ -810,5 +971,44 @@ ggplot(mutate(author_data,
 
 
 
+## Références
+
 https://guides.loc.gov/federalist-papers/text-1-10#s-lg-box-wrapper-25493264
 https://guides.loc.gov/federalist-papers/text-1-10#s-lg-box-wrapper-25493265
+
+
+## Annexe
+
+Quelques essaies de codes sont ici:
+
+<!--
+
+
+Voyons comment fonctionne la fonction crossv_kfold de modelr
+
+```{r}
+
+data_essai <- data_frame(id = c(1,2,3,4,5), y = c("a","b","c","d","e"), z = c("aa", "ab", "ac", "ad", "ae"))
+
+a <- resample(data_essai, 1:2)
+as.data.frame(a)
+
+
+data_essai_2 <- crossv_kfold(data_essai, k = 3, id = ".id")
+
+data_essai_2$test[[1]]
+data_essai_2$test[[2]]
+data_essai_2$test[[3]]
+data_essai_2$train[[1]]
+data_essai_2$train[[2]]
+data_essai_2$train[[3]]
+
+data_essai2_df <- as.data.frame(data_essai_2$train[[1]])
+as.integer(data_essai_2$train[[1]])
+
+resampl
+
+crossvk
+
+```
+-->
