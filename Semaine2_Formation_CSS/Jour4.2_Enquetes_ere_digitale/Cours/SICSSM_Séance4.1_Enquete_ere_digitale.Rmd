@@ -92,7 +92,7 @@ https://academic.oup.com/poq/article/74/5/849/1817502
 
 - Erreur totale = erreur de mesure + erreur de couverture
 
-![](../Données/enq1.png)
+![](../Figs/enq1.png)
 
 - Le cadre d'erreur totale d'enquête nous aide également à réfléchir à la façon dont l'ère numérique peut créer de nouvelles opportunités (à qui demander et comment demander)
 
@@ -182,18 +182,18 @@ Quelle est l'estimé de la taille moyenne?
 
 ## Conclusion
 
-![](../Données/enq2.png)
+![](../Figs/enq2.png)
 
 ## Conclusion
 
-![](../Données/enq3.png)
+![](../Figs/enq3.png)
 
 ## Conclusion
 
 - Les échantillons n'ont pas besoin de ressembler à des mini-populations
 - La clé pour faire de bonnes estimations est que le processus d'estimation prenne en compte le processus d'échantillonnage
 - Il n'y a pas de différence nette entre l'échantillonnage probabiliste en pratique et l'échantillonnage non probabiliste
-- Pour en savoir plus : Lohr (2009) ou Sandal et al (2013)
+- Pour en savoir plus : Lohr(2009) ou Sandal et al.(2013)
 
 
 Enquêtes administrées par les machines
@@ -229,19 +229,19 @@ Troisième période  Non probabiliste     Par ordinateur     **Lié**
 
 ## Deux perspectives
 
-![](../Données/enq4.png)
+![](../Figs/enq4.png)
 
 ## cas 1:
 
 [Ansolabehere and Hersh (2012)](https://www.jstor.org/stable/23359641)
 
-![](../Données/enq5.png)
+![](../Figs/enq5.png)
 
 ## Cas 2: 
 
 [Blumenstock, Cadamuro, and On (2015)](https://science.sciencemag.org/content/350/6264/1073)
 
-![](../Données/Blumenstock.jpg)
+![](../Figs/Blumenstock.jpg)
 
 
 ## Prédire la pauvreté}
@@ -263,17 +263,17 @@ L'étude combine des données volumineuses (Big Data) avec des données d'enquê
 
 ## Prédire la pauvreté}
 
-![](../Données/Matthews2.png)
+![](../Figs/Matthews2.png)
 
 ## Prédire la pauvreté}
 
 
-![](../Données/blum_pp.png) 
+![](../Figs/blum_pp.png) 
 
 
 ## Prédire la pauvreté}
 
-![](../Données/blum_pp2.png)
+![](../Figs/blum_pp2.png)
 
 
 ## Prédire la pauvreté}
@@ -295,5 +295,3 @@ L'étude combine des données volumineuses (Big Data) avec des données d'enquê
 [Galesic et al. Asking about social circles improves election predictions](https://www.nature.com/articles/s41562-018-0302-y)
 
 
-Additions et extensions
-===============================================

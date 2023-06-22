@@ -80,6 +80,10 @@ data <- read_csv("https://raw.githubusercontent.com/compsocialscience/summer-ins
 # Charger les informations additionnelles -- Les données sur la population
 census <- read_csv("https://raw.githubusercontent.com/compsocialscience/summer-institute/master/2020/materials/day4-surveys/activity/2017_acs_data_clean.csv")
 
+write_csv(census, file = "../Data/census.csv")
+
+census1 <- read_csv("../Data/census.csv")
+
 # Charger les "vrais" résultats
 pew <- read_csv("https://raw.githubusercontent.com/compsocialscience/summer-institute/master/2020/materials/day4-surveys/activity/pew_benchmark_question_source_sicss_2020.csv")
 pew <- pew %>% select(qid, pew_estimate)
@@ -323,7 +327,7 @@ summary()
 
 ### 3.1.1) Traiter les groupes manquants : imputation avec des moyennes d'échantillon
 
-Maintenant, remplacez les groupes manquants par les moyens d'échantillon que vous avez calculés en 1.1.
+Maintenant, remplacez les groupes manquants par les moyennes d'échantillon que vous avez calculés en 1.1.
 
 ```{r}
 # remplacer les moyennes de groupe manquantes par des moyennes d'échantillon

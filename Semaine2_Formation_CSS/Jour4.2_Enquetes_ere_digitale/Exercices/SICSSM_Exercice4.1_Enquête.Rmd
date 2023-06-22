@@ -58,8 +58,12 @@ Lire l'introduction à la [poststratification](https://github.com/compsocialscie
 
 2.	Analysez les données que nous avons collectées précédemment (60 minutes).
 
--	En raison des contraintes financières, chaque groupe ne peut collecter qu'un petit nombre de réponses. Par conséquent, nous avons pré-collecté un grand ensemble de données que tous les groupes peuvent analyser. Notez que pour les questions de priorité politique qui ont quatre réponses possibles, nous avons transformé les réponses en binaire dans notre étape de nettoyage des données où nous avons codé "TOP PRIORITY" comme "1" et toutes les autres réponses comme "0". Téléchargez les données que nous avons recueillies avec ce questionnaire auprès des travailleurs de MTurk ici.
--	Comparez les estimations brutes (non pondérées) aux résultats obtenus par Pew [3]. Comparez ensuite les estimations après avoir effectué une cell-based post-stratification. Utilisez ce modèle pendant que vous travaillez sur ces étapes. Il vous aidera à reproduire les figures 1 et 2 de Goel et al. et à éviter certains problèmes fréquents.
+-	En raison des contraintes financières, chaque groupe ne peut collecter qu'un petit nombre de réponses. Par conséquent, nous avons pré-collecté un grand ensemble de données que tous les groupes peuvent analyser. Notez que pour les questions de priorité politique qui ont quatre réponses possibles, nous avons transformé les réponses en binaire dans notre étape de nettoyage des données où nous avons codé "TOP PRIORITY" comme "1" et toutes les autres réponses comme "0". Chargez les données que nous avons recueillies avec ce questionnaire auprès des travailleurs de MTurk. Ces données appelées **2020_06_clean_mturk_data.csv** se trouvent dans le fichier Data.
+
+1.	Comparez les estimations brutes (non pondérées) aux résultats obtenus par Pew [3]. Les résultats de Pew se trouvent dans la base de données **pew_benchmark_question_source_sicss_2020.csv**.
+
+2. Comparez ensuite les estimations après avoir effectué une cell-based post-stratification. Utilisez le modèle ci-dessous décrit dans le chunck pendant que vous travaillez sur ces étapes. Il vous aidera à reproduire les figures 1 et 2 de Goel et al. et à éviter certains problèmes fréquents.
+
 -	En raison de la contrainte de temps, vous ne serez pas en mesure d'utiliser des techniques aussi compliquées que celles de l'article de Goel et al. Cependant, ces sections sont marquées comme extension optionnelle dans le code du modèle, et nous fournissons les instructions sur la façon de les réaliser dans le code ici.
 
 Nous n'avons pas eu le temps de collecter les données aujourd'hui. Nous allons donc utiliser les données collectées l'année passée. Le chunck suivant vous aide à télécharger ces données:
@@ -83,6 +87,7 @@ census <- read_csv("https://raw.githubusercontent.com/compsocialscience/summer-i
 # Charger les "vrais" résultats
 pew <- read_csv("https://raw.githubusercontent.com/compsocialscience/summer-institute/master/2020/materials/day4-surveys/activity/pew_benchmark_question_source_sicss_2020.csv")
 pew <- pew %>% select(qid, pew_estimate)
+
 ```
 
 \newpage
