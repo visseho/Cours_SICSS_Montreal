@@ -180,6 +180,8 @@ Quelle est l'estimé de la taille moyenne?
 
 - Comment cela pourrait-il mal tourner ?
 
+<!-- La clé de la post-stratification est de former les bons groupes. Si vous pouvez découper la population en groupes homogènes de sorte que les propensions à répondre soient les mêmes pour tous les membres de chaque groupe, la post-stratification produira des estimations non biaisées. En d'autres termes, la post-stratification par sexe produira des estimations non biaisées si tous les hommes ont la propension à répondre et si toutes les femmes ont la même propension à répondre. Cette hypothèse est appelée l'hypothèse homogène-réponse-propensions-à- l'intérieur des groupes , et je la décris un peu plus dans les notes mathématiques à la fin de ce chapitre.-->
+
 ## Conclusion
 
 ![](../Figs/enq2.png)
@@ -194,6 +196,8 @@ Quelle est l'estimé de la taille moyenne?
 - La clé pour faire de bonnes estimations est que le processus d'estimation prenne en compte le processus d'échantillonnage
 - Il n'y a pas de différence nette entre l'échantillonnage probabiliste en pratique et l'échantillonnage non probabiliste
 - Pour en savoir plus : Lohr(2009) ou Sandal et al.(2013)
+
+<!--Il y a deux leçons principales de l'étude de Wang et de ses collègues. Premièrement, les échantillons non probabilistes non ajustés peuvent conduire à de mauvaises estimations; C'est une leçon que de nombreux chercheurs ont déjà entendue. La deuxième leçon, cependant, est que les échantillons non probabilistes, lorsqu'ils sont analysés correctement, peuvent effectivement produire de bonnes estimations; les échantillons non probabilistes ne doivent pas automatiquement conduire à quelque chose comme le fiasco Literary Digest .-->
 
 
 Enquêtes administrées par les machines
@@ -211,6 +215,26 @@ Deuxième période   Probabilité de       Téléphone          Autonome
 Troisième période  Non probabiliste     **Par ordinateur** Lié
 
 
+<!--Une étude de Michael Schober et ses collègues (2015) illustre les avantages de l'ajustement des approches traditionnelles pour mieux correspondre aux systèmes de communication numériques. Dans cette étude, Schober et ses collègues ont comparé différentes approches pour poser des questions aux gens via un téléphone mobile. Ils ont comparé la collecte de données via des conversations vocales, ce qui aurait été une traduction naturelle des approches de la deuxième ère, à la collecte de données via de nombreuses microsurveys envoyées par SMS, une approche sans précédent évident. Ils ont découvert que les microsurveys envoyés par texto conduisaient à des données de meilleure qualité que les interviews vocales. En d'autres termes, le simple transfert de l'ancienne approche dans le nouveau support n'a pas conduit à des données de la plus haute qualité. Au lieu de cela, en pensant clairement aux capacités et aux normes sociales autour des téléphones mobiles, Schober et ses collègues ont pu développer une meilleure façon de poser des questions qui mènent à des réponses de meilleure qualité.-->
+
+
+## Administré par ordinateur
+
+- Opportunités
+    - réduire le biais de désirabilité sociale: la tendance des répondants à essayer de se présenter de la meilleure façon possible
+    - éliminer les effets de l'intervieweur : la tendance des réponses à être influencée de façon subtile par les caractéristiques de l'intervieweur humain
+    - Réduction des coûts : temps et argent
+    - Augmente la flexibilité pour les répondants
+    
+## Administré par ordinateur
+
+- Défis
+    - Réduire les taux de non-réponses
+    - Clarifier les questions confuses
+    - Maintenir l'engagement des répondants
+
+<!--En termes d'avantages, retirer les intervieweurs humains peut réduire le biais de désirabilité sociale , la tendance des répondants à essayer de se présenter de la meilleure façon possible, par exemple, sous-déclaration des comportements stigmatisés (p. comportement (p. ex. vote) (Kreuter, Presser, and Tourangeau 2008) . L'élimination des intervieweurs humains peut également éliminer les effets de l'intervieweur , la tendance des réponses à être influencée de façon subtile par les caractéristiques de l'intervieweur humain (West and Blom 2016) . En plus d'améliorer la précision pour certains types de questions, la suppression des intervieweurs humains réduit considérablement les coûts - le temps d'entrevue est l'une des dépenses les plus importantes dans la recherche par sondage - et augmente la flexibilité parce que les répondants peuvent participer quand ils le veulent. . Cependant, supprimer l'intervieweur humain crée également des défis. En particulier, les enquêteurs peuvent établir un rapport avec les répondants qui peut augmenter les taux de participation, clarifier des questions confuses et maintenir l'engagement des répondants pendant qu'ils parcourent un questionnaire long (potentiellement fastidieux) (Garbarski, Schaeffer, and Dykema 2016) . Ainsi, passer d'un mode d'enquête administré par un intervieweur à un mode administré par ordinateur crée des opportunités et des défis.-->
+
 
 Combiner les enquêtes avec les données massives
 =================================================
@@ -227,6 +251,7 @@ Deuxième période   Probabilité de       Téléphone          Autonome
                    rique aléatoire
 Troisième période  Non probabiliste     Par ordinateur     **Lié**
 
+
 ## Deux perspectives
 
 ![](../Figs/enq4.png)
@@ -236,6 +261,16 @@ Troisième période  Non probabiliste     Par ordinateur     **Lié**
 [Ansolabehere and Hersh (2012)](https://www.jstor.org/stable/23359641)
 
 ![](../Figs/enq5.png)
+
+
+## cas 1:
+
+[Ansolabehere and Hersh (2012)](https://www.jstor.org/stable/23359641)
+
+![](../Figs/enrichi.jpg)
+
+<!--Figure 3.13: Schéma de l'étude réalisée par Ansolabehere and Hersh (2012) . Pour créer le fichier de données maître, Catalist combine et harmonise les informations de nombreuses sources différentes. Ce processus de fusion, peu importe la prudence, propage les erreurs dans les sources de données d'origine et introduit de nouvelles erreurs. Une deuxième source d'erreurs est le couplage d'enregistrements entre les données d'enquête et le fichier de données maître. Si chaque personne avait un identifiant unique et stable dans les deux sources de données, alors le couplage serait trivial. Mais, Catalist a dû faire le lien en utilisant des identifiants imparfaits, dans ce cas, le nom, le sexe, l'année de naissance, et l'adresse du domicile. Malheureusement, dans de nombreux cas, il peut y avoir des informations incomplètes ou inexactes; un électeur nommé Homer Simpson pourrait apparaître comme Homer Jay Simpson, Homie J Simpson, ou même Homer Sampsin. Malgré le potentiel d'erreurs dans le fichier de données maître Catalyst et les erreurs dans le couplage d'enregistrements, Ansolabehere et Hersh ont pu établir la confiance dans leurs estimations grâce à différents types de contrôles -->
+
 
 ## Cas 2: 
 
